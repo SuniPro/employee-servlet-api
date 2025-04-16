@@ -1,0 +1,69 @@
+package com.taekang.employeeservletapi.controller;
+
+import com.taekang.employeeservletapi.DTO.EmployeeDTO;
+import com.taekang.employeeservletapi.DTO.RegisterRequestDTO;
+import com.taekang.employeeservletapi.entity.employee.Department;
+import com.taekang.employeeservletapi.entity.employee.Employee;
+import com.taekang.employeeservletapi.entity.employee.Level;
+import com.taekang.employeeservletapi.service.EmployeeService;
+import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.http.ResponseEntity;
+import org.springframework.web.bind.annotation.*;
+
+import java.util.List;
+
+@RestController
+@RequestMapping("employee")
+public class EmployeeController {
+
+  private final EmployeeService employeeService;
+
+  @Autowired
+  public EmployeeController(EmployeeService employeeService) {
+    this.employeeService = employeeService;
+  }
+
+  @PostMapping("create")
+  public ResponseEntity<Employee> createEmployee(
+      @RequestBody RegisterRequestDTO registerRequestDTO) {
+    return ResponseEntity.ok().body(employeeService.createEmployee(registerRequestDTO));
+  }
+
+  @PutMapping("update")
+  public ResponseEntity<Employee> updateEmployee(@RequestBody EmployeeDTO employeeDTO) {
+    return ResponseEntity.ok().body(employeeService.updateEmployee(employeeDTO));
+  }
+
+  @GetMapping("get/by/{id}")
+  public ResponseEntity<Employee> getEmployeeById(@PathVariable Long id) {
+    return ResponseEntity.ok().body(employeeService.getEmployeeById(id));
+  }
+
+  @GetMapping("get/by/{name}")
+  public ResponseEntity<Employee> getEmployeeByName(@PathVariable String name) {
+    return ResponseEntity.ok().body(employeeService.getEmployeeByName(name));
+  }
+
+  @GetMapping("get/all")
+  public ResponseEntity<List<Employee>> getAllEmployees() {
+    return ResponseEntity.ok().body(employeeService.getAllEmployees());
+  }
+
+  @GetMapping("get/by/{department}")
+  public ResponseEntity<List<Employee>> getEmployeeListByDepartment(
+      @PathVariable Department department) {
+    return ResponseEntity.ok().body(employeeService.getEmployeeListByDepartment(department));
+  }
+
+  @GetMapping("get/by/{level}")
+  public ResponseEntity<List<Employee>> getEmployeeListByLevel(@PathVariable Level level) {
+    return ResponseEntity.ok().body(employeeService.getEmployeeListByLevel(level));
+  }
+
+  @DeleteMapping("delete/by/{id}")
+  public ResponseEntity<Long> deleteEmployee(@PathVariable Long id) {
+    employeeService.deleteEmployeeById(id);
+
+    return ResponseEntity.ok().body(id);
+  }
+}

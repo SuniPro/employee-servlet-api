@@ -1,0 +1,33 @@
+package com.taekang.employeeservletapi.entity.employee;
+
+import jakarta.persistence.*;
+import lombok.*;
+
+import java.time.LocalDateTime;
+
+@Getter
+@Entity
+@Table(
+    name = "notify_read",
+    uniqueConstraints = @UniqueConstraint(columnNames = {"employee_id", "notify_id"}))
+@NoArgsConstructor(access = AccessLevel.PROTECTED)
+@AllArgsConstructor(access = AccessLevel.PRIVATE) // 빌더 사용 시 필수
+@Builder
+public class NotifyRead {
+
+  @Id
+  @Column(name = "id")
+  @GeneratedValue(strategy = GenerationType.IDENTITY)
+  private Long id;
+
+  @ManyToOne
+  @JoinColumn(name = "employee_id")
+  private Employee employee;
+
+  @ManyToOne
+  @JoinColumn(name = "notify_id")
+  private Notify notify;
+
+  @Column(name = "read_time")
+  private LocalDateTime readTime;
+}

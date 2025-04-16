@@ -10,7 +10,6 @@ import com.taekang.employeeservletapi.error.NotifyNotFoundedException;
 import com.taekang.employeeservletapi.repository.employee.EmployeeRepository;
 import com.taekang.employeeservletapi.repository.employee.NotifyReadRepository;
 import com.taekang.employeeservletapi.repository.employee.NotifyRepository;
-import com.taekang.employeeservletapi.service.EmployeeService;
 import com.taekang.employeeservletapi.service.NotifyService;
 import java.time.LocalDateTime;
 import java.util.List;
@@ -31,7 +30,6 @@ public class NotifyServiceImplements implements NotifyService {
   public NotifyServiceImplements(
       NotifyRepository notifyRepository,
       NotifyReadRepository notifyReadRepository,
-      EmployeeService employeeService,
       EmployeeRepository employeeRepository) {
     this.notifyRepository = notifyRepository;
     this.notifyReadRepository = notifyReadRepository;

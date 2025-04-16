@@ -57,7 +57,7 @@ public interface NotifyReadRepository extends JpaRepository<NotifyRead, Long> {
                       FROM notify_read r
                       WHERE r.employee_id = :employeeId
                   )
-                  ORDER BY n.insert_time DESC
+                  ORDER BY n.insert_date_time DESC
                   """,
       nativeQuery = true)
   List<Notify> findReadNotifyListByEmployee(@Param("employeeId") Long employeeId);
@@ -72,7 +72,7 @@ public interface NotifyReadRepository extends JpaRepository<NotifyRead, Long> {
         WHERE r.notify_id = n.id
           AND r.employee_id = :employeeId
       )
-    ORDER BY n.insert_time DESC
+    ORDER BY n.insert_date_time DESC
 """,
       nativeQuery = true)
   List<Notify> findUnreadNotifyListByEmployee(
@@ -86,7 +86,7 @@ public interface NotifyReadRepository extends JpaRepository<NotifyRead, Long> {
                   FROM notify_read
                   WHERE employee_id = :employeeId
               )
-              ORDER BY n.insert_time DESC
+              ORDER BY n.insert_date_time DESC
           """, nativeQuery = true)
   List<Notify> findUnreadNotifyAllLevelByEmployee(@Param("employeeId") Long employeeId);
 

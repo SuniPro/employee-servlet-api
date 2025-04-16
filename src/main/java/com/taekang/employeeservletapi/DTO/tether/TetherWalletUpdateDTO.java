@@ -10,5 +10,5 @@ import lombok.Setter;
 @NoArgsConstructor
 @AllArgsConstructor
 public class TetherWalletUpdateDTO {
-    private String tetherWallet;
+  private String tetherWallet;
 }

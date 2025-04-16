@@ -130,8 +130,11 @@ public class TetherServiceImplements implements TetherService {
 
   @Override
   public TetherDeposit getLatestDeposit(Long id) {
-    TetherAccount tetherAccount = tetherAccountRepository.findById(id).orElseThrow(AccountNotFoundException::new);
-    return tetherDepositRepository.findTopByTetherAccountOrderByRequestedAtDesc(tetherAccount).orElseThrow(AccountNotFoundException::new);
+    TetherAccount tetherAccount =
+        tetherAccountRepository.findById(id).orElseThrow(AccountNotFoundException::new);
+    return tetherDepositRepository
+        .findTopByTetherAccountOrderByRequestedAtDesc(tetherAccount)
+        .orElseThrow(AccountNotFoundException::new);
   }
 
   /** 특정 지갑의 마지막 입금 내역을 조회합니다. */

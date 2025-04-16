@@ -67,7 +67,7 @@ public class SecurityConfig {
 
     httpSecurity.authorizeHttpRequests(
         authorizeRequests ->
-                // @PreAuthorization 을 사용 예정이라 모든 경로에 대한 인증처리는 일단 허가합니다.
+            // @PreAuthorization 을 사용 예정이라 모든 경로에 대한 인증처리는 일단 허가합니다.
             authorizeRequests.requestMatchers(AUTH_WHITELIST).permitAll().anyRequest().permitAll()
         //            .anyRequest().authenticated()
         );

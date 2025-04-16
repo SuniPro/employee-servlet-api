@@ -19,15 +19,15 @@ import lombok.experimental.SuperBuilder;
 @AllArgsConstructor(access = AccessLevel.PRIVATE)
 public abstract class TetherBaseTransaction {
 
-    @ManyToOne(fetch = FetchType.LAZY)
-    @JoinColumn(name="tether_account_id", nullable = false)
-    private TetherAccount tetherAccount;
+  @ManyToOne(fetch = FetchType.LAZY)
+  @JoinColumn(name = "tether_account_id", nullable = false)
+  private TetherAccount tetherAccount;
 
-    private BigDecimal amount;
+  private BigDecimal amount;
 
-    private Boolean accepted;
+  private Boolean accepted;
 
-    private LocalDateTime acceptedAt;
+  private LocalDateTime acceptedAt;
 
-    private LocalDateTime requestedAt;
+  private LocalDateTime requestedAt;
 }

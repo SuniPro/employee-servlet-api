@@ -4,13 +4,12 @@ import com.taekang.employeeservletapi.entity.employee.Employee;
 import com.taekang.employeeservletapi.entity.employee.Level;
 import com.taekang.employeeservletapi.entity.employee.Notify;
 import com.taekang.employeeservletapi.entity.employee.NotifyRead;
+import java.util.List;
+import java.util.Optional;
 import org.springframework.data.jpa.repository.JpaRepository;
 import org.springframework.data.jpa.repository.Query;
 import org.springframework.data.repository.query.Param;
 import org.springframework.stereotype.Repository;
-
-import java.util.List;
-import java.util.Optional;
 
 @Repository
 public interface NotifyReadRepository extends JpaRepository<NotifyRead, Long> {
@@ -49,7 +48,7 @@ public interface NotifyReadRepository extends JpaRepository<NotifyRead, Long> {
 
   @Query(
       value =
-          """ 
+          """
                   SELECT n.*
                   FROM notify n
                   WHERE n.id IN (
@@ -78,7 +77,9 @@ public interface NotifyReadRepository extends JpaRepository<NotifyRead, Long> {
   List<Notify> findUnreadNotifyListByEmployee(
       @Param("employeeId") Long employeeId, @Param("level") Level level);
 
-  @Query(value = """
+  @Query(
+      value =
+          """
               SELECT n.*
               FROM notify n
               WHERE n.id NOT IN (
@@ -87,7 +88,7 @@ public interface NotifyReadRepository extends JpaRepository<NotifyRead, Long> {
                   WHERE employee_id = :employeeId
               )
               ORDER BY n.insert_date_time DESC
-          """, nativeQuery = true)
+          """,
+      nativeQuery = true)
   List<Notify> findUnreadNotifyAllLevelByEmployee(@Param("employeeId") Long employeeId);
-
 }

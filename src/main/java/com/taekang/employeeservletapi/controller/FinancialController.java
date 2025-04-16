@@ -19,7 +19,8 @@ import org.springframework.web.bind.annotation.*;
 public class FinancialController {
 
   private static final String MANAGER_ACCESS =
-          "hasAnyAuthority('LEVEL_CEO', 'LEVEL_COO', 'LEVEL_CFO', 'LEVEL_CIO', 'LEVEL_CTO', 'LEVEL_CDO', 'LEVEL_MANAGER', 'LEVEL_OFFICEMANAGER', 'LEVEL_SENIORMANAGER')";
+      "hasAnyAuthority('LEVEL_CEO', 'LEVEL_COO', 'LEVEL_CFO', 'LEVEL_CIO', 'LEVEL_CTO',"
+          + " 'LEVEL_CDO', 'LEVEL_MANAGER', 'LEVEL_OFFICEMANAGER', 'LEVEL_SENIORMANAGER')";
 
   private final TetherService tetherService;
 
@@ -30,13 +31,16 @@ public class FinancialController {
 
   @PreAuthorize(MANAGER_ACCESS)
   @PatchMapping("change/tether/wallet")
-  public ResponseEntity<TetherAccount> updateTetherWallet(@RequestBody TetherWalletUpdateDTO tetherWalletUpdateDTO) {
-    return ResponseEntity.ok().body(tetherService.updateTetherWallet(tetherWalletUpdateDTO.getTetherWallet()));
+  public ResponseEntity<TetherAccount> updateTetherWallet(
+      @RequestBody TetherWalletUpdateDTO tetherWalletUpdateDTO) {
+    return ResponseEntity.ok()
+        .body(tetherService.updateTetherWallet(tetherWalletUpdateDTO.getTetherWallet()));
   }
 
   @PreAuthorize(MANAGER_ACCESS)
   @PatchMapping("accept/deposit")
-  public ResponseEntity<Boolean> approveDeposit(@RequestBody TetherDepositAcceptedDTO tetherDepositAcceptedDTO) {
+  public ResponseEntity<Boolean> approveDeposit(
+      @RequestBody TetherDepositAcceptedDTO tetherDepositAcceptedDTO) {
     return ResponseEntity.ok().body(tetherService.depositAccept(tetherDepositAcceptedDTO));
   }
 

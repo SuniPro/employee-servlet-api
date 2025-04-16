@@ -35,7 +35,8 @@ public class ReviewController {
   }
 
   @GetMapping("get/ability/set/by/{employeeId}")
-  public ResponseEntity<EmployeesAbilityDTO> getAbilitySetById(@PathVariable Long employeeId, HttpServletRequest request) {
+  public ResponseEntity<EmployeesAbilityDTO> getAbilitySetById(
+      @PathVariable Long employeeId, HttpServletRequest request) {
     String token = jwtUtil.getAccessTokenInCookie(request);
 
     boolean validationToken = jwtUtil.validateToken(token);
@@ -45,7 +46,8 @@ public class ReviewController {
 
     String level = jwtUtil.getLevel(token);
 
-    return ResponseEntity.ok().body(reviewService.getEmployeeAbility(Level.valueOf(level), employeeId));
+    return ResponseEntity.ok()
+        .body(reviewService.getEmployeeAbility(Level.valueOf(level), employeeId));
   }
 
   @GetMapping("get/ability/by/{id}")

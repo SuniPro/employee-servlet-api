@@ -16,8 +16,8 @@ import org.springframework.web.bind.annotation.*;
 public class NotifyController {
 
   private static final String MANAGER_ACCESS =
-          "hasAnyAuthority('LEVEL_CEO', 'LEVEL_COO', 'LEVEL_CFO', 'LEVEL_CIO', 'LEVEL_CTO', 'LEVEL_CDO', 'LEVEL_MANAGER', 'LEVEL_OFFICEMANAGER', 'LEVEL_SENIORMANAGER')";
-
+      "hasAnyAuthority('LEVEL_CEO', 'LEVEL_COO', 'LEVEL_CFO', 'LEVEL_CIO', 'LEVEL_CTO',"
+          + " 'LEVEL_CDO', 'LEVEL_MANAGER', 'LEVEL_OFFICEMANAGER', 'LEVEL_SENIORMANAGER')";
 
   private final NotifyService notifyService;
 
@@ -76,8 +76,7 @@ public class NotifyController {
   }
 
   @GetMapping("read/about/notify/{id}/{employeeId}")
-  public ResponseEntity<Boolean> isRead(
-      @PathVariable Long id, @PathVariable Long employeeId) {
+  public ResponseEntity<Boolean> isRead(@PathVariable Long id, @PathVariable Long employeeId) {
     return ResponseEntity.ok().body(notifyService.isNotifyRead(id, employeeId));
   }
 
@@ -95,13 +94,16 @@ public class NotifyController {
 
   @GetMapping("get/unread/{employeeId}/{level}")
   @PreAuthorize(MANAGER_ACCESS)
-  public ResponseEntity<List<Notify>> getNotifyListByUnReadEmployee(@PathVariable Long employeeId, @PathVariable Level level) {
+  public ResponseEntity<List<Notify>> getNotifyListByUnReadEmployee(
+      @PathVariable Long employeeId, @PathVariable Level level) {
     return ResponseEntity.ok().body(notifyService.getUnreadNotifyListByEmployee(employeeId, level));
   }
 
   @GetMapping("get/unread/all/{employeeId}/{level}")
   @PreAuthorize(MANAGER_ACCESS)
-  public ResponseEntity<List<Notify>> getAllNotifyListByUnReadEmployee(@PathVariable Long employeeId, @PathVariable Level level) {
-    return ResponseEntity.ok().body(notifyService.getAllUnreadNotifyListByEmployee(employeeId, level));
+  public ResponseEntity<List<Notify>> getAllNotifyListByUnReadEmployee(
+      @PathVariable Long employeeId, @PathVariable Level level) {
+    return ResponseEntity.ok()
+        .body(notifyService.getAllUnreadNotifyListByEmployee(employeeId, level));
   }
 }

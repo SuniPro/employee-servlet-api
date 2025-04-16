@@ -9,13 +9,13 @@ import org.springframework.stereotype.Service;
 @Service
 public class RegisterRequestDTO {
 
-    private String name;
+  private String name;
 
-    private String password;
+  private String password;
 
-    private Department department;
+  private Department department;
 
-    private Level level;
+  private Level level;
 
-    private String insertName;
+  private String insertName;
 }

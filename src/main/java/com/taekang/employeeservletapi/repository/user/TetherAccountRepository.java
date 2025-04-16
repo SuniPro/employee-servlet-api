@@ -6,5 +6,5 @@ import org.springframework.data.jpa.repository.JpaRepository;
 
 public interface TetherAccountRepository extends JpaRepository<TetherAccount, Long> {
 
-    Optional<TetherAccount> findByTetherWallet(String tetherWallet);
+  Optional<TetherAccount> findByTetherWallet(String tetherWallet);
 }

@@ -10,9 +10,9 @@ import lombok.*;
 @AllArgsConstructor
 public class TetherDepositAcceptedDTO {
 
-    private Long depositId;
+  private Long depositId;
 
-    private String tetherWallet;
-    
-    private BigDecimal amount;
+  private String tetherWallet;
+
+  private BigDecimal amount;
 }

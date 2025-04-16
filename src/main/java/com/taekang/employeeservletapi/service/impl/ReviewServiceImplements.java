@@ -11,20 +11,19 @@ import com.taekang.employeeservletapi.repository.employee.AbilityRepository;
 import com.taekang.employeeservletapi.repository.employee.CommuteRepository;
 import com.taekang.employeeservletapi.repository.employee.EmployeeRepository;
 import com.taekang.employeeservletapi.service.ReviewService;
-import lombok.extern.slf4j.Slf4j;
-import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.stereotype.Service;
-
 import java.time.*;
 import java.util.*;
 import java.util.function.ToDoubleFunction;
 import java.util.stream.Collectors;
+import lombok.extern.slf4j.Slf4j;
+import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.stereotype.Service;
 
 @Slf4j
 @Service
 public class ReviewServiceImplements implements ReviewService {
 
-    private final CommuteRepository commuteRepository;
+  private final CommuteRepository commuteRepository;
   private final AbilityRepository abilityRepository;
   private final EmployeeRepository employeeRepository;
 
@@ -94,22 +93,24 @@ public class ReviewServiceImplements implements ReviewService {
   @Override
   public List<WorkBalanceDTO> getWorkBalanceByEmployeeId(Long employeeId) {
     LocalDateTime minus3Month = LocalDateTime.now().minusMonths(3);
-    List<Commute> commutes = commuteRepository.findCommuteByEmployee_IdAndOnTimeBetween(employeeId, minus3Month, LocalDateTime.now());
+    List<Commute> commutes =
+        commuteRepository.findCommuteByEmployee_IdAndOnTimeBetween(
+            employeeId, minus3Month, LocalDateTime.now());
 
     return commutes.stream()
-            .map(commute -> {
+        .map(
+            commute -> {
               Duration duration = Duration.between(commute.getOnTime(), commute.getOffTime());
               Integer workTime = Math.toIntExact(duration.toHours());
 
               return WorkBalanceDTO.builder()
-                      .employeeId(employeeId)
-                      .workBalance(workTime)
-                      .date(commute.getOnTime())
-                      .build();
+                  .employeeId(employeeId)
+                  .workBalance(workTime)
+                  .date(commute.getOnTime())
+                  .build();
             })
-            .toList();
+        .toList();
   }
-
 
   @Override
   public void abilityReview(AbilityDTO abilityDTO) {
@@ -161,7 +162,8 @@ public class ReviewServiceImplements implements ReviewService {
     List<Ability> employeeAbility = abilityRepository.findByEmployee_Id(targetEmployee.getId());
     employeesAbilityDTO.setEmployeeId(employeeId);
     employeesAbilityDTO.setAbility(getAverageAbilityInfo(employeeAbility));
-    employeesAbilityDTO.setEmployeesAbilityList(getAdjustedAbilitiesByEmployeeList(anotherEmployees));
+    employeesAbilityDTO.setEmployeesAbilityList(
+        getAdjustedAbilitiesByEmployeeList(anotherEmployees));
 
     return employeesAbilityDTO;
   }
@@ -191,24 +193,22 @@ public class ReviewServiceImplements implements ReviewService {
 
   private AbilityDTO getAverageAbilityInfo(List<Ability> abilities) {
     return AbilityDTO.builder()
-            .id(abilities.get(0).getId())
-            .employee(abilities.get(0).getEmployee())
-            .attitude(adjustedWeightedAverage(abilities, Ability::getAttitude))
-            .teamwork(adjustedWeightedAverage(abilities, Ability::getTeamwork))
-            .creativity(adjustedWeightedAverage(abilities, Ability::getCreativity))
-            .workPerformance(adjustedWeightedAverage(abilities, Ability::getWorkPerformance))
-            .knowledgeLevel(adjustedWeightedAverage(abilities, Ability::getKnowledgeLevel))
-            .build();
+        .id(abilities.get(0).getId())
+        .employee(abilities.get(0).getEmployee())
+        .attitude(adjustedWeightedAverage(abilities, Ability::getAttitude))
+        .teamwork(adjustedWeightedAverage(abilities, Ability::getTeamwork))
+        .creativity(adjustedWeightedAverage(abilities, Ability::getCreativity))
+        .workPerformance(adjustedWeightedAverage(abilities, Ability::getWorkPerformance))
+        .knowledgeLevel(adjustedWeightedAverage(abilities, Ability::getKnowledgeLevel))
+        .build();
   }
 
   private double adjustedWeightedAverage(
-          List<Ability> abilities,
-          ToDoubleFunction<Ability> getter
-  ) {
+      List<Ability> abilities, ToDoubleFunction<Ability> getter) {
     int count = abilities.size();
     double sum = abilities.stream().mapToDouble(getter).sum();
-      int PSEUDO_COUNT = 5;
-      double GLOBAL_MEAN = 2.7;
-      return (sum + GLOBAL_MEAN * PSEUDO_COUNT) / (count + PSEUDO_COUNT);
+    int PSEUDO_COUNT = 5;
+    double GLOBAL_MEAN = 2.7;
+    return (sum + GLOBAL_MEAN * PSEUDO_COUNT) / (count + PSEUDO_COUNT);
   }
 }

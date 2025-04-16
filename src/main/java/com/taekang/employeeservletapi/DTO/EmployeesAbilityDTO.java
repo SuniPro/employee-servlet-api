@@ -1,8 +1,7 @@
 package com.taekang.employeeservletapi.DTO;
 
-import lombok.*;
-
 import java.util.List;
+import lombok.*;
 
 @Getter
 @Setter
@@ -10,9 +9,9 @@ import java.util.List;
 @NoArgsConstructor
 @AllArgsConstructor
 public class EmployeesAbilityDTO {
-    private Long employeeId;
+  private Long employeeId;
 
-    private AbilityDTO ability;
+  private AbilityDTO ability;
 
-    private List<AbilityDTO> employeesAbilityList;
+  private List<AbilityDTO> employeesAbilityList;
 }

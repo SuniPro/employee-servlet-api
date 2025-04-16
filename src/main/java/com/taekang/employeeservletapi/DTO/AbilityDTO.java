@@ -10,17 +10,17 @@ import lombok.*;
 @AllArgsConstructor
 public class AbilityDTO {
 
-    private Long id;
+  private Long id;
 
-    private Employee employee;
+  private Employee employee;
 
-    private double attitude;
+  private double attitude;
 
-    private double creativity;
+  private double creativity;
 
-    private double workPerformance;
+  private double workPerformance;
 
-    private double teamwork;
+  private double teamwork;
 
-    private double knowledgeLevel;
+  private double knowledgeLevel;
 }

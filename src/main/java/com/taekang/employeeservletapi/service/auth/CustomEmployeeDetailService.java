@@ -14,21 +14,25 @@ import org.springframework.transaction.annotation.Transactional;
 @Transactional(readOnly = true)
 public class CustomEmployeeDetailService implements UserDetailsService {
 
-    private final EmployeeRepository employeeRepository;
+  private final EmployeeRepository employeeRepository;
 
-    private final ModelMapper modelMapper;
+  private final ModelMapper modelMapper;
 
-    public CustomEmployeeDetailService(EmployeeRepository employeeRepository, ModelMapper modelMapper) {
-        this.employeeRepository = employeeRepository;
-        this.modelMapper = modelMapper;
-    }
+  public CustomEmployeeDetailService(
+      EmployeeRepository employeeRepository, ModelMapper modelMapper) {
+    this.employeeRepository = employeeRepository;
+    this.modelMapper = modelMapper;
+  }
 
-    @Override
-    public UserDetails loadUserByUsername(String name) throws UsernameNotFoundException {
-        Employee employee = employeeRepository.findByName(name).orElseThrow(() -> new UsernameNotFoundException(name + "는 없는 직원입니다."));
+  @Override
+  public UserDetails loadUserByUsername(String name) throws UsernameNotFoundException {
+    Employee employee =
+        employeeRepository
+            .findByName(name)
+            .orElseThrow(() -> new UsernameNotFoundException(name + "는 없는 직원입니다."));
 
-        CustomEmployeeDTO dto = modelMapper.map(employee, CustomEmployeeDTO.class);
+    CustomEmployeeDTO dto = modelMapper.map(employee, CustomEmployeeDTO.class);
 
-        return new CustomEmployeeDetails(dto);
-    }
+    return new CustomEmployeeDetails(dto);
+  }
 }

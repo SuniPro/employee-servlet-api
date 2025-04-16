@@ -1,9 +1,8 @@
 package com.taekang.employeeservletapi.entity.employee;
 
 import jakarta.persistence.*;
-import lombok.*;
-
 import java.time.LocalDateTime;
+import lombok.*;
 
 @Getter
 @Entity
@@ -12,40 +11,40 @@ import java.time.LocalDateTime;
 @Builder
 public class Employee {
 
-    @Id
-    @Column(name = "id")
-    @GeneratedValue(strategy = GenerationType.IDENTITY)
-    private Long id;
+  @Id
+  @Column(name = "id")
+  @GeneratedValue(strategy = GenerationType.IDENTITY)
+  private Long id;
 
-    @Enumerated(EnumType.STRING)
-    @Column(name = "department", nullable = false)
-    private Department department;
+  @Enumerated(EnumType.STRING)
+  @Column(name = "department", nullable = false)
+  private Department department;
 
-    @Enumerated(EnumType.STRING)
-    @Column(name = "level", nullable = false)
-    private Level level;
+  @Enumerated(EnumType.STRING)
+  @Column(name = "level", nullable = false)
+  private Level level;
 
-    @Column(name = "name", unique = true, nullable = false)
-    private String name;
+  @Column(name = "name", unique = true, nullable = false)
+  private String name;
 
-    @Column(name = "password", nullable = false)
-    private String password;
+  @Column(name = "password", nullable = false)
+  private String password;
 
-    @Column(name = "insert_name", nullable = false)
-    private String insertName;
+  @Column(name = "insert_name", nullable = false)
+  private String insertName;
 
-    @Column(name = "insert_date_time", nullable = false)
-    private LocalDateTime insertDateTime;
+  @Column(name = "insert_date_time", nullable = false)
+  private LocalDateTime insertDateTime;
 
-    @Column(name = "update_name")
-    private String updateName;
+  @Column(name = "update_name")
+  private String updateName;
 
-    @Column(name = "update_date_time")
-    private LocalDateTime updateDateTime;
+  @Column(name = "update_date_time")
+  private LocalDateTime updateDateTime;
 
-    @Column(name = "delete_name")
-    private String deleteName;
+  @Column(name = "delete_name")
+  private String deleteName;
 
-    @Column(name = "delete_date_time")
-    private LocalDateTime deleteDateTime;
+  @Column(name = "delete_date_time")
+  private LocalDateTime deleteDateTime;
 }

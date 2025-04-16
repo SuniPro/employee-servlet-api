@@ -1,8 +1,7 @@
 package com.taekang.employeeservletapi.DTO;
 
-import lombok.*;
-
 import java.time.LocalDateTime;
+import lombok.*;
 
 @Setter
 @Getter
@@ -11,9 +10,9 @@ import java.time.LocalDateTime;
 @AllArgsConstructor
 public class WorkBalanceDTO {
 
-    private Long employeeId;
+  private Long employeeId;
 
-    private Integer workBalance;
+  private Integer workBalance;
 
-    private LocalDateTime date;
+  private LocalDateTime date;
 }

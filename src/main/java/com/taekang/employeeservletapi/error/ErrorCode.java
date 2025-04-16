@@ -26,7 +26,8 @@ public enum ErrorCode {
   DUPLICATE_ACCOUNT("D409", "중복된 계좌입니다.", HttpStatus.CONFLICT),
   INVALID_AMOUNT("C400", "잘못된 금액입니다.", HttpStatus.BAD_REQUEST),
   DEPOSIT_VERIFICATION("C400", "계정과 금액이 일치하지 않습니다.", HttpStatus.BAD_REQUEST),
-  DEPOSIT_NOT_FOUND_OR_ALREADY_APPROVED("C400", "입금기록을 찾을 수 없거나, 이미 승인되었습니다.", HttpStatus.BAD_REQUEST),
+  DEPOSIT_NOT_FOUND_OR_ALREADY_APPROVED(
+      "C400", "입금기록을 찾을 수 없거나, 이미 승인되었습니다.", HttpStatus.BAD_REQUEST),
   DEPOSIT_NOT_FOUND("D404", "입금 정보를 찾을 수 없습니다.", HttpStatus.NOT_FOUND);
 
   private final String code;
@@ -41,10 +42,15 @@ public enum ErrorCode {
 
   @Override
   public String toString() {
-    return "ErrorCode{" +
-            "code='" + code + '\'' +
-            ", message='" + message + '\'' +
-            ", httpStatus=" + httpStatus +
-            '}';
+    return "ErrorCode{"
+        + "code='"
+        + code
+        + '\''
+        + ", message='"
+        + message
+        + '\''
+        + ", httpStatus="
+        + httpStatus
+        + '}';
   }
 }

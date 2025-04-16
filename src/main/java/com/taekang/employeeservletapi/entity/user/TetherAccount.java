@@ -12,22 +12,22 @@ import lombok.*;
 @Builder(toBuilder = true)
 public class TetherAccount {
 
-    @Id
-    @GeneratedValue(strategy = GenerationType.IDENTITY)
-    private Long id;
+  @Id
+  @GeneratedValue(strategy = GenerationType.IDENTITY)
+  private Long id;
 
-    @Column(name="tether_wallet", unique = true, nullable = false)
-    private String tetherWallet;
+  @Column(name = "tether_wallet", unique = true, nullable = false)
+  private String tetherWallet;
 
-    @Column(name="username", nullable = false)
-    private String username;
+  @Column(name = "username", nullable = false)
+  private String username;
 
-    @Column(name="insert_date_time")
-    private LocalDateTime insertDateTime;
+  @Column(name = "insert_date_time")
+  private LocalDateTime insertDateTime;
 
-    @Column(name="update_date_time")
-    private LocalDateTime updateDateTime;
+  @Column(name = "update_date_time")
+  private LocalDateTime updateDateTime;
 
-    @Column(name="delete_date_time")
-    private LocalDateTime deleteDateTime;
+  @Column(name = "delete_date_time")
+  private LocalDateTime deleteDateTime;
 }

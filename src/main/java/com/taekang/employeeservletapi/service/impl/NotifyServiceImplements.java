@@ -63,7 +63,8 @@ public class NotifyServiceImplements implements NotifyService {
 
   @Override
   public Notify updateNotify(NotifyDTO notifyDTO) {
-    Notify notify = Notify.builder()
+    Notify notify =
+        Notify.builder()
             .id(notifyDTO.getId())
             .title(notifyDTO.getTitle())
             .contents(notifyDTO.getContents())
@@ -89,7 +90,9 @@ public class NotifyServiceImplements implements NotifyService {
 
   @Override
   public Notify getLatestNotify() {
-    return notifyRepository.findTopByOrderByInsertDateTimeDesc().orElseThrow(NotifyNotFoundedException::new);
+    return notifyRepository
+        .findTopByOrderByInsertDateTimeDesc()
+        .orElseThrow(NotifyNotFoundedException::new);
   }
 
   @Override

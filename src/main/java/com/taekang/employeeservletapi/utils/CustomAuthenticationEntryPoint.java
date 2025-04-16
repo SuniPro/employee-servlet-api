@@ -1,15 +1,13 @@
 package com.taekang.employeeservletapi.utils;
 
 import com.taekang.employeeservletapi.error.ErrorCode;
-import jakarta.servlet.ServletException;
 import jakarta.servlet.http.HttpServletRequest;
 import jakarta.servlet.http.HttpServletResponse;
+import java.io.IOException;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.security.core.AuthenticationException;
 import org.springframework.security.web.AuthenticationEntryPoint;
 import org.springframework.stereotype.Component;
-
-import java.io.IOException;
 
 @Slf4j
 @Component
@@ -20,7 +18,7 @@ public class CustomAuthenticationEntryPoint implements AuthenticationEntryPoint 
       HttpServletRequest request,
       HttpServletResponse response,
       AuthenticationException authException)
-      throws IOException, ServletException {
+      throws IOException {
 
     ErrorCode errorCode;
     String exception = request.getAttribute("exception").toString();

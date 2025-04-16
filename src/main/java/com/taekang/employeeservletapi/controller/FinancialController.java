@@ -77,9 +77,15 @@ public class FinancialController {
   }
 
   @PreAuthorize(MANAGER_ACCESS)
+  @GetMapping("get/latest/deposit/by/{id}")
+  public ResponseEntity<TetherDeposit> getLatestDeposit(@PathVariable Long id) {
+    return ResponseEntity.ok().body(tetherService.getLatestDeposit(id));
+  }
+
+  @PreAuthorize(MANAGER_ACCESS)
   @GetMapping("get/latest/deposit/by/tether/wallet/{tetherWallet}")
-  public ResponseEntity<TetherDeposit> getLatestDeposit(@PathVariable String tetherWallet) {
-    return ResponseEntity.ok().body(tetherService.getLatestDeposit(tetherWallet));
+  public ResponseEntity<TetherDeposit> getLatestDepositByWallet(@PathVariable String tetherWallet) {
+    return ResponseEntity.ok().body(tetherService.getLatestDepositByTetherWallet(tetherWallet));
   }
 
   @PreAuthorize(MANAGER_ACCESS)

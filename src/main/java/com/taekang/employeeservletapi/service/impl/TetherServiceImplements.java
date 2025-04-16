@@ -128,10 +128,16 @@ public class TetherServiceImplements implements TetherService {
         tetherWallet, TransactionStatus.PENDING);
   }
 
+  @Override
+  public TetherDeposit getLatestDeposit(Long id) {
+    TetherAccount tetherAccount = tetherAccountRepository.findById(id).orElseThrow(AccountNotFoundException::new);
+    return tetherDepositRepository.findTopByTetherAccountOrderByRequestedAtDesc(tetherAccount).orElseThrow(AccountNotFoundException::new);
+  }
+
   /** 특정 지갑의 마지막 입금 내역을 조회합니다. */
   @Override
   @Transactional(readOnly = true)
-  public TetherDeposit getLatestDeposit(String tetherWallet) {
+  public TetherDeposit getLatestDepositByTetherWallet(String tetherWallet) {
     return tetherDepositRepository
         .findTopByTetherAccount_TetherWalletOrderByRequestedAtDesc(tetherWallet)
         .orElseThrow(DepositNotFoundException::new);

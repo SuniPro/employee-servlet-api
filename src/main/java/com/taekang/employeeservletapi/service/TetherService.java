@@ -31,8 +31,11 @@ public interface TetherService {
     // 특정 지갑의 미승인된 입금 정보
     List<TetherDeposit> getNonApprovedDepositsForAccountByTetherWallet(String tetherWallet);
 
+    // 특정 계좌의 최근 입금 1건 조회
+    TetherDeposit getLatestDeposit(Long id);
+
     // 특정 지갑의 최근 입금 1건 조회
-    TetherDeposit getLatestDeposit(String tetherWallet);
+    TetherDeposit getLatestDepositByTetherWallet(String tetherWallet);
 
     // 특정 기간의 전체 입금 목록
     List<TetherDeposit> getDepositsInRange(LocalDateTime start, LocalDateTime end);

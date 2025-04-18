@@ -7,6 +7,8 @@ import java.math.BigDecimal;
 import java.time.LocalDateTime;
 import java.util.List;
 import java.util.Optional;
+import org.springframework.data.domain.Page;
+import org.springframework.data.domain.Pageable;
 import org.springframework.data.jpa.repository.JpaRepository;
 import org.springframework.data.jpa.repository.Query;
 import org.springframework.data.repository.query.Param;
@@ -19,7 +21,7 @@ public interface TetherDepositRepository extends JpaRepository<TetherDeposit, Lo
   List<TetherDeposit> findByTetherAccount_IdOrderByRequestedAtDesc(Long accountId);
 
   // 3. 상태 기반 조회 (예: PENDING 승인 대기 리스트)
-  List<TetherDeposit> findByStatus(TransactionStatus status);
+  Page<TetherDeposit> findByStatus(TransactionStatus status, Pageable pageable);
 
   // 4. 계정별 + 상태 필터 조회
   List<TetherDeposit> findByTetherAccount_IdAndStatus(Long accountId, TransactionStatus status);

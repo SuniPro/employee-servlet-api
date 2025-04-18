@@ -1,9 +1,13 @@
 package com.taekang.employeeservletapi.service;
 
 import com.taekang.employeeservletapi.DTO.tether.TetherDepositAcceptedDTO;
+import com.taekang.employeeservletapi.DTO.tether.TetherDepositDTO;
 import com.taekang.employeeservletapi.entity.user.TetherAccount;
 import com.taekang.employeeservletapi.entity.user.TetherDeposit;
 import com.taekang.employeeservletapi.entity.user.TransactionStatus;
+import org.springframework.data.domain.Page;
+import org.springframework.data.domain.Pageable;
+
 import java.math.BigDecimal;
 import java.time.LocalDateTime;
 import java.util.List;
@@ -20,7 +24,7 @@ public interface TetherService {
   List<TetherDeposit> getDepositsForAccount(Long accountId);
 
   // 상태별 전체 리스트 조회
-  List<TetherDeposit> getDepositsByStatus(TransactionStatus status);
+  Page<TetherDepositDTO> getDepositsByStatus(TransactionStatus status, Pageable pageable);
 
   // 특정 계정의 승인된 입금 조회
   List<TetherDeposit> getApprovedDepositsForAccountById(Long accountId, TransactionStatus status);
@@ -29,7 +33,7 @@ public interface TetherService {
   List<TetherDeposit> getApprovedDepositsForAccountByTetherWallet(String tetherWallet);
 
   // 특정 지갑의 미승인된 입금 정보
-  List<TetherDeposit> getNonApprovedDepositsForAccountByTetherWallet(String tetherWallet);
+  List<TetherDepositDTO> getNonApprovedDepositsForAccountByTetherWallet(String tetherWallet);
 
   // 특정 계좌의 최근 입금 1건 조회
   TetherDeposit getLatestDeposit(Long id);

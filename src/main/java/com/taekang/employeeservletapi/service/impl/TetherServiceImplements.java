@@ -1,6 +1,7 @@
 package com.taekang.employeeservletapi.service.impl;
 
 import com.taekang.employeeservletapi.DTO.tether.TetherDepositAcceptedDTO;
+import com.taekang.employeeservletapi.DTO.tether.TetherDepositDTO;
 import com.taekang.employeeservletapi.entity.user.TetherAccount;
 import com.taekang.employeeservletapi.entity.user.TetherDeposit;
 import com.taekang.employeeservletapi.entity.user.TransactionStatus;
@@ -16,6 +17,8 @@ import java.time.LocalDateTime;
 import java.time.ZoneId;
 import java.util.List;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.data.domain.Page;
+import org.springframework.data.domain.Pageable;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
@@ -53,7 +56,7 @@ public class TetherServiceImplements implements TetherService {
 
   /** 입금 내역을 승인합니다. */
   @Override
-  @Transactional
+  @Transactional(transactionManager = "userTransactionManager")
   public Boolean depositAccept(TetherDepositAcceptedDTO tetherDepositAcceptedDTO) {
     TetherAccount tetherAccount =
         tetherAccountRepository
@@ -99,14 +102,25 @@ public class TetherServiceImplements implements TetherService {
 
   /** 모든 입금내역을 상태를 기준으로 조회합니다. */
   @Override
-  @Transactional(readOnly = true)
-  public List<TetherDeposit> getDepositsByStatus(TransactionStatus status) {
-    return tetherDepositRepository.findByStatus(status);
+  @Transactional(transactionManager = "userTransactionManager", readOnly = true)
+  public Page<TetherDepositDTO> getDepositsByStatus(TransactionStatus status, Pageable pageable) {
+    return tetherDepositRepository.findByStatus(status, pageable)
+            .map(deposit -> TetherDepositDTO.builder()
+                    .id(deposit.getId())
+                    .tetherWallet(deposit.getTetherAccount().getTetherWallet())
+                    .username(deposit.getTetherAccount().getUsername())
+                    .insertDateTime(deposit.getTetherAccount().getInsertDateTime())
+                    .amount(deposit.getAmount())
+                    .accepted(deposit.getAccepted())
+                    .acceptedAt(deposit.getAcceptedAt())
+                    .requestedAt(deposit.getRequestedAt())
+                    .status(deposit.getStatus())
+                    .build());
   }
 
   /** 아이디를 기준으로 특정 상태의 입금을 조회합니다. */
   @Override
-  @Transactional(readOnly = true)
+  @Transactional(transactionManager = "userTransactionManager", readOnly = true)
   public List<TetherDeposit> getApprovedDepositsForAccountById(
       Long accountId, TransactionStatus status) {
     return tetherDepositRepository.findByTetherAccount_IdAndStatus(accountId, status);
@@ -114,18 +128,31 @@ public class TetherServiceImplements implements TetherService {
 
   /** 승인된 모든 입금내역을 특정 지갑을 기준으로 조회합니다. */
   @Override
-  @Transactional(readOnly = true)
+  @Transactional(transactionManager = "userTransactionManager", readOnly = true)
   public List<TetherDeposit> getApprovedDepositsForAccountByTetherWallet(String tetherWallet) {
     return tetherDepositRepository.findByTetherAccount_TetherWalletAndStatus(
         tetherWallet, TransactionStatus.CONFIRMED);
   }
 
-  /** 미승인된 모든 입금내역을 특정 지갑을 기준으로 조회합니다. */
+  /**
+   * 미승인된 모든 입금내역을 특정 지갑을 기준으로 조회합니다.
+   */
   @Override
-  @Transactional(readOnly = true)
-  public List<TetherDeposit> getNonApprovedDepositsForAccountByTetherWallet(String tetherWallet) {
-    return tetherDepositRepository.findByTetherAccount_TetherWalletAndStatus(
-        tetherWallet, TransactionStatus.PENDING);
+  @Transactional(transactionManager = "userTransactionManager", readOnly = true)
+  public List<TetherDepositDTO> getNonApprovedDepositsForAccountByTetherWallet(String tetherWallet) {
+    return tetherDepositRepository.findByTetherAccount_TetherWalletAndStatus(tetherWallet, TransactionStatus.PENDING).stream()
+            .map(deposit -> TetherDepositDTO.builder()
+                    .id(deposit.getId())
+                    .tetherWallet(deposit.getTetherAccount().getTetherWallet())
+                    .username(deposit.getTetherAccount().getUsername())
+                    .insertDateTime(deposit.getTetherAccount().getInsertDateTime())
+                    .amount(deposit.getAmount())
+                    .accepted(deposit.getAccepted())
+                    .acceptedAt(deposit.getAcceptedAt())
+                    .requestedAt(deposit.getRequestedAt())
+                    .status(deposit.getStatus())
+                    .build())
+            .toList();
   }
 
   @Override

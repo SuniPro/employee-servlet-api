@@ -1,9 +1,6 @@
 package com.taekang.employeeservletapi.entity.user;
 
-import jakarta.persistence.FetchType;
-import jakarta.persistence.JoinColumn;
-import jakarta.persistence.ManyToOne;
-import jakarta.persistence.MappedSuperclass;
+import jakarta.persistence.*;
 import java.math.BigDecimal;
 import java.time.LocalDateTime;
 import lombok.AccessLevel;
@@ -23,11 +20,15 @@ public abstract class TetherBaseTransaction {
   @JoinColumn(name = "tether_account_id", nullable = false)
   private TetherAccount tetherAccount;
 
+  @Column(name = "amount")
   private BigDecimal amount;
 
+  @Column(name = "accepted")
   private Boolean accepted;
 
+  @Column(name = "accepted_at")
   private LocalDateTime acceptedAt;
 
+  @Column(name = "requested_at")
   private LocalDateTime requestedAt;
 }

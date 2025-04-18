@@ -20,28 +20,22 @@ public class CustomAuthenticationEntryPoint implements AuthenticationEntryPoint 
       AuthenticationException authException)
       throws IOException {
 
+    Object exceptionAttr = request.getAttribute("exception");
     ErrorCode errorCode;
-    String exception = request.getAttribute("exception").toString();
 
-    log.debug("exception: {}", exception);
-
-    /* 토큰이 없는 경우 */
-    if (exception == null) {
+    if (exceptionAttr == null) {
       errorCode = ErrorCode.CANNOT_FIND_TOKEN;
-      setResponse(response, errorCode);
-    }
+    } else {
+      String exception = exceptionAttr.toString();
+      log.debug("exception: {}", exception);
 
-    /* 토큰이 만료된 경우 */
-    if (exception == null) {
-      errorCode = ErrorCode.TOKEN_EXPIRE;
-      setResponse(response, errorCode);
+      switch (exception) {
+        case "TokenExpiredException" -> errorCode = ErrorCode.TOKEN_EXPIRE;
+        case "JWTVerificationException" -> errorCode = ErrorCode.TOKEN_ABNORMALITY;
+        default -> errorCode = ErrorCode.CANNOT_FIND_TOKEN;
+      }
     }
-
-    /* 토큰 시크니처가 다른 경우 */
-    if (exception == null) {
-      errorCode = ErrorCode.TOKEN_ABNORMALITY;
-      setResponse(response, errorCode);
-    }
+    setResponse(response, errorCode);
   }
 
   private void setResponse(HttpServletResponse response, ErrorCode errorCode) throws IOException {

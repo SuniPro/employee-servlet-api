@@ -48,7 +48,7 @@ public class SignController {
   }
 
   @PostMapping("login")
-  public ResponseEntity<HttpStatus> login(@RequestBody LoginRequestDTO loginRequestDTO) {
+  public ResponseEntity<String> login(@RequestBody LoginRequestDTO loginRequestDTO) {
 
     String token = signService.signIn(loginRequestDTO);
 
@@ -56,7 +56,7 @@ public class SignController {
 
     return ResponseEntity.ok()
         .header(HttpHeaders.SET_COOKIE, responseCookie.toString())
-        .body(HttpStatus.OK);
+        .body(token);
   }
 
   @GetMapping("logout")

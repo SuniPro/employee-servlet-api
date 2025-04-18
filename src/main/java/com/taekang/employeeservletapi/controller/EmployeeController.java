@@ -8,6 +8,10 @@ import com.taekang.employeeservletapi.entity.employee.Level;
 import com.taekang.employeeservletapi.service.EmployeeService;
 import java.util.List;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.data.domain.Page;
+import org.springframework.data.domain.Pageable;
+import org.springframework.data.domain.Sort;
+import org.springframework.data.web.PageableDefault;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
 
@@ -44,8 +48,9 @@ public class EmployeeController {
   }
 
   @GetMapping("get/all")
-  public ResponseEntity<List<Employee>> getAllEmployees() {
-    return ResponseEntity.ok().body(employeeService.getAllEmployees());
+  public ResponseEntity<Page<Employee>> getAllEmployees(@PageableDefault(size = 10, sort = "requestedAt", direction = Sort.Direction.DESC)
+                                                          Pageable pageable) {
+    return ResponseEntity.ok().body(employeeService.getAllEmployees(pageable));
   }
 
   @GetMapping("get/by/{department}")

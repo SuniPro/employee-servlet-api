@@ -15,6 +15,8 @@ import java.time.LocalDateTime;
 import java.util.List;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.data.domain.Page;
+import org.springframework.data.domain.Pageable;
 import org.springframework.security.crypto.bcrypt.BCryptPasswordEncoder;
 import org.springframework.stereotype.Service;
 
@@ -114,8 +116,8 @@ public class EmployeeServiceImplements implements EmployeeService {
   }
 
   @Override
-  public List<Employee> getAllEmployees() {
-    return employeeRepository.findAll();
+  public Page<Employee> getAllEmployees(Pageable pageable) {
+    return employeeRepository.findAll(pageable);
   }
 
   @Override

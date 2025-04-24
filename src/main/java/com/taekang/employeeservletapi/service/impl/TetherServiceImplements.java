@@ -5,10 +5,7 @@ import com.taekang.employeeservletapi.DTO.tether.TetherDepositDTO;
 import com.taekang.employeeservletapi.entity.user.TetherAccount;
 import com.taekang.employeeservletapi.entity.user.TetherDeposit;
 import com.taekang.employeeservletapi.entity.user.TransactionStatus;
-import com.taekang.employeeservletapi.error.AccountNotFoundException;
-import com.taekang.employeeservletapi.error.DepositNotFoundException;
-import com.taekang.employeeservletapi.error.DepositNotFoundOrAlreadyApprovedException;
-import com.taekang.employeeservletapi.error.DepositVerificationException;
+import com.taekang.employeeservletapi.error.*;
 import com.taekang.employeeservletapi.repository.user.TetherAccountRepository;
 import com.taekang.employeeservletapi.repository.user.TetherDepositRepository;
 import com.taekang.employeeservletapi.service.TetherService;
@@ -141,7 +138,11 @@ public class TetherServiceImplements implements TetherService {
   /** 입금 요청 삭제 */
   @Override
   public void deleteDepositById(Long depositId) {
-    tetherDepositRepository.deleteById(depositId);
+    try {
+      tetherDepositRepository.deleteById(depositId);
+    } catch (Exception e) {
+      throw new CannotDeleteException();
+    }
   }
 
   /** 미승인된 모든 입금내역을 특정 지갑을 기준으로 조회합니다. */

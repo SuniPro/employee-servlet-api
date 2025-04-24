@@ -11,6 +11,7 @@ import org.springframework.http.HttpStatus;
  */
 @Getter
 public enum ErrorCode {
+  INTERNAL_SERVER_ERROR("S500", "서버 에러가 발생하였습니다.", HttpStatus.INTERNAL_SERVER_ERROR),
   EMPLOYEE_NOT_FOUND("D404", "직원 정보를 찾을 수 없습니다.", HttpStatus.NOT_FOUND),
   DUPLICATE_EMPLOYEE_NAME("C409", "중복된 이름입니다.", HttpStatus.CONFLICT),
   PASSWORD_INCORRECT("C401", "잘못된 패스워드입니다.", HttpStatus.UNAUTHORIZED),
@@ -28,6 +29,7 @@ public enum ErrorCode {
   DEPOSIT_VERIFICATION("C400", "계정과 금액이 일치하지 않습니다.", HttpStatus.BAD_REQUEST),
   DEPOSIT_NOT_FOUND_OR_ALREADY_APPROVED(
       "C400", "입금기록을 찾을 수 없거나, 이미 승인되었습니다.", HttpStatus.BAD_REQUEST),
+  CANNOT_DELETE("S500", "서버 에러로 삭제할 수 없습니다.", HttpStatus.INTERNAL_SERVER_ERROR),
   DEPOSIT_NOT_FOUND("D404", "입금 정보를 찾을 수 없습니다.", HttpStatus.NOT_FOUND);
 
   private final String code;

@@ -19,8 +19,8 @@ public class TetherAccount {
   @Column(name = "tether_wallet", unique = true, nullable = false)
   private String tetherWallet;
 
-  @Column(name = "username", nullable = false)
-  private String username;
+  @Column(name = "email", nullable = false)
+  private String email;
 
   @Column(name = "insert_date_time")
   private LocalDateTime insertDateTime;

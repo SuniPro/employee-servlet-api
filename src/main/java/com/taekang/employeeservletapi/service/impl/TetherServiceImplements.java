@@ -138,7 +138,7 @@ public class TetherServiceImplements implements TetherService {
         tetherWallet, TransactionStatus.CONFIRMED);
   }
 
-  /** 입금 요청 삭제*/
+  /** 입금 요청 삭제 */
   @Override
   public void deleteDepositById(Long depositId) {
     tetherDepositRepository.deleteById(depositId);

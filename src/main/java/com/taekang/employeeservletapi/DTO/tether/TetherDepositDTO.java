@@ -13,21 +13,21 @@ import lombok.*;
 @ToString
 public class TetherDepositDTO {
 
-    private Long id;
+  private Long id;
 
-    private String tetherWallet;
+  private String tetherWallet;
 
-    private String email;
+  private String email;
 
-    private LocalDateTime insertDateTime;
+  private LocalDateTime insertDateTime;
 
-    private BigDecimal amount;
+  private BigDecimal amount;
 
-    private Boolean accepted;
+  private Boolean accepted;
 
-    private LocalDateTime acceptedAt;
+  private LocalDateTime acceptedAt;
 
-    private LocalDateTime requestedAt;
+  private LocalDateTime requestedAt;
 
-    private TransactionStatus status;
+  private TransactionStatus status;
 }

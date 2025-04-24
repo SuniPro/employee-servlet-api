@@ -5,12 +5,11 @@ import com.taekang.employeeservletapi.DTO.tether.TetherDepositDTO;
 import com.taekang.employeeservletapi.entity.user.TetherAccount;
 import com.taekang.employeeservletapi.entity.user.TetherDeposit;
 import com.taekang.employeeservletapi.entity.user.TransactionStatus;
-import org.springframework.data.domain.Page;
-import org.springframework.data.domain.Pageable;
-
 import java.math.BigDecimal;
 import java.time.LocalDateTime;
 import java.util.List;
+import org.springframework.data.domain.Page;
+import org.springframework.data.domain.Pageable;
 
 public interface TetherService {
 

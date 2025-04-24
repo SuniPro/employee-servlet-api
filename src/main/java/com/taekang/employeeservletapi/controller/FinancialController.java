@@ -24,7 +24,8 @@ import org.springframework.web.bind.annotation.*;
 public class FinancialController {
 
   private static final String MANAGER_ACCESS =
-      "hasAnyAuthority('LEVEL_CEO', 'LEVEL_COO', 'LEVEL_CFO', 'LEVEL_CIO', 'LEVEL_CTO','LEVEL_CDO', 'LEVEL_MANAGER', 'LEVEL_OFFICEMANAGER', 'LEVEL_SENIORMANAGER')";
+      "hasAnyAuthority('LEVEL_CEO', 'LEVEL_COO', 'LEVEL_CFO', 'LEVEL_CIO', 'LEVEL_CTO','LEVEL_CDO',"
+          + " 'LEVEL_MANAGER', 'LEVEL_OFFICEMANAGER', 'LEVEL_SENIORMANAGER')";
 
   private final TetherService tetherService;
 

@@ -78,6 +78,7 @@ public class TetherServiceImplements implements TetherService {
     // 4. 상태 변경
     TetherDeposit updated =
         tetherDeposit.toBuilder()
+            .id(tetherDeposit.getId())
             .status(TransactionStatus.CONFIRMED)
             .accepted(true)
             .acceptedAt(LocalDateTime.now(ZoneId.of("Asia/Seoul")))
@@ -104,11 +105,14 @@ public class TetherServiceImplements implements TetherService {
   @Override
   @Transactional(transactionManager = "userTransactionManager", readOnly = true)
   public Page<TetherDepositDTO> getDepositsByStatus(TransactionStatus status, Pageable pageable) {
-    return tetherDepositRepository.findByStatus(status, pageable)
-            .map(deposit -> TetherDepositDTO.builder()
+    return tetherDepositRepository
+        .findByStatus(status, pageable)
+        .map(
+            deposit ->
+                TetherDepositDTO.builder()
                     .id(deposit.getId())
                     .tetherWallet(deposit.getTetherAccount().getTetherWallet())
-                    .username(deposit.getTetherAccount().getUsername())
+                    .email(deposit.getTetherAccount().getEmail())
                     .insertDateTime(deposit.getTetherAccount().getInsertDateTime())
                     .amount(deposit.getAmount())
                     .accepted(deposit.getAccepted())
@@ -134,17 +138,26 @@ public class TetherServiceImplements implements TetherService {
         tetherWallet, TransactionStatus.CONFIRMED);
   }
 
-  /**
-   * 미승인된 모든 입금내역을 특정 지갑을 기준으로 조회합니다.
-   */
+  /** 입금 요청 삭제*/
+  @Override
+  public void deleteDepositById(Long depositId) {
+    tetherDepositRepository.deleteById(depositId);
+  }
+
+  /** 미승인된 모든 입금내역을 특정 지갑을 기준으로 조회합니다. */
   @Override
   @Transactional(transactionManager = "userTransactionManager", readOnly = true)
-  public List<TetherDepositDTO> getNonApprovedDepositsForAccountByTetherWallet(String tetherWallet) {
-    return tetherDepositRepository.findByTetherAccount_TetherWalletAndStatus(tetherWallet, TransactionStatus.PENDING).stream()
-            .map(deposit -> TetherDepositDTO.builder()
+  public List<TetherDepositDTO> getNonApprovedDepositsForAccountByTetherWallet(
+      String tetherWallet) {
+    return tetherDepositRepository
+        .findByTetherAccount_TetherWalletAndStatus(tetherWallet, TransactionStatus.PENDING)
+        .stream()
+        .map(
+            deposit ->
+                TetherDepositDTO.builder()
                     .id(deposit.getId())
                     .tetherWallet(deposit.getTetherAccount().getTetherWallet())
-                    .username(deposit.getTetherAccount().getUsername())
+                    .email(deposit.getTetherAccount().getEmail())
                     .insertDateTime(deposit.getTetherAccount().getInsertDateTime())
                     .amount(deposit.getAmount())
                     .accepted(deposit.getAccepted())
@@ -152,7 +165,7 @@ public class TetherServiceImplements implements TetherService {
                     .requestedAt(deposit.getRequestedAt())
                     .status(deposit.getStatus())
                     .build())
-            .toList();
+        .toList();
   }
 
   @Override

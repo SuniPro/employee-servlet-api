@@ -1,7 +1,6 @@
 package com.taekang.employeeservletapi.DTO.tether;
 
 import com.taekang.employeeservletapi.entity.user.TransactionStatus;
-import jakarta.persistence.*;
 import java.math.BigDecimal;
 import java.time.LocalDateTime;
 import lombok.*;
@@ -18,7 +17,7 @@ public class TetherDepositDTO {
 
     private String tetherWallet;
 
-    private String username;
+    private String email;
 
     private LocalDateTime insertDateTime;
 

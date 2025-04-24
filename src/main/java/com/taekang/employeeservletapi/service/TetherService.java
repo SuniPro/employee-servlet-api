@@ -32,6 +32,8 @@ public interface TetherService {
   // 특정 지갑의 승인된 입금 조회
   List<TetherDeposit> getApprovedDepositsForAccountByTetherWallet(String tetherWallet);
 
+  void deleteDepositById(Long depositId);
+
   // 특정 지갑의 미승인된 입금 정보
   List<TetherDepositDTO> getNonApprovedDepositsForAccountByTetherWallet(String tetherWallet);
 

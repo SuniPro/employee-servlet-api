@@ -79,6 +79,12 @@ public class FinancialController {
   }
 
   @PreAuthorize(MANAGER_ACCESS)
+  @DeleteMapping("tether/delete/deposit/by/id/{id}")
+  public void deleteDepositById(@PathVariable Long id) {
+    tetherService.deleteDepositById(id);
+  }
+
+  @PreAuthorize(MANAGER_ACCESS)
   @GetMapping("tether/get/non/approved/deposits/by/tether/wallet/{tetherWallet}")
   public ResponseEntity<List<TetherDepositDTO>> getNonApprovedDepositsByTetherWallet(
       @PathVariable String tetherWallet) {

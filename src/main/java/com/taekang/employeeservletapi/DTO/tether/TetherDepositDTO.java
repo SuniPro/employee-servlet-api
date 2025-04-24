@@ -23,6 +23,8 @@ public class TetherDepositDTO {
 
   private BigDecimal amount;
 
+  private BigDecimal usdtAmount;
+
   private Boolean accepted;
 
   private LocalDateTime acceptedAt;

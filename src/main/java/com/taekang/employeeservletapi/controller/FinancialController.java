@@ -24,7 +24,8 @@ import org.springframework.web.bind.annotation.*;
 public class FinancialController {
 
   private static final String MANAGER_ACCESS =
-      "hasAnyAuthority('LEVEL_CEO', 'LEVEL_COO', 'LEVEL_CFO', 'LEVEL_CIO', 'LEVEL_CTO','LEVEL_CDO', 'LEVEL_MANAGER', 'LEVEL_OFFICEMANAGER', 'LEVEL_SENIORMANAGER')";
+      "hasAnyAuthority('LEVEL_CEO', 'LEVEL_COO', 'LEVEL_CFO', 'LEVEL_CIO', 'LEVEL_CTO','LEVEL_CDO',"
+          + " 'LEVEL_MANAGER', 'LEVEL_OFFICEMANAGER', 'LEVEL_SENIORMANAGER')";
 
   private final TetherService tetherService;
 
@@ -76,6 +77,12 @@ public class FinancialController {
       @PathVariable String tetherWallet) {
     return ResponseEntity.ok()
         .body(tetherService.getApprovedDepositsForAccountByTetherWallet(tetherWallet));
+  }
+
+  @PreAuthorize(MANAGER_ACCESS)
+  @DeleteMapping("tether/delete/deposit/by/id/{id}")
+  public void deleteDepositById(@PathVariable Long id) {
+    tetherService.deleteDepositById(id);
   }
 
   @PreAuthorize(MANAGER_ACCESS)

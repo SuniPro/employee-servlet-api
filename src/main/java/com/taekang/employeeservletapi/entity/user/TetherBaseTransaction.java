@@ -26,6 +26,9 @@ public abstract class TetherBaseTransaction {
   @Column(name = "accepted")
   private Boolean accepted;
 
+  @Column(name = "usdt_amount")
+  private BigDecimal usdtAmount;
+
   @Column(name = "accepted_at")
   private LocalDateTime acceptedAt;
 

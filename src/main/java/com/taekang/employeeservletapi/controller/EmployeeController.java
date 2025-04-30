@@ -48,8 +48,9 @@ public class EmployeeController {
   }
 
   @GetMapping("get/all")
-  public ResponseEntity<Page<Employee>> getAllEmployees(@PageableDefault(size = 10, sort = "requestedAt", direction = Sort.Direction.DESC)
-                                                          Pageable pageable) {
+  public ResponseEntity<Page<Employee>> getAllEmployees(
+      @PageableDefault(size = 10, sort = "requestedAt", direction = Sort.Direction.DESC)
+          Pageable pageable) {
     return ResponseEntity.ok().body(employeeService.getAllEmployees(pageable));
   }
 

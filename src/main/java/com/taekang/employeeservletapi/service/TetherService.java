@@ -5,12 +5,11 @@ import com.taekang.employeeservletapi.DTO.tether.TetherDepositDTO;
 import com.taekang.employeeservletapi.entity.user.TetherAccount;
 import com.taekang.employeeservletapi.entity.user.TetherDeposit;
 import com.taekang.employeeservletapi.entity.user.TransactionStatus;
-import org.springframework.data.domain.Page;
-import org.springframework.data.domain.Pageable;
-
 import java.math.BigDecimal;
 import java.time.LocalDateTime;
 import java.util.List;
+import org.springframework.data.domain.Page;
+import org.springframework.data.domain.Pageable;
 
 public interface TetherService {
 
@@ -31,6 +30,8 @@ public interface TetherService {
 
   // 특정 지갑의 승인된 입금 조회
   List<TetherDeposit> getApprovedDepositsForAccountByTetherWallet(String tetherWallet);
+
+  void deleteDepositById(Long depositId);
 
   // 특정 지갑의 미승인된 입금 정보
   List<TetherDepositDTO> getNonApprovedDepositsForAccountByTetherWallet(String tetherWallet);

@@ -2,9 +2,8 @@ package com.taekang.employeeservletapi.entity.employee;
 
 import com.taekang.employeeservletapi.tools.converter.WorkMenuListConverter;
 import jakarta.persistence.*;
-import lombok.*;
-
 import java.util.List;
+import lombok.*;
 
 @Getter
 @Entity
@@ -14,15 +13,15 @@ import java.util.List;
 @Builder(toBuilder = true)
 public class WorkTable {
 
-    @Id
-    @GeneratedValue(strategy = GenerationType.IDENTITY)
-    private Long id;
+  @Id
+  @GeneratedValue(strategy = GenerationType.IDENTITY)
+  private Long id;
 
-    @ManyToOne
-    @JoinColumn(name = "employee_id")
-    private Employee employee;
+  @ManyToOne
+  @JoinColumn(name = "employee_id")
+  private Employee employee;
 
-    @Convert(converter = WorkMenuListConverter.class)
-    @Column(name = "work_menu_string", nullable = false, length = 255)
-    private List<WorkMenu> workMenuList;
+  @Convert(converter = WorkMenuListConverter.class)
+  @Column(name = "work_menu_string", nullable = false, length = 255)
+  private List<WorkMenu> workMenuList;
 }

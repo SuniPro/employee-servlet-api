@@ -9,10 +9,9 @@ import com.taekang.employeeservletapi.error.WorkTableNotFoundException;
 import com.taekang.employeeservletapi.repository.employee.EmployeeRepository;
 import com.taekang.employeeservletapi.repository.employee.WorkTableRepository;
 import com.taekang.employeeservletapi.service.WorkTableService;
+import java.util.List;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
-
-import java.util.List;
 
 @Service
 public class WorkTableServiceImpl implements WorkTableService {
@@ -27,10 +26,7 @@ public class WorkTableServiceImpl implements WorkTableService {
     this.employeeRepository = employeeRepository;
   }
 
-  /**
-   * 직원 이름은 유니크하게 관리됩니다.
-   * 이름으로 업무 탭 구성을 조회할 수 있도록 지원합니다.
-   */
+  /** 직원 이름은 유니크하게 관리됩니다. 이름으로 업무 탭 구성을 조회할 수 있도록 지원합니다. */
   @Override
   public WorkTableDTO getWorkTableByEmployeeName(String name) {
     WorkTable workTable =
@@ -50,19 +46,19 @@ public class WorkTableServiceImpl implements WorkTableService {
 
   @Override
   public WorkTableDTO createOrUpdateWorkTable(Long id, List<WorkMenu> workMenuList) {
-    Employee employee = employeeRepository.findById(id)
-            .orElseThrow(EmployeeNotFoundException::new);
+    Employee employee = employeeRepository.findById(id).orElseThrow(EmployeeNotFoundException::new);
 
-    WorkTable workTable = workTableRepository.findByEmployee_Id(id)
-            .map(existing -> existing.toBuilder()
-                    .id(existing.getId())
-                    .employee(existing.getEmployee())
-                    .workMenuList(workMenuList)
-                    .build())
-            .orElse(WorkTable.builder()
-                    .employee(employee)
-                    .workMenuList(workMenuList)
-                    .build());
+    WorkTable workTable =
+        workTableRepository
+            .findByEmployee_Id(id)
+            .map(
+                existing ->
+                    existing.toBuilder()
+                        .id(existing.getId())
+                        .employee(existing.getEmployee())
+                        .workMenuList(workMenuList)
+                        .build())
+            .orElse(WorkTable.builder().employee(employee).workMenuList(workMenuList).build());
 
     WorkTable saved = workTableRepository.save(workTable);
     return toDTO(saved);

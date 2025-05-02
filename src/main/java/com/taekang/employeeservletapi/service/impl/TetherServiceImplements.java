@@ -37,16 +37,18 @@ public class TetherServiceImplements implements TetherService {
 
   @Override
   public Page<TetherAccountDTO> getAllTetherAccount(Pageable pageable) {
-    return tetherAccountRepository.findAll(pageable).map(
+    return tetherAccountRepository
+        .findAll(pageable)
+        .map(
             tetherAccount ->
-                            TetherAccountDTO.builder()
-                                    .id(tetherAccount.getId())
-                                    .email(tetherAccount.getEmail())
-                                    .tetherWallet(tetherAccount.getTetherWallet())
-                                    .insertDateTime(tetherAccount.getInsertDateTime())
-                                    .updateDateTime(tetherAccount.getUpdateDateTime())
-                                    .deleteDateTime(tetherAccount.getDeleteDateTime())
-                                    .build());
+                TetherAccountDTO.builder()
+                    .id(tetherAccount.getId())
+                    .email(tetherAccount.getEmail())
+                    .tetherWallet(tetherAccount.getTetherWallet())
+                    .insertDateTime(tetherAccount.getInsertDateTime())
+                    .updateDateTime(tetherAccount.getUpdateDateTime())
+                    .deleteDateTime(tetherAccount.getDeleteDateTime())
+                    .build());
   }
 
   /** tether 지갑 주소 받아 그 주소를 업데이트 합니다.. */
@@ -55,13 +57,13 @@ public class TetherServiceImplements implements TetherService {
   public TetherAccount updateTetherWallet(Long id, String tetherWallet) {
     System.out.println("id = " + id);
     System.out.println("tetherWallet = " + tetherWallet);
-    if (tetherAccountRepository
-            .findByTetherWallet(tetherWallet)
-            .isEmpty()){
+    if (tetherAccountRepository.findByTetherWallet(tetherWallet).isEmpty()) {
       throw new AlreadyTetherWalletException();
-    };
+    }
+    ;
 
-    TetherAccount tetherAccount = tetherAccountRepository.findById(id).orElseThrow(AccountNotFoundException::new);
+    TetherAccount tetherAccount =
+        tetherAccountRepository.findById(id).orElseThrow(AccountNotFoundException::new);
 
     tetherAccount =
         tetherAccount.toBuilder()

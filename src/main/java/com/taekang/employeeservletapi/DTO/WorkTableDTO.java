@@ -13,13 +13,13 @@ import lombok.*;
 @NoArgsConstructor
 public class WorkTableDTO {
 
-    private Long id;
+  private Long id;
 
-    private String name;
+  private String name;
 
-    private Department department;
+  private Department department;
 
-    private Level level;
+  private Level level;
 
-    private List<WorkMenu> workMenuList;
+  private List<WorkMenu> workMenuList;
 }

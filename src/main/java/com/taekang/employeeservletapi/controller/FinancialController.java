@@ -1,5 +1,6 @@
 package com.taekang.employeeservletapi.controller;
 
+import com.taekang.employeeservletapi.DTO.tether.TetherAccountDTO;
 import com.taekang.employeeservletapi.DTO.tether.TetherDepositAcceptedDTO;
 import com.taekang.employeeservletapi.DTO.tether.TetherDepositDTO;
 import com.taekang.employeeservletapi.DTO.tether.TetherWalletUpdateDTO;
@@ -35,11 +36,21 @@ public class FinancialController {
   }
 
   @PreAuthorize(MANAGER_ACCESS)
+  @GetMapping("tether/get/account/all")
+  public ResponseEntity<Page<TetherAccountDTO>> getAllAccounts(
+      @PageableDefault(size = 10, sort = "insertDateTime", direction = Sort.Direction.DESC)
+          Pageable pageable) {
+    return ResponseEntity.ok().body(tetherService.getAllTetherAccount(pageable));
+  }
+
+  @PreAuthorize(MANAGER_ACCESS)
   @PatchMapping("tether/update/wallet")
   public ResponseEntity<TetherAccount> updateTetherWallet(
       @RequestBody TetherWalletUpdateDTO tetherWalletUpdateDTO) {
     return ResponseEntity.ok()
-        .body(tetherService.updateTetherWallet(tetherWalletUpdateDTO.getTetherWallet()));
+        .body(
+            tetherService.updateTetherWallet(
+                tetherWalletUpdateDTO.getId(), tetherWalletUpdateDTO.getTetherWallet()));
   }
 
   @PreAuthorize(MANAGER_ACCESS)

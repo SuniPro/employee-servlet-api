@@ -1,5 +1,6 @@
 package com.taekang.employeeservletapi.service;
 
+import com.taekang.employeeservletapi.DTO.tether.TetherAccountDTO;
 import com.taekang.employeeservletapi.DTO.tether.TetherDepositAcceptedDTO;
 import com.taekang.employeeservletapi.DTO.tether.TetherDepositDTO;
 import com.taekang.employeeservletapi.entity.user.TetherAccount;
@@ -13,7 +14,9 @@ import org.springframework.data.domain.Pageable;
 
 public interface TetherService {
 
-  TetherAccount updateTetherWallet(String tetherWallet);
+  Page<TetherAccountDTO> getAllTetherAccount(Pageable pageable);
+
+  TetherAccount updateTetherWallet(Long id, String tetherWallet);
 
   Boolean depositAccept(TetherDepositAcceptedDTO tetherDepositAcceptedDTO);
 

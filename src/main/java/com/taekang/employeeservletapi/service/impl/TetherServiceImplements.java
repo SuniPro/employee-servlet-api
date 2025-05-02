@@ -1,5 +1,6 @@
 package com.taekang.employeeservletapi.service.impl;
 
+import com.taekang.employeeservletapi.DTO.tether.TetherAccountDTO;
 import com.taekang.employeeservletapi.DTO.tether.TetherDepositAcceptedDTO;
 import com.taekang.employeeservletapi.DTO.tether.TetherDepositDTO;
 import com.taekang.employeeservletapi.entity.user.TetherAccount;
@@ -34,14 +35,35 @@ public class TetherServiceImplements implements TetherService {
     this.tetherDepositRepository = tetherDepositRepository;
   }
 
-  /** 모든 입금 내역을 Id를 기준으로 조회합니다. */
+  @Override
+  public Page<TetherAccountDTO> getAllTetherAccount(Pageable pageable) {
+    return tetherAccountRepository
+        .findAll(pageable)
+        .map(
+            tetherAccount ->
+                TetherAccountDTO.builder()
+                    .id(tetherAccount.getId())
+                    .email(tetherAccount.getEmail())
+                    .tetherWallet(tetherAccount.getTetherWallet())
+                    .insertDateTime(tetherAccount.getInsertDateTime())
+                    .updateDateTime(tetherAccount.getUpdateDateTime())
+                    .deleteDateTime(tetherAccount.getDeleteDateTime())
+                    .build());
+  }
+
+  /** tether 지갑 주소 받아 그 주소를 업데이트 합니다.. */
   @Override
   @Transactional
-  public TetherAccount updateTetherWallet(String tetherWallet) {
+  public TetherAccount updateTetherWallet(Long id, String tetherWallet) {
+    System.out.println("id = " + id);
+    System.out.println("tetherWallet = " + tetherWallet);
+    if (tetherAccountRepository.findByTetherWallet(tetherWallet).isEmpty()) {
+      throw new AlreadyTetherWalletException();
+    }
+    ;
+
     TetherAccount tetherAccount =
-        tetherAccountRepository
-            .findByTetherWallet(tetherWallet)
-            .orElseThrow(AccountNotFoundException::new);
+        tetherAccountRepository.findById(id).orElseThrow(AccountNotFoundException::new);
 
     tetherAccount =
         tetherAccount.toBuilder()

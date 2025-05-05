@@ -1,15 +1,25 @@
 package com.taekang.employeeservletapi.entity.employee;
 
 public enum Level {
-  CEO,
-  COO,
-  CFO,
-  CIO,
-  CDO,
-  CTO,
-  MANAGER, // 총괄 팀장
-  OFFICEMANAGER, // 부장, 부서 내 팀장
-  SENIORMANAGER, // 차장
-  ASSOCIATE,
-  STAFF // 스태프
+  STAFF(1),
+  ASSOCIATE(2),
+  SENIORMANAGER(3),
+  OFFICEMANAGER(4),
+  MANAGER(5),
+  CTO(6),
+  CDO(7),
+  CIO(8),
+  CFO(9),
+  COO(10),
+  CEO(11);
+
+  private final int rank;
+
+  Level(int rank) {
+    this.rank = rank;
+  }
+
+  public int getRank() {
+    return rank;
+  }
 }

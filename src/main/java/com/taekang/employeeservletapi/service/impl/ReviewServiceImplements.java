@@ -1,10 +1,7 @@
 package com.taekang.employeeservletapi.service.impl;
 
 import com.taekang.employeeservletapi.DTO.*;
-import com.taekang.employeeservletapi.entity.employee.Ability;
-import com.taekang.employeeservletapi.entity.employee.Commute;
-import com.taekang.employeeservletapi.entity.employee.Employee;
-import com.taekang.employeeservletapi.entity.employee.Level;
+import com.taekang.employeeservletapi.entity.employee.*;
 import com.taekang.employeeservletapi.error.AbilityNotFoundException;
 import com.taekang.employeeservletapi.error.EmployeeNotFoundException;
 import com.taekang.employeeservletapi.repository.employee.AbilityRepository;
@@ -17,6 +14,9 @@ import java.util.function.ToDoubleFunction;
 import java.util.stream.Collectors;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.data.domain.Page;
+import org.springframework.data.domain.PageImpl;
+import org.springframework.data.domain.Pageable;
 import org.springframework.stereotype.Service;
 
 @Slf4j
@@ -88,6 +88,53 @@ public class ReviewServiceImplements implements ReviewService {
       Ability ability = Ability.builder().attitude(attitudeValue).build();
       abilityRepository.save(ability);
     }
+  }
+
+  @Override
+  public Page<AbilityReviewDTO> getEmployeesAbilityReviews(Level level, Department department, Pageable pageable) {
+    int rank = level.getRank();
+    long totalCount = employeeRepository.countByLevelRankLessThan(rank);
+    int limit = pageable.getPageSize();
+
+    // OFFSET 보정
+    long offset = pageable.getOffset();
+    if (offset >= totalCount) {
+      int lastPage = (int) Math.ceil((double) totalCount / limit) - 1;
+      offset = Math.max(0, lastPage * limit);
+    }
+
+    List<Employee> employeeList = employeeRepository.findByLevelRankLessThan(rank, limit, offset);
+
+    List<Long> employeeIds = employeeList.stream().map(Employee::getId).collect(Collectors.toList());
+    Map<Long, List<Ability>> abilitiesMap = abilityRepository.findByEmployeeIdInAndReviewDate(employeeIds, LocalDate.now())
+            .stream()
+            .collect(Collectors.groupingBy(ability -> ability.getEmployee().getId()));
+
+    List<AbilityReviewDTO> content = employeeList.stream()
+            .map(employee -> {
+              List<Ability> abilityList = abilitiesMap.getOrDefault(employee.getId(), Collections.emptyList());
+
+              return AbilityReviewDTO.builder()
+                      .employeeId(employee.getId())
+                      .employeeName(employee.getName())
+                      .creativity(abilityList.isEmpty() ? 3.0 :
+                              abilityList.stream().collect(Collectors.averagingDouble(Ability::getCreativity)))
+                      .workPerformance(abilityList.isEmpty() ? 3.0 :
+                              abilityList.stream().collect(Collectors.averagingDouble(Ability::getWorkPerformance)))
+                      .teamwork(abilityList.isEmpty() ? 3.0 :
+                              abilityList.stream().collect(Collectors.averagingDouble(Ability::getTeamwork)))
+                      .knowledgeLevel(abilityList.isEmpty() ? 3.0 :
+                              abilityList.stream().collect(Collectors.averagingDouble(Ability::getKnowledgeLevel)))
+                      .reviewDate(abilityList.isEmpty() ? null :
+                              abilityList.stream()
+                                      .map(Ability::getReviewDate)
+                                      .max(LocalDate::compareTo) // 가장 최근 날짜
+                                      .orElse(null))
+                      .build();
+            })
+            .collect(Collectors.toList());
+
+    return new PageImpl<>(content, pageable, totalCount);
   }
 
   @Override
@@ -178,6 +225,32 @@ public class ReviewServiceImplements implements ReviewService {
     }
 
     return getAverageAbilityInfo(abilities);
+  }
+
+  @Override
+  public List<String> createAbility(List<AbilityReviewDTO> abilityReviewDTOList) {
+    List<Ability> abilityList = new ArrayList<>();
+    List<String> successList = new ArrayList<>();
+
+    abilityReviewDTOList.forEach(
+        abilityReviewDTO -> {
+
+          Ability ability =
+              Ability.builder()
+                  .employee(Employee.builder().id(abilityReviewDTO.getEmployeeId()).build())
+                      .creativity(abilityReviewDTO.getCreativity())
+                      .workPerformance(abilityReviewDTO.getWorkPerformance())
+                      .teamwork(abilityReviewDTO.getTeamwork())
+                      .knowledgeLevel(abilityReviewDTO.getKnowledgeLevel())
+                      .reviewDate(LocalDate.now(ZoneId.of("Asia/Singapore")))
+                  .build();
+
+          successList.add(abilityReviewDTO.getEmployeeName());
+          abilityList.add(ability);
+        });
+
+    abilityRepository.saveAll(abilityList);
+    return successList;
   }
 
   public List<AbilityDTO> getAdjustedAbilitiesByEmployeeList(List<Employee> employees) {

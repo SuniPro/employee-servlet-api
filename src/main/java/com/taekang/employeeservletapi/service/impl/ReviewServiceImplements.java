@@ -91,7 +91,8 @@ public class ReviewServiceImplements implements ReviewService {
   }
 
   @Override
-  public Page<AbilityReviewDTO> getEmployeesAbilityReviews(Level level, Department department, Pageable pageable) {
+  public Page<AbilityReviewDTO> getEmployeesAbilityReviews(
+      Level level, Department department, Pageable pageable) {
     int rank = level.getRank();
     long totalCount = employeeRepository.countByLevelRankLessThan(rank);
     int limit = pageable.getPageSize();
@@ -105,33 +106,51 @@ public class ReviewServiceImplements implements ReviewService {
 
     List<Employee> employeeList = employeeRepository.findByLevelRankLessThan(rank, limit, offset);
 
-    List<Long> employeeIds = employeeList.stream().map(Employee::getId).collect(Collectors.toList());
-    Map<Long, List<Ability>> abilitiesMap = abilityRepository.findByEmployeeIdInAndReviewDate(employeeIds, LocalDate.now())
-            .stream()
+    List<Long> employeeIds =
+        employeeList.stream().map(Employee::getId).collect(Collectors.toList());
+    Map<Long, List<Ability>> abilitiesMap =
+        abilityRepository.findByEmployeeIdInAndReviewDate(employeeIds, LocalDate.now()).stream()
             .collect(Collectors.groupingBy(ability -> ability.getEmployee().getId()));
 
-    List<AbilityReviewDTO> content = employeeList.stream()
-            .map(employee -> {
-              List<Ability> abilityList = abilitiesMap.getOrDefault(employee.getId(), Collections.emptyList());
+    List<AbilityReviewDTO> content =
+        employeeList.stream()
+            .map(
+                employee -> {
+                  List<Ability> abilityList =
+                      abilitiesMap.getOrDefault(employee.getId(), Collections.emptyList());
 
-              return AbilityReviewDTO.builder()
+                  return AbilityReviewDTO.builder()
                       .employeeId(employee.getId())
                       .employeeName(employee.getName())
-                      .creativity(abilityList.isEmpty() ? 3.0 :
-                              abilityList.stream().collect(Collectors.averagingDouble(Ability::getCreativity)))
-                      .workPerformance(abilityList.isEmpty() ? 3.0 :
-                              abilityList.stream().collect(Collectors.averagingDouble(Ability::getWorkPerformance)))
-                      .teamwork(abilityList.isEmpty() ? 3.0 :
-                              abilityList.stream().collect(Collectors.averagingDouble(Ability::getTeamwork)))
-                      .knowledgeLevel(abilityList.isEmpty() ? 3.0 :
-                              abilityList.stream().collect(Collectors.averagingDouble(Ability::getKnowledgeLevel)))
-                      .reviewDate(abilityList.isEmpty() ? null :
-                              abilityList.stream()
-                                      .map(Ability::getReviewDate)
-                                      .max(LocalDate::compareTo) // 가장 최근 날짜
-                                      .orElse(null))
+                      .creativity(
+                          abilityList.isEmpty()
+                              ? 3.0
+                              : abilityList.stream()
+                                  .collect(Collectors.averagingDouble(Ability::getCreativity)))
+                      .workPerformance(
+                          abilityList.isEmpty()
+                              ? 3.0
+                              : abilityList.stream()
+                                  .collect(Collectors.averagingDouble(Ability::getWorkPerformance)))
+                      .teamwork(
+                          abilityList.isEmpty()
+                              ? 3.0
+                              : abilityList.stream()
+                                  .collect(Collectors.averagingDouble(Ability::getTeamwork)))
+                      .knowledgeLevel(
+                          abilityList.isEmpty()
+                              ? 3.0
+                              : abilityList.stream()
+                                  .collect(Collectors.averagingDouble(Ability::getKnowledgeLevel)))
+                      .reviewDate(
+                          abilityList.isEmpty()
+                              ? null
+                              : abilityList.stream()
+                                  .map(Ability::getReviewDate)
+                                  .max(LocalDate::compareTo) // 가장 최근 날짜
+                                  .orElse(null))
                       .build();
-            })
+                })
             .collect(Collectors.toList());
 
     return new PageImpl<>(content, pageable, totalCount);
@@ -234,15 +253,14 @@ public class ReviewServiceImplements implements ReviewService {
 
     abilityReviewDTOList.forEach(
         abilityReviewDTO -> {
-
           Ability ability =
               Ability.builder()
                   .employee(Employee.builder().id(abilityReviewDTO.getEmployeeId()).build())
-                      .creativity(abilityReviewDTO.getCreativity())
-                      .workPerformance(abilityReviewDTO.getWorkPerformance())
-                      .teamwork(abilityReviewDTO.getTeamwork())
-                      .knowledgeLevel(abilityReviewDTO.getKnowledgeLevel())
-                      .reviewDate(LocalDate.now(ZoneId.of("Asia/Singapore")))
+                  .creativity(abilityReviewDTO.getCreativity())
+                  .workPerformance(abilityReviewDTO.getWorkPerformance())
+                  .teamwork(abilityReviewDTO.getTeamwork())
+                  .knowledgeLevel(abilityReviewDTO.getKnowledgeLevel())
+                  .reviewDate(LocalDate.now(ZoneId.of("Asia/Singapore")))
                   .build();
 
           successList.add(abilityReviewDTO.getEmployeeName());

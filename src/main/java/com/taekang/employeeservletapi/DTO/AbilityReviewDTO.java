@@ -1,8 +1,7 @@
 package com.taekang.employeeservletapi.DTO;
 
-import lombok.*;
-
 import java.time.LocalDate;
+import lombok.*;
 
 @Getter
 @Setter
@@ -11,19 +10,19 @@ import java.time.LocalDate;
 @Builder(toBuilder = true)
 public class AbilityReviewDTO {
 
-    private Long id;
+  private Long id;
 
-    private Long employeeId;
+  private Long employeeId;
 
-    private String employeeName;
+  private String employeeName;
 
-    private double creativity;
+  private double creativity;
 
-    private double workPerformance;
+  private double workPerformance;
 
-    private double teamwork;
+  private double teamwork;
 
-    private double knowledgeLevel;
+  private double knowledgeLevel;
 
-    private LocalDate reviewDate;
+  private LocalDate reviewDate;
 }

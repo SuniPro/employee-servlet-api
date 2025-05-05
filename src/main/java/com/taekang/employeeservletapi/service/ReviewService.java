@@ -3,10 +3,9 @@ package com.taekang.employeeservletapi.service;
 import com.taekang.employeeservletapi.DTO.*;
 import com.taekang.employeeservletapi.entity.employee.Department;
 import com.taekang.employeeservletapi.entity.employee.Level;
+import java.util.List;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.Pageable;
-
-import java.util.List;
 
 public interface ReviewService {
 
@@ -14,7 +13,8 @@ public interface ReviewService {
 
   void workOff(CommuteDTO commuteDTO);
 
-  Page<AbilityReviewDTO> getEmployeesAbilityReviews(Level level, Department department, Pageable pageable);
+  Page<AbilityReviewDTO> getEmployeesAbilityReviews(
+      Level level, Department department, Pageable pageable);
 
   List<WorkBalanceDTO> getWorkBalanceByEmployeeId(Long employeeId);
 

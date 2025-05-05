@@ -1,9 +1,6 @@
 package com.taekang.employeeservletapi.controller;
 
-import com.taekang.employeeservletapi.DTO.tether.TetherAccountDTO;
-import com.taekang.employeeservletapi.DTO.tether.TetherDepositAcceptedDTO;
-import com.taekang.employeeservletapi.DTO.tether.TetherDepositDTO;
-import com.taekang.employeeservletapi.DTO.tether.TetherWalletUpdateDTO;
+import com.taekang.employeeservletapi.DTO.tether.*;
 import com.taekang.employeeservletapi.entity.user.TetherAccount;
 import com.taekang.employeeservletapi.entity.user.TetherDeposit;
 import com.taekang.employeeservletapi.entity.user.TransactionStatus;
@@ -54,6 +51,22 @@ public class FinancialController {
   }
 
   @PreAuthorize(MANAGER_ACCESS)
+  @PatchMapping("tether/update/site")
+  public void updateSite(
+          @RequestBody TetherAccountUpdateDTO tetherAccountUpdateDTO
+  ){
+    tetherService.updateSite(tetherAccountUpdateDTO.getId(), tetherAccountUpdateDTO.getSite());
+  }
+
+  @PreAuthorize(MANAGER_ACCESS)
+  @PatchMapping("tether/update/memo")
+  public void updateMemo(
+          @RequestBody TetherAccountUpdateDTO tetherAccountUpdateDTO
+  ){
+    tetherService.updateMemo(tetherAccountUpdateDTO.getId(), tetherAccountUpdateDTO.getMemo());
+  }
+
+  @PreAuthorize(MANAGER_ACCESS)
   @PatchMapping("tether/accept/deposit")
   public ResponseEntity<Boolean> approveDeposit(
       @RequestBody TetherDepositAcceptedDTO tetherDepositAcceptedDTO) {
@@ -73,6 +86,17 @@ public class FinancialController {
       @PageableDefault(size = 10, sort = "requestedAt", direction = Sort.Direction.DESC)
           Pageable pageable) {
     return ResponseEntity.ok().body(tetherService.getDepositsByStatus(status, pageable));
+  }
+
+  @PreAuthorize(MANAGER_ACCESS)
+  @GetMapping("tether/get/deposits/by/status/{status}/email/{email}")
+  public ResponseEntity<Page<TetherDepositDTO>> getDepositsByTetherWalletAndStatus(
+      @PathVariable String email,
+      @PathVariable TransactionStatus status,
+      @PageableDefault(size = 10, sort = "requestedAt", direction = Sort.Direction.DESC)
+          Pageable pageable) {
+    return ResponseEntity.ok()
+        .body(tetherService.getDepositsByEmailAndStatus(status, email, pageable));
   }
 
   @PreAuthorize(MANAGER_ACCESS)
@@ -124,13 +148,28 @@ public class FinancialController {
   }
 
   @PreAuthorize(MANAGER_ACCESS)
-  @GetMapping("tether/get/deposits/range/by/wallet/{tetherWallet}")
-  public ResponseEntity<List<TetherDeposit>> getDepositsByWalletAndDateRange(
-      @PathVariable String tetherWallet,
+  @GetMapping("tether/get/deposits/range/by/status/{status}")
+  public ResponseEntity<Page<TetherDepositDTO>> getDepositsByDateRangeAndStatus(
+      @PathVariable TransactionStatus status,
       @RequestParam LocalDateTime start,
-      @RequestParam LocalDateTime end) {
+      @RequestParam LocalDateTime end,
+      @PageableDefault(size = 10, sort = "requestedAt", direction = Sort.Direction.DESC)
+          Pageable pageable) {
     return ResponseEntity.ok()
-        .body(tetherService.getDepositsInRangeByTetherWallet(tetherWallet, start, end));
+        .body(tetherService.getDepositsInRangeByStatus(start, end, status, pageable));
+  }
+
+  @PreAuthorize(MANAGER_ACCESS)
+  @GetMapping("tether/get/deposits/range/by/status/{status}/email/{email}")
+  public ResponseEntity<Page<TetherDepositDTO>> getDepositsByStatusAndWalletAndDateRange(
+      @PathVariable TransactionStatus status,
+      @PathVariable String email,
+      @RequestParam LocalDateTime start,
+      @RequestParam LocalDateTime end,
+      @PageableDefault(size = 10, sort = "requestedAt", direction = Sort.Direction.DESC)
+          Pageable pageable) {
+    return ResponseEntity.ok()
+        .body(tetherService.getDepositsInRangeByEmail(status, email, start, end, pageable));
   }
 
   @PreAuthorize(MANAGER_ACCESS)

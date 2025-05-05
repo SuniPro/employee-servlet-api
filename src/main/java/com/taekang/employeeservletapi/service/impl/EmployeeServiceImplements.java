@@ -12,10 +12,15 @@ import com.taekang.employeeservletapi.repository.employee.AbilityRepository;
 import com.taekang.employeeservletapi.repository.employee.EmployeeRepository;
 import com.taekang.employeeservletapi.service.EmployeeService;
 import java.time.LocalDateTime;
+import java.util.ArrayList;
 import java.util.List;
+import java.util.stream.Collectors;
 import lombok.extern.slf4j.Slf4j;
+import org.modelmapper.ModelMapper;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.data.domain.Page;
+import org.springframework.data.domain.PageImpl;
+import org.springframework.data.domain.PageRequest;
 import org.springframework.data.domain.Pageable;
 import org.springframework.security.crypto.bcrypt.BCryptPasswordEncoder;
 import org.springframework.stereotype.Service;
@@ -27,15 +32,17 @@ public class EmployeeServiceImplements implements EmployeeService {
   private final EmployeeRepository employeeRepository;
   private final BCryptPasswordEncoder bCryptPasswordEncoder;
   private final AbilityRepository abilityRepository;
+  private final ModelMapper modelMapper;
 
   @Autowired
   public EmployeeServiceImplements(
-      EmployeeRepository employeeRepository,
-      BCryptPasswordEncoder bCryptPasswordEncoder,
-      AbilityRepository abilityRepository1) {
+          EmployeeRepository employeeRepository,
+          BCryptPasswordEncoder bCryptPasswordEncoder,
+          AbilityRepository abilityRepository1, ModelMapper modelMapper) {
     this.employeeRepository = employeeRepository;
     this.bCryptPasswordEncoder = bCryptPasswordEncoder;
     this.abilityRepository = abilityRepository1;
+    this.modelMapper = modelMapper;
   }
 
   @Override
@@ -108,6 +115,55 @@ public class EmployeeServiceImplements implements EmployeeService {
   @Override
   public List<Employee> getEmployeeListByLevel(Level level) {
     return employeeRepository.findByLevel(level);
+  }
+
+  @Override
+  public Page<EmployeeDTO> getEmployeeListByLevelLessThen(Level level, Pageable pageable) {
+    int rank = level.getRank();
+    long totalCount = employeeRepository.countByLevelRankLessThan(rank);
+
+    int limit = pageable.getPageSize();
+    long totalPages = totalCount / limit;
+
+    // OFFSET 값 보정
+    long offset = pageable.getOffset();
+    if (offset >= totalCount) {
+      int lastPage = (int) Math.ceil((double) totalCount / limit) - 1;
+      if (lastPage < 0) lastPage = 0;
+      offset = (long) lastPage * limit;
+    }
+
+    // 1. 엔티티 리스트 조회
+    List<Employee> employeeList = employeeRepository.findByLevelRankLessThan(
+            rank, limit, offset);
+
+    // 2. DTO로 변환
+    List<EmployeeDTO> content = employeeList.stream()
+            .map(employee -> modelMapper.map(employee, EmployeeDTO.class))
+            .collect(Collectors.toList());
+
+    // 3. Page 객체 생성 (수정된 부분)
+    return new PageImpl<>(
+            content,
+            PageRequest.of(
+                    pageable.getPageNumber(),
+                    pageable.getPageSize(),
+                    pageable.getSort()), // 정렬 정보 유지
+            totalPages
+    );
+  }
+
+  @Override
+  public Page<EmployeeDTO> getEmployeeListByLevelAndDepartmentLessThen(Level level, Department department, Pageable pageable) {
+    Page<Employee> employeePage = employeeRepository.findByLevelLessThanAndDepartment(level, department, pageable);
+    return employeePage.map(employee -> modelMapper.map(employee, EmployeeDTO.class));
+  }
+
+  @Override
+  public List<EmployeeDTO> getEmployeeListByLevelGreaterThen(Level level) {
+    List<EmployeeDTO> employeeDTOList = new ArrayList<>();
+    employeeRepository.findByLevelGreaterThan(level).forEach(employee -> employeeDTOList.add(modelMapper.map(employee, EmployeeDTO.class)));
+    return employeeDTOList;
   }
 
   @Override

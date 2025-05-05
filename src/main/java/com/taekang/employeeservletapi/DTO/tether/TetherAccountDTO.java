@@ -16,6 +16,10 @@ public class TetherAccountDTO {
 
   private String email;
 
+  private String site;
+
+  private String memo;
+
   private LocalDateTime insertDateTime;
 
   private LocalDateTime updateDateTime;

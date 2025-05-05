@@ -19,6 +19,10 @@ public class TetherDepositDTO {
 
   private String email;
 
+  private String site;
+
+  private String memo;
+
   private LocalDateTime insertDateTime;
 
   private BigDecimal amount;

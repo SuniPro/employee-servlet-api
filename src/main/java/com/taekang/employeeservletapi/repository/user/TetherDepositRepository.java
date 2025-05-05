@@ -23,6 +23,8 @@ public interface TetherDepositRepository extends JpaRepository<TetherDeposit, Lo
   // 3. 상태 기반 조회 (예: PENDING 승인 대기 리스트)
   Page<TetherDeposit> findByStatus(TransactionStatus status, Pageable pageable);
 
+  Page<TetherDeposit> findByStatusAndTetherAccount_Email(TransactionStatus status, String tetherAccountEmail, Pageable pageable);
+
   // 4. 계정별 + 상태 필터 조회
   List<TetherDeposit> findByTetherAccount_IdAndStatus(Long accountId, TransactionStatus status);
 
@@ -31,6 +33,8 @@ public interface TetherDepositRepository extends JpaRepository<TetherDeposit, Lo
 
   // 6. 입금 날짜 기준 범위 조회 (통계/필터링)
   List<TetherDeposit> findByRequestedAtBetween(LocalDateTime start, LocalDateTime end);
+
+  Page<TetherDeposit> findByRequestedAtBetweenAndStatus(LocalDateTime start, LocalDateTime end, TransactionStatus status, Pageable pageable);
 
   // 7. 상태별 총 입금 합계 (native)
   @Query(
@@ -68,9 +72,7 @@ public interface TetherDepositRepository extends JpaRepository<TetherDeposit, Lo
   Optional<TetherDeposit> findTopByTetherAccount_TetherWalletOrderByRequestedAtDesc(
       String tetherWallet);
 
-  // 특정 지갑의 입금 목록 (기간 기준)
-  List<TetherDeposit> findByTetherAccount_TetherWalletAndRequestedAtBetween(
-      String tetherWallet, LocalDateTime start, LocalDateTime end);
+  Page<TetherDeposit> findByStatusAndTetherAccount_EmailAndRequestedAtBetween(TransactionStatus status, String tetherAccount_email, LocalDateTime requestedAt, LocalDateTime requestedAt2, Pageable pageable);
 
   @Query(
       value =

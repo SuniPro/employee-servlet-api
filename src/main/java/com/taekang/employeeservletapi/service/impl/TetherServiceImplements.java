@@ -44,6 +44,8 @@ public class TetherServiceImplements implements TetherService {
                 TetherAccountDTO.builder()
                     .id(tetherAccount.getId())
                     .email(tetherAccount.getEmail())
+                    .site(tetherAccount.getSite())
+                    .memo(tetherAccount.getMemo())
                     .tetherWallet(tetherAccount.getTetherWallet())
                     .insertDateTime(tetherAccount.getInsertDateTime())
                     .updateDateTime(tetherAccount.getUpdateDateTime())
@@ -55,12 +57,9 @@ public class TetherServiceImplements implements TetherService {
   @Override
   @Transactional
   public TetherAccount updateTetherWallet(Long id, String tetherWallet) {
-    System.out.println("id = " + id);
-    System.out.println("tetherWallet = " + tetherWallet);
     if (tetherAccountRepository.findByTetherWallet(tetherWallet).isEmpty()) {
       throw new AlreadyTetherWalletException();
     }
-    ;
 
     TetherAccount tetherAccount =
         tetherAccountRepository.findById(id).orElseThrow(AccountNotFoundException::new);
@@ -71,6 +70,22 @@ public class TetherServiceImplements implements TetherService {
             .updateDateTime(LocalDateTime.now(ZoneId.of("Asia/Seoul")))
             .build();
     return tetherAccountRepository.save(tetherAccount);
+  }
+
+  @Override
+  public void updateSite(Long id, String site) {
+    TetherAccount tetherAccount =
+        tetherAccountRepository.findById(id).orElseThrow(AccountNotFoundException::new);
+
+    tetherAccountRepository.save(tetherAccount.toBuilder().id(id).site(site).build());
+  }
+
+  @Override
+  public void updateMemo(Long id, String memo) {
+    TetherAccount tetherAccount =
+        tetherAccountRepository.findById(id).orElseThrow(AccountNotFoundException::new);
+
+    tetherAccountRepository.save(tetherAccount.toBuilder().id(id).memo(memo).build());
   }
 
   /** 입금 내역을 승인합니다. */
@@ -124,22 +139,16 @@ public class TetherServiceImplements implements TetherService {
   @Override
   @Transactional(transactionManager = "userTransactionManager", readOnly = true)
   public Page<TetherDepositDTO> getDepositsByStatus(TransactionStatus status, Pageable pageable) {
+    return tetherDepositRepository.findByStatus(status, pageable).map(this::toTetherDepositDTO);
+  }
+
+  @Override
+  @Transactional(transactionManager = "userTransactionManager", readOnly = true)
+  public Page<TetherDepositDTO> getDepositsByEmailAndStatus(
+      TransactionStatus status, String email, Pageable pageable) {
     return tetherDepositRepository
-        .findByStatus(status, pageable)
-        .map(
-            deposit ->
-                TetherDepositDTO.builder()
-                    .id(deposit.getId())
-                    .tetherWallet(deposit.getTetherAccount().getTetherWallet())
-                    .email(deposit.getTetherAccount().getEmail())
-                    .insertDateTime(deposit.getTetherAccount().getInsertDateTime())
-                    .amount(deposit.getAmount())
-                    .usdtAmount(deposit.getUsdtAmount())
-                    .accepted(deposit.getAccepted())
-                    .acceptedAt(deposit.getAcceptedAt())
-                    .requestedAt(deposit.getRequestedAt())
-                    .status(deposit.getStatus())
-                    .build());
+        .findByStatusAndTetherAccount_Email(status, email, pageable)
+        .map(this::toTetherDepositDTO);
   }
 
   /** 아이디를 기준으로 특정 상태의 입금을 조회합니다. */
@@ -176,20 +185,7 @@ public class TetherServiceImplements implements TetherService {
     return tetherDepositRepository
         .findByTetherAccount_TetherWalletAndStatus(tetherWallet, TransactionStatus.PENDING)
         .stream()
-        .map(
-            deposit ->
-                TetherDepositDTO.builder()
-                    .id(deposit.getId())
-                    .tetherWallet(deposit.getTetherAccount().getTetherWallet())
-                    .email(deposit.getTetherAccount().getEmail())
-                    .insertDateTime(deposit.getTetherAccount().getInsertDateTime())
-                    .amount(deposit.getAmount())
-                    .usdtAmount(deposit.getUsdtAmount())
-                    .accepted(deposit.getAccepted())
-                    .acceptedAt(deposit.getAcceptedAt())
-                    .requestedAt(deposit.getRequestedAt())
-                    .status(deposit.getStatus())
-                    .build())
+        .map(this::toTetherDepositDTO)
         .toList();
   }
 
@@ -218,13 +214,28 @@ public class TetherServiceImplements implements TetherService {
     return tetherDepositRepository.findByRequestedAtBetween(start, end);
   }
 
+  @Override
+  @Transactional(transactionManager = "userTransactionManager", readOnly = true)
+  public Page<TetherDepositDTO> getDepositsInRangeByStatus(
+      LocalDateTime start, LocalDateTime end, TransactionStatus status, Pageable pageable) {
+    return tetherDepositRepository
+        .findByRequestedAtBetweenAndStatus(start, end, status, pageable)
+        .map(this::toTetherDepositDTO);
+  }
+
   /** 기간을 기준으로 특정 지갑의 모든 입금 목록을 조회합니다.. */
   @Override
   @Transactional(readOnly = true)
-  public List<TetherDeposit> getDepositsInRangeByTetherWallet(
-      String tetherWallet, LocalDateTime start, LocalDateTime end) {
-    return tetherDepositRepository.findByTetherAccount_TetherWalletAndRequestedAtBetween(
-        tetherWallet, start, end);
+  public Page<TetherDepositDTO> getDepositsInRangeByEmail(
+      TransactionStatus status,
+      String email,
+      LocalDateTime start,
+      LocalDateTime end,
+      Pageable pageable) {
+    return tetherDepositRepository
+        .findByStatusAndTetherAccount_EmailAndRequestedAtBetween(
+            status, email, start, end, pageable)
+        .map(this::toTetherDepositDTO);
   }
 
   /** 상태별 총 입금 합계를 조회합니다. */
@@ -240,5 +251,23 @@ public class TetherServiceImplements implements TetherService {
   public BigDecimal getTotalDepositAmountByStatusAndWallet(
       TransactionStatus status, String tetherWallet) {
     return tetherDepositRepository.sumByStatusAndWallet(status.name(), tetherWallet);
+  }
+
+  private TetherDepositDTO toTetherDepositDTO(TetherDeposit deposit) {
+
+    return TetherDepositDTO.builder()
+        .id(deposit.getId())
+        .tetherWallet(deposit.getTetherAccount().getTetherWallet())
+        .email(deposit.getTetherAccount().getEmail())
+        .site(deposit.getTetherAccount().getSite())
+        .memo(deposit.getTetherAccount().getMemo())
+        .insertDateTime(deposit.getTetherAccount().getInsertDateTime())
+        .amount(deposit.getAmount())
+        .usdtAmount(deposit.getUsdtAmount())
+        .accepted(deposit.getAccepted())
+        .acceptedAt(deposit.getAcceptedAt())
+        .requestedAt(deposit.getRequestedAt())
+        .status(deposit.getStatus())
+        .build();
   }
 }

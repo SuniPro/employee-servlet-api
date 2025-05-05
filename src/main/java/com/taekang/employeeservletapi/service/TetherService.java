@@ -18,6 +18,10 @@ public interface TetherService {
 
   TetherAccount updateTetherWallet(Long id, String tetherWallet);
 
+  void updateSite(Long id, String site);
+
+  void updateMemo(Long id, String memo);
+
   Boolean depositAccept(TetherDepositAcceptedDTO tetherDepositAcceptedDTO);
 
   Boolean withdrawAccept(String tetherWallet, BigDecimal amount);
@@ -27,6 +31,9 @@ public interface TetherService {
 
   // 상태별 전체 리스트 조회
   Page<TetherDepositDTO> getDepositsByStatus(TransactionStatus status, Pageable pageable);
+
+  Page<TetherDepositDTO> getDepositsByEmailAndStatus(
+      TransactionStatus status, String email, Pageable pageable);
 
   // 특정 계정의 승인된 입금 조회
   List<TetherDeposit> getApprovedDepositsForAccountById(Long accountId, TransactionStatus status);
@@ -48,9 +55,16 @@ public interface TetherService {
   // 특정 기간의 전체 입금 목록
   List<TetherDeposit> getDepositsInRange(LocalDateTime start, LocalDateTime end);
 
+  Page<TetherDepositDTO> getDepositsInRangeByStatus(
+      LocalDateTime start, LocalDateTime end, TransactionStatus status, Pageable pageable);
+
   // 특정 기간의 지갑 입금 목록
-  List<TetherDeposit> getDepositsInRangeByTetherWallet(
-      String tetherWallet, LocalDateTime start, LocalDateTime end);
+  Page<TetherDepositDTO> getDepositsInRangeByEmail(
+      TransactionStatus status,
+      String tetherWallet,
+      LocalDateTime start,
+      LocalDateTime end,
+      Pageable pageable);
 
   // 상태별 총 입금합계
   BigDecimal getTotalDepositAmountByStatus(TransactionStatus status);

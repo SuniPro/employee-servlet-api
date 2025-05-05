@@ -22,6 +22,12 @@ public class TetherAccount {
   @Column(name = "email", nullable = false)
   private String email;
 
+  @Column(name = "site", nullable = false)
+  private String site;
+
+  @Column(name = "memo", nullable = false)
+  private String memo;
+
   @Column(name = "insert_date_time")
   private LocalDateTime insertDateTime;
 

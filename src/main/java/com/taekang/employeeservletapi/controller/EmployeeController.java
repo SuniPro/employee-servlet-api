@@ -49,7 +49,7 @@ public class EmployeeController {
 
   @GetMapping("get/all")
   public ResponseEntity<Page<Employee>> getAllEmployees(
-      @PageableDefault(size = 10, sort = "requestedAt", direction = Sort.Direction.DESC)
+      @PageableDefault(size = 10, sort = "insertDateTime", direction = Sort.Direction.DESC)
           Pageable pageable) {
     return ResponseEntity.ok().body(employeeService.getAllEmployees(pageable));
   }
@@ -63,6 +63,33 @@ public class EmployeeController {
   @GetMapping("get/by/{level}")
   public ResponseEntity<List<Employee>> getEmployeeListByLevel(@PathVariable Level level) {
     return ResponseEntity.ok().body(employeeService.getEmployeeListByLevel(level));
+  }
+
+  @GetMapping("get/by/{level}/less/then")
+  public ResponseEntity<Page<EmployeeDTO>> getEmployeeListByLevelLessThen(
+      @PathVariable Level level,
+      @PageableDefault(size = 10, sort = "insert_date_time", direction = Sort.Direction.DESC)
+          Pageable pageable) {
+    return ResponseEntity.ok()
+        .body(employeeService.getEmployeeListByLevelLessThen(level, pageable));
+  }
+
+  @GetMapping("get/by/{level}/department/{department}/less/then")
+  public ResponseEntity<Page<EmployeeDTO>> getEmployeeListByLevelAndDepartmentLessThen(
+      @PathVariable Level level,
+      @PathVariable Department department,
+      @PageableDefault(size = 10, sort = "insertDateTime", direction = Sort.Direction.DESC)
+          Pageable pageable) {
+    return ResponseEntity.ok()
+        .body(
+            employeeService.getEmployeeListByLevelAndDepartmentLessThen(
+                level, department, pageable));
+  }
+
+  @GetMapping("get/by/{level}/greater/then")
+  public ResponseEntity<List<EmployeeDTO>> getEmployeeListByLevelGreaterThan(
+      @PathVariable Level level) {
+    return ResponseEntity.ok().body(employeeService.getEmployeeListByLevelGreaterThen(level));
   }
 
   @DeleteMapping("delete/by/{id}")

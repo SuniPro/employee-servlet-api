@@ -9,9 +9,9 @@ import lombok.*;
 @AllArgsConstructor
 public class TetherAccountUpdateDTO {
 
-    private Long id;
+  private Long id;
 
-    private String site;
+  private String site;
 
-    private String memo;
+  private String memo;
 }

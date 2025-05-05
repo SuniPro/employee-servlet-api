@@ -36,9 +36,10 @@ public class EmployeeServiceImplements implements EmployeeService {
 
   @Autowired
   public EmployeeServiceImplements(
-          EmployeeRepository employeeRepository,
-          BCryptPasswordEncoder bCryptPasswordEncoder,
-          AbilityRepository abilityRepository1, ModelMapper modelMapper) {
+      EmployeeRepository employeeRepository,
+      BCryptPasswordEncoder bCryptPasswordEncoder,
+      AbilityRepository abilityRepository1,
+      ModelMapper modelMapper) {
     this.employeeRepository = employeeRepository;
     this.bCryptPasswordEncoder = bCryptPasswordEncoder;
     this.abilityRepository = abilityRepository1;
@@ -134,35 +135,36 @@ public class EmployeeServiceImplements implements EmployeeService {
     }
 
     // 1. 엔티티 리스트 조회
-    List<Employee> employeeList = employeeRepository.findByLevelRankLessThan(
-            rank, limit, offset);
+    List<Employee> employeeList = employeeRepository.findByLevelRankLessThan(rank, limit, offset);
 
     // 2. DTO로 변환
-    List<EmployeeDTO> content = employeeList.stream()
+    List<EmployeeDTO> content =
+        employeeList.stream()
             .map(employee -> modelMapper.map(employee, EmployeeDTO.class))
             .collect(Collectors.toList());
 
     // 3. Page 객체 생성 (수정된 부분)
     return new PageImpl<>(
-            content,
-            PageRequest.of(
-                    pageable.getPageNumber(),
-                    pageable.getPageSize(),
-                    pageable.getSort()), // 정렬 정보 유지
-            totalPages
-    );
+        content,
+        PageRequest.of(
+            pageable.getPageNumber(), pageable.getPageSize(), pageable.getSort()), // 정렬 정보 유지
+        totalPages);
   }
 
   @Override
-  public Page<EmployeeDTO> getEmployeeListByLevelAndDepartmentLessThen(Level level, Department department, Pageable pageable) {
-    Page<Employee> employeePage = employeeRepository.findByLevelLessThanAndDepartment(level, department, pageable);
+  public Page<EmployeeDTO> getEmployeeListByLevelAndDepartmentLessThen(
+      Level level, Department department, Pageable pageable) {
+    Page<Employee> employeePage =
+        employeeRepository.findByLevelLessThanAndDepartment(level, department, pageable);
     return employeePage.map(employee -> modelMapper.map(employee, EmployeeDTO.class));
   }
 
   @Override
   public List<EmployeeDTO> getEmployeeListByLevelGreaterThen(Level level) {
     List<EmployeeDTO> employeeDTOList = new ArrayList<>();
-    employeeRepository.findByLevelGreaterThan(level).forEach(employee -> employeeDTOList.add(modelMapper.map(employee, EmployeeDTO.class)));
+    employeeRepository
+        .findByLevelGreaterThan(level)
+        .forEach(employee -> employeeDTOList.add(modelMapper.map(employee, EmployeeDTO.class)));
     return employeeDTOList;
   }
 

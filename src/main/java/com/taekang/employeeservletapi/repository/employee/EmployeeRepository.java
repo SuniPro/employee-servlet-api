@@ -29,7 +29,9 @@ public interface EmployeeRepository extends JpaRepository<Employee, Long> {
 
   List<Employee> findByLevelAndName(Level level, String name);
 
-  @Query(value = """
+  @Query(
+      value =
+          """
         SELECT * FROM employee
         WHERE
             CASE level
@@ -48,7 +50,8 @@ public interface EmployeeRepository extends JpaRepository<Employee, Long> {
         ORDER BY insert_date_time DESC
         LIMIT :limit OFFSET :offset
         """,
-          countQuery = """
+      countQuery =
+          """
             SELECT COUNT(*) FROM employee
             WHERE
                 CASE level
@@ -65,14 +68,13 @@ public interface EmployeeRepository extends JpaRepository<Employee, Long> {
                     WHEN 'CEO' THEN 11
                 END < :rank
             """,
-          nativeQuery = true)
+      nativeQuery = true)
   List<Employee> findByLevelRankLessThan(
-          @Param("rank") int rank,
-          @Param("limit") int limit,
-          @Param("offset") long offset);
+      @Param("rank") int rank, @Param("limit") int limit, @Param("offset") long offset);
 
-  @Query(value =
-      """
+  @Query(
+      value =
+          """
               SELECT COUNT(*) FROM Employee employee
                           WHERE
                               CASE employee.level
@@ -91,12 +93,12 @@ public interface EmployeeRepository extends JpaRepository<Employee, Long> {
               """)
   Long countByLevelRankLessThan(@Param("rank") int rank);
 
-//          countByLevelRankLessThan
+  //          countByLevelRankLessThan
 
   List<Employee> findByLevelLessThanEqual(Level level);
 
-  Page<Employee> findByLevelLessThanAndDepartment(Level level, Department department, Pageable pageable);
+  Page<Employee> findByLevelLessThanAndDepartment(
+      Level level, Department department, Pageable pageable);
 
   List<Employee> findByLevelGreaterThan(Level level);
-
 }

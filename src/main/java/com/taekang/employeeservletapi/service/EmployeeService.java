@@ -27,7 +27,8 @@ public interface EmployeeService {
 
   Page<EmployeeDTO> getEmployeeListByLevelLessThen(Level level, Pageable pageable);
 
-  Page<EmployeeDTO> getEmployeeListByLevelAndDepartmentLessThen(Level level, Department department, Pageable pageable);
+  Page<EmployeeDTO> getEmployeeListByLevelAndDepartmentLessThen(
+      Level level, Department department, Pageable pageable);
 
   List<EmployeeDTO> getEmployeeListByLevelGreaterThen(Level level);
 

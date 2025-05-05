@@ -70,14 +70,20 @@ public class EmployeeController {
       @PathVariable Level level,
       @PageableDefault(size = 10, sort = "insert_date_time", direction = Sort.Direction.DESC)
           Pageable pageable) {
-    return ResponseEntity.ok().body(employeeService.getEmployeeListByLevelLessThen(level, pageable));
+    return ResponseEntity.ok()
+        .body(employeeService.getEmployeeListByLevelLessThen(level, pageable));
   }
 
   @GetMapping("get/by/{level}/department/{department}/less/then")
   public ResponseEntity<Page<EmployeeDTO>> getEmployeeListByLevelAndDepartmentLessThen(
-      @PathVariable Level level, @PathVariable Department department, @PageableDefault(size = 10, sort = "insertDateTime", direction = Sort.Direction.DESC)
+      @PathVariable Level level,
+      @PathVariable Department department,
+      @PageableDefault(size = 10, sort = "insertDateTime", direction = Sort.Direction.DESC)
           Pageable pageable) {
-    return ResponseEntity.ok().body(employeeService.getEmployeeListByLevelAndDepartmentLessThen(level, department, pageable));
+    return ResponseEntity.ok()
+        .body(
+            employeeService.getEmployeeListByLevelAndDepartmentLessThen(
+                level, department, pageable));
   }
 
   @GetMapping("get/by/{level}/greater/then")

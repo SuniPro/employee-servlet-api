@@ -52,17 +52,13 @@ public class FinancialController {
 
   @PreAuthorize(MANAGER_ACCESS)
   @PatchMapping("tether/update/site")
-  public void updateSite(
-          @RequestBody TetherAccountUpdateDTO tetherAccountUpdateDTO
-  ){
+  public void updateSite(@RequestBody TetherAccountUpdateDTO tetherAccountUpdateDTO) {
     tetherService.updateSite(tetherAccountUpdateDTO.getId(), tetherAccountUpdateDTO.getSite());
   }
 
   @PreAuthorize(MANAGER_ACCESS)
   @PatchMapping("tether/update/memo")
-  public void updateMemo(
-          @RequestBody TetherAccountUpdateDTO tetherAccountUpdateDTO
-  ){
+  public void updateMemo(@RequestBody TetherAccountUpdateDTO tetherAccountUpdateDTO) {
     tetherService.updateMemo(tetherAccountUpdateDTO.getId(), tetherAccountUpdateDTO.getMemo());
   }
 

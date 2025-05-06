@@ -35,8 +35,8 @@ public class FinancialController {
   @PreAuthorize(MANAGER_ACCESS)
   @GetMapping("tether/get/account/by/email/{email}")
   public ResponseEntity<Page<TetherAccountDTO>> getAccount(
-          @PathVariable String email,
-          @PageableDefault(size = 10, sort = "insertDateTime", direction = Sort.Direction.DESC)
+      @PathVariable String email,
+      @PageableDefault(size = 10, sort = "insertDateTime", direction = Sort.Direction.DESC)
           Pageable pageable) {
     return ResponseEntity.ok().body(tetherService.getTetherAccount(email, pageable));
   }
@@ -81,7 +81,7 @@ public class FinancialController {
   @PreAuthorize(MANAGER_ACCESS)
   @PatchMapping("tether/cancel/deposit")
   public ResponseEntity<Boolean> cancelDeposit(
-          @RequestBody TetherDepositChangeStatusDTO tetherDepositChangeStatusDTO) {
+      @RequestBody TetherDepositChangeStatusDTO tetherDepositChangeStatusDTO) {
     return ResponseEntity.ok().body(tetherService.depositCancel(tetherDepositChangeStatusDTO));
   }
 

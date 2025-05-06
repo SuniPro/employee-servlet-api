@@ -18,6 +18,7 @@ public interface TetherAccountRepository extends JpaRepository<TetherAccount, Lo
   Page<TetherAccount> findByEmailContainingIgnoreCase(String email, Pageable pageable);
 
   @Query(
-      "SELECT ta FROM TetherAccount ta WHERE LOWER(TRIM(ta.email)) LIKE LOWER(CONCAT('%', TRIM(:email), '%'))")
+      "SELECT ta FROM TetherAccount ta WHERE LOWER(TRIM(ta.email)) LIKE LOWER(CONCAT('%',"
+          + " TRIM(:email), '%'))")
   Page<TetherAccount> findByEmailContaining(@Param("email") String email, Pageable pageable);
 }

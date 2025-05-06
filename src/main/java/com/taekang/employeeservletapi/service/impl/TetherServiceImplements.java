@@ -1,7 +1,7 @@
 package com.taekang.employeeservletapi.service.impl;
 
 import com.taekang.employeeservletapi.DTO.tether.TetherAccountDTO;
-import com.taekang.employeeservletapi.DTO.tether.TetherDepositAcceptedDTO;
+import com.taekang.employeeservletapi.DTO.tether.TetherDepositChangeStatusDTO;
 import com.taekang.employeeservletapi.DTO.tether.TetherDepositDTO;
 import com.taekang.employeeservletapi.entity.user.TetherAccount;
 import com.taekang.employeeservletapi.entity.user.TetherDeposit;
@@ -14,12 +14,14 @@ import java.math.BigDecimal;
 import java.time.LocalDateTime;
 import java.time.ZoneId;
 import java.util.List;
+import lombok.extern.slf4j.Slf4j;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.Pageable;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
+@Slf4j
 @Service
 public class TetherServiceImplements implements TetherService {
 
@@ -33,6 +35,31 @@ public class TetherServiceImplements implements TetherService {
       TetherDepositRepository tetherDepositRepository) {
     this.tetherAccountRepository = tetherAccountRepository;
     this.tetherDepositRepository = tetherDepositRepository;
+  }
+
+  @Override
+  public Page<TetherAccountDTO> getTetherAccount(String email, Pageable pageable) {
+    // 입력값 trim 처리
+    String trimmedEmail = email != null ? email.trim() : "";
+
+    // 빈 문자열일 경우 전체 조회, 아니면 contains 검색
+    Page<TetherAccount> accounts =
+        trimmedEmail.isEmpty()
+            ? tetherAccountRepository.findAll(pageable)
+            : tetherAccountRepository.findByEmailContainingIgnoreCase(trimmedEmail, pageable);
+
+    return accounts.map(
+        tetherAccount ->
+            TetherAccountDTO.builder()
+                .id(tetherAccount.getId())
+                .email(tetherAccount.getEmail().trim()) // 응답 시에도 trim 처리
+                .site(tetherAccount.getSite())
+                .memo(tetherAccount.getMemo())
+                .tetherWallet(tetherAccount.getTetherWallet())
+                .insertDateTime(tetherAccount.getInsertDateTime())
+                .updateDateTime(tetherAccount.getUpdateDateTime())
+                .deleteDateTime(tetherAccount.getDeleteDateTime())
+                .build());
   }
 
   @Override
@@ -57,7 +84,7 @@ public class TetherServiceImplements implements TetherService {
   @Override
   @Transactional
   public TetherAccount updateTetherWallet(Long id, String tetherWallet) {
-    if (tetherAccountRepository.findByTetherWallet(tetherWallet).isEmpty()) {
+    if (tetherAccountRepository.findByTetherWallet(tetherWallet).isPresent()) {
       throw new AlreadyTetherWalletException();
     }
 
@@ -85,29 +112,18 @@ public class TetherServiceImplements implements TetherService {
     TetherAccount tetherAccount =
         tetherAccountRepository.findById(id).orElseThrow(AccountNotFoundException::new);
 
+    if (memo == null || memo.isBlank()) {
+      return;
+    }
+
     tetherAccountRepository.save(tetherAccount.toBuilder().id(id).memo(memo).build());
   }
 
   /** 입금 내역을 승인합니다. */
   @Override
   @Transactional(transactionManager = "userTransactionManager")
-  public Boolean depositAccept(TetherDepositAcceptedDTO tetherDepositAcceptedDTO) {
-    TetherAccount tetherAccount =
-        tetherAccountRepository
-            .findByTetherWallet(tetherDepositAcceptedDTO.getTetherWallet())
-            .orElseThrow(AccountNotFoundException::new);
-
-    // 2. 기존 입금 요청 확인
-    TetherDeposit tetherDeposit =
-        tetherDepositRepository
-            .findById(tetherDepositAcceptedDTO.getDepositId())
-            .orElseThrow(DepositNotFoundOrAlreadyApprovedException::new);
-
-    // 3. 검증: 계정 & 금액 일치 여부 확인
-    if (!tetherDeposit.getTetherAccount().equals(tetherAccount)
-        || tetherDeposit.getAmount().compareTo(tetherDepositAcceptedDTO.getAmount()) != 0) {
-      throw new DepositVerificationException(); // 커스텀 예외로 명확히
-    }
+  public Boolean depositAccept(TetherDepositChangeStatusDTO tetherDepositChangeStatusDTO) {
+    TetherDeposit tetherDeposit = getTetherDepositForStatusChange(tetherDepositChangeStatusDTO);
 
     // 4. 상태 변경
     TetherDeposit updated =
@@ -120,6 +136,46 @@ public class TetherServiceImplements implements TetherService {
 
     tetherDepositRepository.save(updated);
     return updated.getAccepted();
+  }
+
+  @Override
+  public Boolean depositCancel(TetherDepositChangeStatusDTO tetherDepositChangeStatusDTO) {
+    TetherDeposit tetherDeposit = getTetherDepositForStatusChange(tetherDepositChangeStatusDTO);
+
+    // 4. 상태 변경
+    TetherDeposit updated =
+        tetherDeposit.toBuilder()
+            .id(tetherDeposit.getId())
+            .status(TransactionStatus.CANCELLED)
+            .accepted(false)
+            .build();
+
+    tetherDepositRepository.save(updated);
+    return updated.getAccepted();
+  }
+
+  private TetherDeposit getTetherDepositForStatusChange(
+      TetherDepositChangeStatusDTO tetherDepositChangeStatusDTO) {
+    TetherAccount tetherAccount =
+        tetherAccountRepository
+            .findByTetherWallet(tetherDepositChangeStatusDTO.getTetherWallet())
+            .orElseThrow(AccountNotFoundException::new);
+
+    // 2. 기존 입금 요청 확인
+    TetherDeposit tetherDeposit =
+        tetherDepositRepository
+            .findById(tetherDepositChangeStatusDTO.getDepositId())
+            .orElseThrow(DepositNotFoundOrAlreadyApprovedException::new);
+
+    // 3. 검증: 계정 & 금액 일치 여부 확인
+    if (!tetherDeposit
+        .getAmount()
+        .stripTrailingZeros()
+        .equals(tetherDepositChangeStatusDTO.getAmount().stripTrailingZeros())) {
+      throw new DepositVerificationException();
+    }
+
+    return tetherDeposit;
   }
 
   @Override
@@ -147,7 +203,7 @@ public class TetherServiceImplements implements TetherService {
   public Page<TetherDepositDTO> getDepositsByEmailAndStatus(
       TransactionStatus status, String email, Pageable pageable) {
     return tetherDepositRepository
-        .findByStatusAndTetherAccount_Email(status, email, pageable)
+        .findByTetherAccount_EmailContainingIgnoreCaseAndStatus(email, status, pageable)
         .map(this::toTetherDepositDTO);
   }
 

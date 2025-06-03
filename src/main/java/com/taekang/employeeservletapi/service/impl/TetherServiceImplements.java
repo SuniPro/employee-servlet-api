@@ -133,15 +133,15 @@ public class TetherServiceImplements implements TetherService {
   @Override
   public Boolean depositCancel(TetherDepositChangeStatusDTO tetherDepositChangeStatusDTO) {
     TetherAccount tetherAccount =
-            tetherAccountRepository
-                    .findByTetherWallet(tetherDepositChangeStatusDTO.getTetherWallet())
-                    .orElseThrow(AccountNotFoundException::new);
+        tetherAccountRepository
+            .findByTetherWallet(tetherDepositChangeStatusDTO.getTetherWallet())
+            .orElseThrow(AccountNotFoundException::new);
 
     // 2. 기존 입금 요청 확인
     TetherDeposit tetherDeposit =
-            tetherDepositRepository
-                    .findById(tetherDepositChangeStatusDTO.getDepositId())
-                    .orElseThrow(DepositNotFoundOrAlreadyApprovedException::new);
+        tetherDepositRepository
+            .findById(tetherDepositChangeStatusDTO.getDepositId())
+            .orElseThrow(DepositNotFoundOrAlreadyApprovedException::new);
 
     // 3. 검증: 계정 & 금액 일치 여부 확인
     if (!tetherDeposit.getTetherAccount().equals(tetherAccount)
@@ -151,12 +151,12 @@ public class TetherServiceImplements implements TetherService {
 
     // 4. 상태 변경
     TetherDeposit updated =
-            tetherDeposit.toBuilder()
-                    .id(tetherDeposit.getId())
-                    .status(TransactionStatus.CANCELLED)
-                    .accepted(true)
-                    .acceptedAt(LocalDateTime.now(ZoneId.of("Asia/Seoul")))
-                    .build();
+        tetherDeposit.toBuilder()
+            .id(tetherDeposit.getId())
+            .status(TransactionStatus.CANCELLED)
+            .accepted(true)
+            .acceptedAt(LocalDateTime.now(ZoneId.of("Asia/Seoul")))
+            .build();
 
     tetherDepositRepository.save(updated);
     return updated.getAccepted();
@@ -276,16 +276,16 @@ public class TetherServiceImplements implements TetherService {
   @Override
   @Transactional(readOnly = true)
   public TetherDepositSummaryDTO getStatistics(
-          TransactionStatus status,
-          String email,
-          LocalDateTime requestedAtStart,
-          LocalDateTime requestedAtEnd) {
+      TransactionStatus status,
+      String email,
+      LocalDateTime requestedAtStart,
+      LocalDateTime requestedAtEnd) {
 
-    Object[] result = tetherDepositRepository.findSummaryStatNative(
+    Object[] result =
+        tetherDepositRepository.findSummaryStatNative(
             status.name(), // native 쿼리는 Enum이 아닌 문자열로 받는 것이 안전합니다
             requestedAtStart,
-            requestedAtEnd
-    );
+            requestedAtEnd);
 
     if (result == null) {
       return new TetherDepositSummaryDTO(); // 빈 응답
@@ -294,11 +294,11 @@ public class TetherServiceImplements implements TetherService {
     Object[] row = (Object[]) result[0];
 
     return TetherDepositSummaryDTO.builder()
-            .depositLength(Long.parseLong(String.valueOf(row[0])))
-            .totalAmount(BigDecimal.valueOf(Double.parseDouble(String.valueOf(row[1]))))
-            .maximumDepositor(String.valueOf(row[2]))
-            .maximumAmount(BigDecimal.valueOf(Double.parseDouble(String.valueOf(row[3]))))
-            .build();
+        .depositLength(Long.parseLong(String.valueOf(row[0])))
+        .totalAmount(BigDecimal.valueOf(Double.parseDouble(String.valueOf(row[1]))))
+        .maximumDepositor(String.valueOf(row[2]))
+        .maximumAmount(BigDecimal.valueOf(Double.parseDouble(String.valueOf(row[3]))))
+        .build();
   }
 
   /** 특정 상태를 기준으로 그 지갑의 모든 입금 총액을 조회합니다. */

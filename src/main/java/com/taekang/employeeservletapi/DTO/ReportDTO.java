@@ -11,16 +11,15 @@ import lombok.*;
 @ToString
 public class ReportDTO {
 
-    private Long id;
+  private Long id;
 
-    private EmployeeDTO employee;
+  private EmployeeDTO employee;
 
-    private String title;
+  private String title;
 
-    private String reportContents;
+  private String reportContents;
 
-    private LocalDateTime insertDateTime;
+  private LocalDateTime insertDateTime;
 
-    private LocalDateTime updateDateTime;
-
+  private LocalDateTime updateDateTime;
 }

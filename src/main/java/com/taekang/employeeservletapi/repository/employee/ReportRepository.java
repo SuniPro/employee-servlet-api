@@ -12,9 +12,15 @@ import org.springframework.data.repository.query.Param;
 
 public interface ReportRepository extends JpaRepository<Report, Long> {
 
-    Page<Report> findByEmployee_idAndInsertDateTimeBetween(Long employeeId, LocalDateTime insertDateTimeAfter, LocalDateTime insertDateTimeBefore, Pageable pageable);
+  Page<Report> findByEmployee_idAndInsertDateTimeBetween(
+      Long employeeId,
+      LocalDateTime insertDateTimeAfter,
+      LocalDateTime insertDateTimeBefore,
+      Pageable pageable);
 
-    @Query(value = """
+  @Query(
+      value =
+          """
     SELECT r.*
     FROM report r
     JOIN employee e ON r.employee_id = e.id
@@ -22,29 +28,31 @@ public interface ReportRepository extends JpaRepository<Report, Long> {
       AND r.insert_date_time BETWEEN :start AND :end
     ORDER BY r.insert_date_time DESC
     LIMIT :limit OFFSET :offset
-""", nativeQuery = true)
-    List<Report> findReportsByLevelWithPaging(
-            @Param("level") String level,
-            @Param("start") LocalDateTime start,
-            @Param("end") LocalDateTime end,
-            @Param("limit") int limit,
-            @Param("offset") long offset
-    );
+""",
+      nativeQuery = true)
+  List<Report> findReportsByLevelWithPaging(
+      @Param("level") String level,
+      @Param("start") LocalDateTime start,
+      @Param("end") LocalDateTime end,
+      @Param("limit") int limit,
+      @Param("offset") long offset);
 
-    @Query("""
+  @Query(
+      """
     SELECT COUNT(r)
     FROM Report r
     JOIN r.employee e
     WHERE e.level <= :level
       AND r.insertDateTime BETWEEN :start AND :end
 """)
-    long countReportsByMaxLevelAndPeriod(
-            @Param("level") Level level,
-            @Param("start") LocalDateTime start,
-            @Param("end") LocalDateTime end
-    );
+  long countReportsByMaxLevelAndPeriod(
+      @Param("level") Level level,
+      @Param("start") LocalDateTime start,
+      @Param("end") LocalDateTime end);
 
-    @Query(value = """
+  @Query(
+      value =
+          """
     SELECT r.*
     FROM report r
     JOIN employee e ON r.employee_id = e.id
@@ -53,17 +61,18 @@ public interface ReportRepository extends JpaRepository<Report, Long> {
       AND r.insert_date_time BETWEEN :start AND :end
     ORDER BY r.insert_date_time DESC
     LIMIT :limit OFFSET :offset
-""", nativeQuery = true)
-    List<Report> findReportsByLevelAndEmployeeNameWithPaging(
-            @Param("level") String level,
-            @Param("name") String name,
-            @Param("start") LocalDateTime start,
-            @Param("end") LocalDateTime end,
-            @Param("limit") int limit,
-            @Param("offset") long offset
-    );
+""",
+      nativeQuery = true)
+  List<Report> findReportsByLevelAndEmployeeNameWithPaging(
+      @Param("level") String level,
+      @Param("name") String name,
+      @Param("start") LocalDateTime start,
+      @Param("end") LocalDateTime end,
+      @Param("limit") int limit,
+      @Param("offset") long offset);
 
-    @Query("""
+  @Query(
+      """
                 SELECT COUNT(r)
                 FROM Report r
                 JOIN r.employee e
@@ -71,10 +80,9 @@ public interface ReportRepository extends JpaRepository<Report, Long> {
                 AND e.name = :name
                   AND r.insertDateTime BETWEEN :start AND :end
             """)
-    long countReportsByMaxLevelAndNameAndPeriod(
-            @Param("level") Level level,
-            @Param("name") String name,
-            @Param("start") LocalDateTime start,
-            @Param("end") LocalDateTime end
-    );
+  long countReportsByMaxLevelAndNameAndPeriod(
+      @Param("level") Level level,
+      @Param("name") String name,
+      @Param("start") LocalDateTime start,
+      @Param("end") LocalDateTime end);
 }

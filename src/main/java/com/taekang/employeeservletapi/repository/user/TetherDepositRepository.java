@@ -89,8 +89,14 @@ public interface TetherDepositRepository extends JpaRepository<TetherDeposit, Lo
       LocalDateTime requestedAtBefore,
       Pageable pageable);
 
-  List<TetherDeposit> findByStatusAndRequestedAtBetween(TransactionStatus status, LocalDateTime requestedAtAfter, LocalDateTime requestedAtBefore);
-  List<TetherDeposit> findByStatusAndTetherAccount_EmailAndRequestedAtBetween(TransactionStatus status, String tetherAccount_email, LocalDateTime requestedAtAfter, LocalDateTime requestedAtBefore);
+  List<TetherDeposit> findByStatusAndRequestedAtBetween(
+      TransactionStatus status, LocalDateTime requestedAtAfter, LocalDateTime requestedAtBefore);
+
+  List<TetherDeposit> findByStatusAndTetherAccount_EmailAndRequestedAtBetween(
+      TransactionStatus status,
+      String tetherAccount_email,
+      LocalDateTime requestedAtAfter,
+      LocalDateTime requestedAtBefore);
 
   @Query(
       value =

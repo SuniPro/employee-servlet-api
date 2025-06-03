@@ -49,13 +49,11 @@ public class JwtAuthFilter extends OncePerRequestFilter {
 
         UserDetails userDetails = new CustomEmployeeDetails(dto);
 
-        if (userDetails != null) {
-          UsernamePasswordAuthenticationToken usernamePasswordAuthenticationToken =
-              new UsernamePasswordAuthenticationToken(
-                  userDetails, null, userDetails.getAuthorities());
+        UsernamePasswordAuthenticationToken usernamePasswordAuthenticationToken =
+            new UsernamePasswordAuthenticationToken(
+                userDetails, null, userDetails.getAuthorities());
 
-          SecurityContextHolder.getContext().setAuthentication(usernamePasswordAuthenticationToken);
-        }
+        SecurityContextHolder.getContext().setAuthentication(usernamePasswordAuthenticationToken);
       }
     }
 

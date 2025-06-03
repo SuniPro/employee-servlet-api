@@ -23,8 +23,6 @@ public class TetherDepositDTO {
 
   private String memo;
 
-  private LocalDateTime insertDateTime;
-
   private BigDecimal amount;
 
   private BigDecimal usdtAmount;

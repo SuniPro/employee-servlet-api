@@ -85,9 +85,56 @@ public interface TetherDepositRepository extends JpaRepository<TetherDeposit, Lo
   Page<TetherDeposit> findByStatusAndTetherAccount_EmailAndRequestedAtBetween(
       TransactionStatus status,
       String tetherAccount_email,
-      LocalDateTime requestedAt,
-      LocalDateTime requestedAt2,
+      LocalDateTime requestedAtAfter,
+      LocalDateTime requestedAtBefore,
       Pageable pageable);
+
+  List<TetherDeposit> findByStatusAndRequestedAtBetween(
+      TransactionStatus status, LocalDateTime requestedAtAfter, LocalDateTime requestedAtBefore);
+
+  List<TetherDeposit> findByStatusAndTetherAccount_EmailAndRequestedAtBetween(
+      TransactionStatus status,
+      String tetherAccount_email,
+      LocalDateTime requestedAtAfter,
+      LocalDateTime requestedAtBefore);
+
+  @Query(
+      value =
+          """
+              WITH deposit_stats AS (
+                  -- 전체 입금 건수 및 금액 계산 (유저 무관)
+                  SELECT COUNT(*) AS total_count,
+                         COALESCE(SUM(amount), 0) AS total_amount
+                  FROM tether_deposit
+                  WHERE status = :status
+                    AND requested_at BETWEEN :start AND :end
+              ),
+              max_deposit_user AS (
+                  -- 최대 입금자 정보 계산
+                  SELECT d.tether_account_id, ta.email,
+                         SUM(d.amount) AS max_amount
+                  FROM tether_deposit d
+                  JOIN tether_account ta ON d.tether_account_id = ta.id
+                  WHERE d.status = :status
+                    AND d.requested_at BETWEEN :start AND :end
+                  GROUP BY d.tether_account_id, ta.email
+                  ORDER BY max_amount DESC
+                  LIMIT 1
+              )
+              -- 최종 결과 조합
+              SELECT ds.total_count,
+                     ds.total_amount,
+                     mdu.email AS max_user_email,
+                     mdu.max_amount AS max_user_amount
+              FROM deposit_stats ds
+                       CROSS JOIN max_deposit_user mdu;
+
+          """,
+      nativeQuery = true)
+  Object[] findSummaryStatNative(
+      @Param("status") String status,
+      @Param("start") LocalDateTime start,
+      @Param("end") LocalDateTime end);
 
   @Query(
       value =

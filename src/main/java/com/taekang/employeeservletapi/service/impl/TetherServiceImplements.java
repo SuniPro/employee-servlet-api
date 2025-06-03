@@ -3,6 +3,7 @@ package com.taekang.employeeservletapi.service.impl;
 import com.taekang.employeeservletapi.DTO.tether.TetherAccountDTO;
 import com.taekang.employeeservletapi.DTO.tether.TetherDepositChangeStatusDTO;
 import com.taekang.employeeservletapi.DTO.tether.TetherDepositDTO;
+import com.taekang.employeeservletapi.DTO.tether.TetherDepositSummaryDTO;
 import com.taekang.employeeservletapi.entity.user.TetherAccount;
 import com.taekang.employeeservletapi.entity.user.TetherDeposit;
 import com.taekang.employeeservletapi.entity.user.TransactionStatus;
@@ -13,7 +14,7 @@ import com.taekang.employeeservletapi.service.TetherService;
 import java.math.BigDecimal;
 import java.time.LocalDateTime;
 import java.time.ZoneId;
-import java.util.List;
+import java.util.*;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.data.domain.Page;
@@ -39,27 +40,7 @@ public class TetherServiceImplements implements TetherService {
 
   @Override
   public Page<TetherAccountDTO> getTetherAccount(String email, Pageable pageable) {
-    // 입력값 trim 처리
-    String trimmedEmail = email != null ? email.trim() : "";
-
-    // 빈 문자열일 경우 전체 조회, 아니면 contains 검색
-    Page<TetherAccount> accounts =
-        trimmedEmail.isEmpty()
-            ? tetherAccountRepository.findAll(pageable)
-            : tetherAccountRepository.findByEmailContainingIgnoreCase(trimmedEmail, pageable);
-
-    return accounts.map(
-        tetherAccount ->
-            TetherAccountDTO.builder()
-                .id(tetherAccount.getId())
-                .email(tetherAccount.getEmail().trim()) // 응답 시에도 trim 처리
-                .site(tetherAccount.getSite())
-                .memo(tetherAccount.getMemo())
-                .tetherWallet(tetherAccount.getTetherWallet())
-                .insertDateTime(tetherAccount.getInsertDateTime())
-                .updateDateTime(tetherAccount.getUpdateDateTime())
-                .deleteDateTime(tetherAccount.getDeleteDateTime())
-                .build());
+    return null;
   }
 
   @Override
@@ -84,7 +65,7 @@ public class TetherServiceImplements implements TetherService {
   @Override
   @Transactional
   public TetherAccount updateTetherWallet(Long id, String tetherWallet) {
-    if (tetherAccountRepository.findByTetherWallet(tetherWallet).isPresent()) {
+    if (tetherAccountRepository.findByTetherWallet(tetherWallet).isEmpty()) {
       throw new AlreadyTetherWalletException();
     }
 
@@ -112,10 +93,6 @@ public class TetherServiceImplements implements TetherService {
     TetherAccount tetherAccount =
         tetherAccountRepository.findById(id).orElseThrow(AccountNotFoundException::new);
 
-    if (memo == null || memo.isBlank()) {
-      return;
-    }
-
     tetherAccountRepository.save(tetherAccount.toBuilder().id(id).memo(memo).build());
   }
 
@@ -123,7 +100,22 @@ public class TetherServiceImplements implements TetherService {
   @Override
   @Transactional(transactionManager = "userTransactionManager")
   public Boolean depositAccept(TetherDepositChangeStatusDTO tetherDepositChangeStatusDTO) {
-    TetherDeposit tetherDeposit = getTetherDepositForStatusChange(tetherDepositChangeStatusDTO);
+    TetherAccount tetherAccount =
+        tetherAccountRepository
+            .findByTetherWallet(tetherDepositChangeStatusDTO.getTetherWallet())
+            .orElseThrow(AccountNotFoundException::new);
+
+    // 2. 기존 입금 요청 확인
+    TetherDeposit tetherDeposit =
+        tetherDepositRepository
+            .findById(tetherDepositChangeStatusDTO.getDepositId())
+            .orElseThrow(DepositNotFoundOrAlreadyApprovedException::new);
+
+    // 3. 검증: 계정 & 금액 일치 여부 확인
+    if (!tetherDeposit.getTetherAccount().equals(tetherAccount)
+        || tetherDeposit.getAmount().compareTo(tetherDepositChangeStatusDTO.getAmount()) != 0) {
+      throw new DepositVerificationException(); // 커스텀 예외로 명확히
+    }
 
     // 4. 상태 변경
     TetherDeposit updated =
@@ -140,22 +132,6 @@ public class TetherServiceImplements implements TetherService {
 
   @Override
   public Boolean depositCancel(TetherDepositChangeStatusDTO tetherDepositChangeStatusDTO) {
-    TetherDeposit tetherDeposit = getTetherDepositForStatusChange(tetherDepositChangeStatusDTO);
-
-    // 4. 상태 변경
-    TetherDeposit updated =
-        tetherDeposit.toBuilder()
-            .id(tetherDeposit.getId())
-            .status(TransactionStatus.CANCELLED)
-            .accepted(false)
-            .build();
-
-    tetherDepositRepository.save(updated);
-    return updated.getAccepted();
-  }
-
-  private TetherDeposit getTetherDepositForStatusChange(
-      TetherDepositChangeStatusDTO tetherDepositChangeStatusDTO) {
     TetherAccount tetherAccount =
         tetherAccountRepository
             .findByTetherWallet(tetherDepositChangeStatusDTO.getTetherWallet())
@@ -168,20 +144,22 @@ public class TetherServiceImplements implements TetherService {
             .orElseThrow(DepositNotFoundOrAlreadyApprovedException::new);
 
     // 3. 검증: 계정 & 금액 일치 여부 확인
-    if (!tetherDeposit
-        .getAmount()
-        .stripTrailingZeros()
-        .equals(tetherDepositChangeStatusDTO.getAmount().stripTrailingZeros())) {
-      throw new DepositVerificationException();
+    if (!tetherDeposit.getTetherAccount().equals(tetherAccount)
+        || tetherDeposit.getAmount().compareTo(tetherDepositChangeStatusDTO.getAmount()) != 0) {
+      throw new DepositVerificationException(); // 커스텀 예외로 명확히
     }
 
-    return tetherDeposit;
-  }
+    // 4. 상태 변경
+    TetherDeposit updated =
+        tetherDeposit.toBuilder()
+            .id(tetherDeposit.getId())
+            .status(TransactionStatus.CANCELLED)
+            .accepted(true)
+            .acceptedAt(LocalDateTime.now(ZoneId.of("Asia/Seoul")))
+            .build();
 
-  @Override
-  @Transactional
-  public Boolean withdrawAccept(String tetherWallet, BigDecimal amount) {
-    return null;
+    tetherDepositRepository.save(updated);
+    return updated.getAccepted();
   }
 
   /** 모든 입금 내역을 Id를 기준으로 조회합니다. */
@@ -203,7 +181,7 @@ public class TetherServiceImplements implements TetherService {
   public Page<TetherDepositDTO> getDepositsByEmailAndStatus(
       TransactionStatus status, String email, Pageable pageable) {
     return tetherDepositRepository
-        .findByTetherAccount_EmailContainingIgnoreCaseAndStatus(email, status, pageable)
+        .findByStatusAndTetherAccount_Email(status, email, pageable)
         .map(this::toTetherDepositDTO);
   }
 
@@ -297,8 +275,30 @@ public class TetherServiceImplements implements TetherService {
   /** 상태별 총 입금 합계를 조회합니다. */
   @Override
   @Transactional(readOnly = true)
-  public BigDecimal getTotalDepositAmountByStatus(TransactionStatus status) {
-    return tetherDepositRepository.sumByStatus(status.name());
+  public TetherDepositSummaryDTO getStatistics(
+      TransactionStatus status,
+      String email,
+      LocalDateTime requestedAtStart,
+      LocalDateTime requestedAtEnd) {
+
+    Object[] result =
+        tetherDepositRepository.findSummaryStatNative(
+            status.name(), // native 쿼리는 Enum이 아닌 문자열로 받는 것이 안전합니다
+            requestedAtStart,
+            requestedAtEnd);
+
+    if (result == null) {
+      return new TetherDepositSummaryDTO(); // 빈 응답
+    }
+
+    Object[] row = (Object[]) result[0];
+
+    return TetherDepositSummaryDTO.builder()
+        .depositLength(Long.parseLong(String.valueOf(row[0])))
+        .totalAmount(BigDecimal.valueOf(Double.parseDouble(String.valueOf(row[1]))))
+        .maximumDepositor(String.valueOf(row[2]))
+        .maximumAmount(BigDecimal.valueOf(Double.parseDouble(String.valueOf(row[3]))))
+        .build();
   }
 
   /** 특정 상태를 기준으로 그 지갑의 모든 입금 총액을 조회합니다. */
@@ -317,7 +317,6 @@ public class TetherServiceImplements implements TetherService {
         .email(deposit.getTetherAccount().getEmail())
         .site(deposit.getTetherAccount().getSite())
         .memo(deposit.getTetherAccount().getMemo())
-        .insertDateTime(deposit.getTetherAccount().getInsertDateTime())
         .amount(deposit.getAmount())
         .usdtAmount(deposit.getUsdtAmount())
         .accepted(deposit.getAccepted())

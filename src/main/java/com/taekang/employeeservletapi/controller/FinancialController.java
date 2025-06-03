@@ -185,10 +185,13 @@ public class FinancialController {
   }
 
   @PreAuthorize(MANAGER_ACCESS)
-  @GetMapping("tether/get/total/deposit/amount/by/status/{status}")
-  public ResponseEntity<BigDecimal> getTotalDepositAmountByStatus(
-      @PathVariable TransactionStatus status) {
-    return ResponseEntity.ok().body(tetherService.getTotalDepositAmountByStatus(status));
+  @GetMapping("tether/get/total/deposit/amount/by/status/{status}/email/{email}")
+  public ResponseEntity<TetherDepositSummaryDTO> getTotalDepositSummaryByStatusAndEmail(
+      @PathVariable TransactionStatus status,
+      @PathVariable(required = false) String email,
+      @RequestParam LocalDateTime start,
+      @RequestParam LocalDateTime end) {
+    return ResponseEntity.ok().body(tetherService.getStatistics(status, email, start, end));
   }
 
   @PreAuthorize(MANAGER_ACCESS)

@@ -3,6 +3,7 @@ package com.taekang.employeeservletapi.service;
 import com.taekang.employeeservletapi.DTO.tether.TetherAccountDTO;
 import com.taekang.employeeservletapi.DTO.tether.TetherDepositChangeStatusDTO;
 import com.taekang.employeeservletapi.DTO.tether.TetherDepositDTO;
+import com.taekang.employeeservletapi.DTO.tether.TetherDepositSummaryDTO;
 import com.taekang.employeeservletapi.entity.user.TetherAccount;
 import com.taekang.employeeservletapi.entity.user.TetherDeposit;
 import com.taekang.employeeservletapi.entity.user.TransactionStatus;
@@ -27,8 +28,6 @@ public interface TetherService {
   Boolean depositAccept(TetherDepositChangeStatusDTO tetherDepositChangeStatusDTO);
 
   Boolean depositCancel(TetherDepositChangeStatusDTO tetherDepositChangeStatusDTO);
-
-  Boolean withdrawAccept(String tetherWallet, BigDecimal amount);
 
   // 전체 입금내역 조회
   List<TetherDeposit> getDepositsForAccount(Long accountId);
@@ -71,7 +70,11 @@ public interface TetherService {
       Pageable pageable);
 
   // 상태별 총 입금합계
-  BigDecimal getTotalDepositAmountByStatus(TransactionStatus status);
+  TetherDepositSummaryDTO getStatistics(
+      TransactionStatus status,
+      String email,
+      LocalDateTime requestedAtBefore,
+      LocalDateTime requestedAtAfter);
 
   // 상태별 특정 지갑의 총 입금 합계
   BigDecimal getTotalDepositAmountByStatusAndWallet(TransactionStatus status, String tetherWallet);

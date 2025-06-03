@@ -1,7 +1,7 @@
 package com.taekang.employeeservletapi.service;
 
 import com.taekang.employeeservletapi.DTO.tether.TetherAccountDTO;
-import com.taekang.employeeservletapi.DTO.tether.TetherDepositAcceptedDTO;
+import com.taekang.employeeservletapi.DTO.tether.TetherDepositChangeStatusDTO;
 import com.taekang.employeeservletapi.DTO.tether.TetherDepositDTO;
 import com.taekang.employeeservletapi.DTO.tether.TetherDepositSummaryDTO;
 import com.taekang.employeeservletapi.entity.user.TetherAccount;
@@ -15,6 +15,8 @@ import org.springframework.data.domain.Pageable;
 
 public interface TetherService {
 
+  Page<TetherAccountDTO> getTetherAccount(String email, Pageable pageable);
+
   Page<TetherAccountDTO> getAllTetherAccount(Pageable pageable);
 
   TetherAccount updateTetherWallet(Long id, String tetherWallet);
@@ -23,7 +25,9 @@ public interface TetherService {
 
   void updateMemo(Long id, String memo);
 
-  Boolean depositAccept(TetherDepositAcceptedDTO tetherDepositAcceptedDTO);
+  Boolean depositAccept(TetherDepositChangeStatusDTO tetherDepositChangeStatusDTO);
+
+  Boolean depositCancel(TetherDepositChangeStatusDTO tetherDepositChangeStatusDTO);
 
   // 전체 입금내역 조회
   List<TetherDeposit> getDepositsForAccount(Long accountId);

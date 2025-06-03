@@ -17,6 +17,14 @@ public interface TetherDepositRepository extends JpaRepository<TetherDeposit, Lo
 
   Optional<TetherDeposit> findById(Long id);
 
+  Page<TetherDeposit> findByTetherAccount_EmailContainingIgnoreCaseAndStatus(
+      String tetherAccountEmail, TransactionStatus status, Pageable pageable);
+
+  @Query(
+      "SELECT ta FROM TetherAccount ta WHERE LOWER(TRIM(ta.email)) LIKE LOWER(CONCAT('%',"
+          + " TRIM(:email), '%'))")
+  Page<TetherAccount> findByEmailContaining(@Param("email") String email, Pageable pageable);
+
   // 2. 계정별 전체 입금 조회 (마이페이지)
   List<TetherDeposit> findByTetherAccount_IdOrderByRequestedAtDesc(Long accountId);
 

@@ -8,7 +8,7 @@ import lombok.*;
 @Builder(toBuilder = true)
 @NoArgsConstructor
 @AllArgsConstructor
-public class TetherDepositAcceptedDTO {
+public class TetherDepositChangeStatusDTO {
 
   private Long depositId;
 

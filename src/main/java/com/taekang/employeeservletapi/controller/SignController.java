@@ -3,7 +3,6 @@ package com.taekang.employeeservletapi.controller;
 import com.taekang.employeeservletapi.DTO.LoginRequestDTO;
 import com.taekang.employeeservletapi.entity.employee.Employee;
 import com.taekang.employeeservletapi.error.TokenNotFoundedException;
-import com.taekang.employeeservletapi.error.TokenNotValidateException;
 import com.taekang.employeeservletapi.service.EmployeeService;
 import com.taekang.employeeservletapi.service.auth.JwtUtil;
 import com.taekang.employeeservletapi.service.auth.SignService;
@@ -40,7 +39,7 @@ public class SignController {
 
     boolean validationToken = jwtUtil.validateToken(token);
     if (!validationToken) {
-      throw new TokenNotValidateException();
+      ResponseEntity.status(401).body(null);
     }
 
     return ResponseEntity.ok()

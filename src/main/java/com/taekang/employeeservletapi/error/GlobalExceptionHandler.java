@@ -103,7 +103,7 @@ public class GlobalExceptionHandler {
 
   @ExceptionHandler(AlreadyTetherWalletException.class)
   public ResponseEntity<ErrorResponse> handleAlreadyTetherWalletException(
-      TokenNotValidateException e) {
+      AlreadyTetherWalletException e) {
     return ResponseEntity.status(e.getErrorCode().getHttpStatus())
         .body(new ErrorResponse(e.getErrorCode()));
   }

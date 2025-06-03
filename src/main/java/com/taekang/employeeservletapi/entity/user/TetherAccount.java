@@ -22,10 +22,10 @@ public class TetherAccount {
   @Column(name = "email", nullable = false)
   private String email;
 
-  @Column(name = "site", nullable = false)
+  @Column(name = "site")
   private String site;
 
-  @Column(name = "memo", nullable = false)
+  @Column(name = "memo")
   private String memo;
 
   @Column(name = "insert_date_time")

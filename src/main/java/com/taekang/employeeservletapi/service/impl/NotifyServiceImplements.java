@@ -12,6 +12,7 @@ import com.taekang.employeeservletapi.repository.employee.NotifyReadRepository;
 import com.taekang.employeeservletapi.repository.employee.NotifyRepository;
 import com.taekang.employeeservletapi.service.NotifyService;
 import java.time.LocalDateTime;
+import java.time.ZoneId;
 import java.util.List;
 import java.util.Map;
 import java.util.stream.Collectors;
@@ -46,7 +47,7 @@ public class NotifyServiceImplements implements NotifyService {
                 .contents(notifyDTO.getContents())
                 .level(notifyDTO.getLevel())
                 .writer(notifyDTO.getWriter())
-                .insertDateTime(LocalDateTime.now())
+                .insertDateTime(LocalDateTime.now(ZoneId.of("Asia/Singapore")))
                 .build());
 
     List<Employee> targets = employeeRepository.findByLevelLessThanEqual(notifyDTO.getLevel());
@@ -68,7 +69,7 @@ public class NotifyServiceImplements implements NotifyService {
             .id(notifyDTO.getId())
             .title(notifyDTO.getTitle())
             .contents(notifyDTO.getContents())
-            .updateDateTime(LocalDateTime.now())
+            .updateDateTime(LocalDateTime.now(ZoneId.of("Asia/Singapore")))
             .build();
     return notifyRepository.save(notify);
   }
@@ -137,7 +138,7 @@ public class NotifyServiceImplements implements NotifyService {
         NotifyRead.builder()
             .notify(Notify.builder().id(notifyId).build()) // 프록시 객체 (조회 X)
             .employee(Employee.builder().id(employeeId).build()) // 프록시 객체
-            .readTime(LocalDateTime.now())
+            .readTime(LocalDateTime.now(ZoneId.of("Asia/Singapore")))
             .build();
 
     notifyReadRepository.save(notifyRead);

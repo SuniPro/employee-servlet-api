@@ -1,7 +1,7 @@
 package com.taekang.employeeservletapi.service.impl;
 
 import com.taekang.employeeservletapi.DTO.tether.TetherAccountDTO;
-import com.taekang.employeeservletapi.DTO.tether.TetherDepositAcceptedDTO;
+import com.taekang.employeeservletapi.DTO.tether.TetherDepositChangeStatusDTO;
 import com.taekang.employeeservletapi.DTO.tether.TetherDepositDTO;
 import com.taekang.employeeservletapi.DTO.tether.TetherDepositSummaryDTO;
 import com.taekang.employeeservletapi.entity.user.TetherAccount;
@@ -36,6 +36,11 @@ public class TetherServiceImplements implements TetherService {
       TetherDepositRepository tetherDepositRepository) {
     this.tetherAccountRepository = tetherAccountRepository;
     this.tetherDepositRepository = tetherDepositRepository;
+  }
+
+  @Override
+  public Page<TetherAccountDTO> getTetherAccount(String email, Pageable pageable) {
+    return null;
   }
 
   @Override
@@ -94,21 +99,21 @@ public class TetherServiceImplements implements TetherService {
   /** 입금 내역을 승인합니다. */
   @Override
   @Transactional(transactionManager = "userTransactionManager")
-  public Boolean depositAccept(TetherDepositAcceptedDTO tetherDepositAcceptedDTO) {
+  public Boolean depositAccept(TetherDepositChangeStatusDTO tetherDepositChangeStatusDTO) {
     TetherAccount tetherAccount =
         tetherAccountRepository
-            .findByTetherWallet(tetherDepositAcceptedDTO.getTetherWallet())
+            .findByTetherWallet(tetherDepositChangeStatusDTO.getTetherWallet())
             .orElseThrow(AccountNotFoundException::new);
 
     // 2. 기존 입금 요청 확인
     TetherDeposit tetherDeposit =
         tetherDepositRepository
-            .findById(tetherDepositAcceptedDTO.getDepositId())
+            .findById(tetherDepositChangeStatusDTO.getDepositId())
             .orElseThrow(DepositNotFoundOrAlreadyApprovedException::new);
 
     // 3. 검증: 계정 & 금액 일치 여부 확인
     if (!tetherDeposit.getTetherAccount().equals(tetherAccount)
-        || tetherDeposit.getAmount().compareTo(tetherDepositAcceptedDTO.getAmount()) != 0) {
+        || tetherDeposit.getAmount().compareTo(tetherDepositChangeStatusDTO.getAmount()) != 0) {
       throw new DepositVerificationException(); // 커스텀 예외로 명확히
     }
 
@@ -120,6 +125,38 @@ public class TetherServiceImplements implements TetherService {
             .accepted(true)
             .acceptedAt(LocalDateTime.now(ZoneId.of("Asia/Seoul")))
             .build();
+
+    tetherDepositRepository.save(updated);
+    return updated.getAccepted();
+  }
+
+  @Override
+  public Boolean depositCancel(TetherDepositChangeStatusDTO tetherDepositChangeStatusDTO) {
+    TetherAccount tetherAccount =
+            tetherAccountRepository
+                    .findByTetherWallet(tetherDepositChangeStatusDTO.getTetherWallet())
+                    .orElseThrow(AccountNotFoundException::new);
+
+    // 2. 기존 입금 요청 확인
+    TetherDeposit tetherDeposit =
+            tetherDepositRepository
+                    .findById(tetherDepositChangeStatusDTO.getDepositId())
+                    .orElseThrow(DepositNotFoundOrAlreadyApprovedException::new);
+
+    // 3. 검증: 계정 & 금액 일치 여부 확인
+    if (!tetherDeposit.getTetherAccount().equals(tetherAccount)
+        || tetherDeposit.getAmount().compareTo(tetherDepositChangeStatusDTO.getAmount()) != 0) {
+      throw new DepositVerificationException(); // 커스텀 예외로 명확히
+    }
+
+    // 4. 상태 변경
+    TetherDeposit updated =
+            tetherDeposit.toBuilder()
+                    .id(tetherDeposit.getId())
+                    .status(TransactionStatus.CANCELLED)
+                    .accepted(true)
+                    .acceptedAt(LocalDateTime.now(ZoneId.of("Asia/Seoul")))
+                    .build();
 
     tetherDepositRepository.save(updated);
     return updated.getAccepted();

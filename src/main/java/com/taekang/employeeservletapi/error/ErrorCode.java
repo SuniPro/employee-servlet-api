@@ -12,7 +12,7 @@ import org.springframework.http.HttpStatus;
 @Getter
 public enum ErrorCode {
   INTERNAL_SERVER_ERROR("500", "서버 에러 발생", HttpStatus.INTERNAL_SERVER_ERROR),
-  EMPLOYEE_NOT_FOUND("D404", "직원 정보를 찾을 수 없습니다.", HttpStatus.NOT_FOUND),
+  EMPLOYEE_NOT_FOUND("D400", "직원 정보를 찾을 수 없습니다.", HttpStatus.BAD_REQUEST),
   DUPLICATE_EMPLOYEE_NAME("C409", "중복된 이름입니다.", HttpStatus.CONFLICT),
   PASSWORD_INCORRECT("C401", "잘못된 패스워드입니다.", HttpStatus.UNAUTHORIZED),
   NAME_INCORRECT("C401", "잘못된 이름입니다.", HttpStatus.UNAUTHORIZED),

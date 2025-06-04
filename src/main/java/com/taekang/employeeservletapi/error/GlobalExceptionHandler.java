@@ -108,9 +108,9 @@ public class GlobalExceptionHandler {
   }
 
   // 다른 커스텀 예외들도 이렇게 추가하면 됨
-//  @ExceptionHandler(Exception.class)
-//  public ResponseEntity<ErrorResponse> handleOther() {
-//    return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR)
-//        .body(new ErrorResponse(ErrorCode.INTERNAL_SERVER_ERROR));
-//  }
+  //  @ExceptionHandler(Exception.class)
+  //  public ResponseEntity<ErrorResponse> handleOther() {
+  //    return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR)
+  //        .body(new ErrorResponse(ErrorCode.INTERNAL_SERVER_ERROR));
+  //  }
 }

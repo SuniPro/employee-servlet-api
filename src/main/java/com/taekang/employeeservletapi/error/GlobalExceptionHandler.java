@@ -1,6 +1,5 @@
 package com.taekang.employeeservletapi.error;
 
-import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.ExceptionHandler;
 import org.springframework.web.bind.annotation.RestControllerAdvice;
@@ -109,9 +108,9 @@ public class GlobalExceptionHandler {
   }
 
   // 다른 커스텀 예외들도 이렇게 추가하면 됨
-  @ExceptionHandler(Exception.class)
-  public ResponseEntity<ErrorResponse> handleOther() {
-    return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR)
-        .body(new ErrorResponse(ErrorCode.INTERNAL_SERVER_ERROR));
-  }
+//  @ExceptionHandler(Exception.class)
+//  public ResponseEntity<ErrorResponse> handleOther() {
+//    return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR)
+//        .body(new ErrorResponse(ErrorCode.INTERNAL_SERVER_ERROR));
+//  }
 }

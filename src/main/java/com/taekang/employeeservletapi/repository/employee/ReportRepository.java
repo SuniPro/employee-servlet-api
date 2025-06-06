@@ -20,7 +20,7 @@ public interface ReportRepository extends JpaRepository<Report, Long> {
 
   @Query(
       value =
-"""
+          """
     SELECT r.*
     FROM report r
     JOIN employee e ON r.employee_id = e.id
@@ -38,7 +38,7 @@ public interface ReportRepository extends JpaRepository<Report, Long> {
       @Param("offset") long offset);
 
   @Query(
-"""
+      """
     SELECT COUNT(r)
     FROM Report r
     JOIN r.employee e
@@ -109,7 +109,7 @@ public interface ReportRepository extends JpaRepository<Report, Long> {
 
   @Query(
       value =
-"""
+          """
     SELECT r.*
     FROM report r
     JOIN employee e ON r.employee_id = e.id

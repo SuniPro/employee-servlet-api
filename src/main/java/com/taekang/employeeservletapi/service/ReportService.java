@@ -20,11 +20,27 @@ public interface ReportService {
       Level level, Long employeeId, LocalDateTime start, LocalDateTime end, Pageable pageable);
 
   Page<ReportDTO> findReportsByEmployeeName(
-          Level level, Long employeeId, String employeeName, LocalDateTime start, LocalDateTime end, Pageable pageable);
+      Level level,
+      Long employeeId,
+      String employeeName,
+      LocalDateTime start,
+      LocalDateTime end,
+      Pageable pageable);
 
   Page<ReportDTO> findReportsByDepartment(
-          Level level, Long employeeId, Department department, LocalDateTime start, LocalDateTime end, Pageable pageable);
+      Level level,
+      Long employeeId,
+      Department department,
+      LocalDateTime start,
+      LocalDateTime end,
+      Pageable pageable);
 
   Page<ReportDTO> findReportsByEmployeeNameAndDepartment(
-          Level level, Long employeeId, Department department, String employeeName, LocalDateTime start, LocalDateTime end, Pageable pageable);
+      Level level,
+      Long employeeId,
+      Department department,
+      String employeeName,
+      LocalDateTime start,
+      LocalDateTime end,
+      Pageable pageable);
 }

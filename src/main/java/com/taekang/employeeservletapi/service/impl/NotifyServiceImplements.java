@@ -45,7 +45,7 @@ public class NotifyServiceImplements implements NotifyService {
             Notify.builder()
                 .title(notifyDTO.getTitle())
                 .contents(notifyDTO.getContents())
-                .level(notifyDTO.getLevel())
+                .rank(notifyDTO.getLevel().getRank())
                 .writer(notifyDTO.getWriter())
                 .insertDateTime(LocalDateTime.now(ZoneId.of("Asia/Singapore")))
                 .build());
@@ -98,13 +98,13 @@ public class NotifyServiceImplements implements NotifyService {
 
   @Override
   public List<Notify> getAllNotifyForLevel(Level level) {
-    return notifyRepository.findByLevelLessThanEqual(level);
+    return notifyRepository.findByRankGreaterThanEqual(level.getRank());
   }
 
   @Override
   public List<NotifyWithReadDTO> getAllNotifyWithReadState(Long employeeId, Level employeeLevel) {
     // 1. 전체 공지 가져오기 (레벨 이하)
-    List<Notify> notifies = notifyRepository.findByLevelLessThanEqual(employeeLevel);
+    List<Notify> notifies = notifyRepository.findByRankGreaterThanEqual(employeeLevel.getRank());
 
     List<NotifyRead> readList = notifyReadRepository.findByEmployee_Id(employeeId);
 
@@ -151,17 +151,17 @@ public class NotifyServiceImplements implements NotifyService {
 
   @Override
   public long countUnreadNotify(Long employeeId, Level employeeLevel) {
-    return notifyReadRepository.countUnreadNotifyByEmployee(employeeId, employeeLevel);
+    return notifyReadRepository.countUnreadNotifyByEmployee(employeeId, employeeLevel.getRank());
   }
 
   @Override
-  public List<Notify> getReadNotifyListByEmployee(Long employeeId) {
-    return notifyReadRepository.findReadNotifyListByEmployee(employeeId);
+  public List<Notify> getReadNotifyListByEmployee(Long employeeId, Level employeeLevel) {
+    return notifyReadRepository.findReadNotifyListByEmployee(employeeId, employeeLevel.getRank());
   }
 
   @Override
   public List<Notify> getUnreadNotifyListByEmployee(Long employeeId, Level employeeLevel) {
-    return notifyReadRepository.findUnreadNotifyListByEmployee(employeeId, employeeLevel);
+    return notifyReadRepository.findUnreadNotifyListByEmployee(employeeId, employeeLevel.getRank());
   }
 
   @Override

@@ -86,10 +86,11 @@ public class NotifyController {
     return ResponseEntity.ok().body(notifyService.countUnreadNotify(id, level));
   }
 
-  @GetMapping("get/read/{employeeId}")
+  @GetMapping("get/read/{employeeId}/{level}")
   @PreAuthorize(MANAGER_ACCESS)
-  public ResponseEntity<List<Notify>> getNotifyListByReadEmployee(@PathVariable Long employeeId) {
-    return ResponseEntity.ok().body(notifyService.getReadNotifyListByEmployee(employeeId));
+  public ResponseEntity<List<Notify>> getNotifyListByReadEmployee(
+      @PathVariable Long employeeId, @PathVariable Level level) {
+    return ResponseEntity.ok().body(notifyService.getReadNotifyListByEmployee(employeeId, level));
   }
 
   @GetMapping("get/unread/{employeeId}/{level}")

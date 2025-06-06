@@ -30,7 +30,7 @@ public interface NotifyService {
 
   long countUnreadNotify(Long employeeId, Level employeeLevel);
 
-  List<Notify> getReadNotifyListByEmployee(Long employeeId);
+  List<Notify> getReadNotifyListByEmployee(Long employeeId, Level employeeLevel);
 
   List<Notify> getUnreadNotifyListByEmployee(Long employeeId, Level employeeLevel);
 

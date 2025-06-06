@@ -17,8 +17,8 @@ public class Notify {
   @GeneratedValue(strategy = GenerationType.IDENTITY)
   private Long id;
 
-  @Column(name = "level", nullable = false)
-  private Level level;
+  @Column(name = "rank", nullable = false)
+  private int rank;
 
   @Column(name = "writer", nullable = false)
   private String writer;

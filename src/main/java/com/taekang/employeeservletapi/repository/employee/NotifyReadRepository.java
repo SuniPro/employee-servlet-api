@@ -31,7 +31,7 @@ public interface NotifyReadRepository extends JpaRepository<NotifyRead, Long> {
   boolean existsByNotify_IdAndEmployee_Id(Long notifyId, Long employeeId);
 
   @Query(
-"""
+      """
     SELECT COUNT(n) FROM Notify n
     WHERE n.rank >= :rank
       AND NOT EXISTS (
@@ -62,7 +62,7 @@ public interface NotifyReadRepository extends JpaRepository<NotifyRead, Long> {
 
   @Query(
       value =
-"""
+          """
     SELECT n.* FROM notify n
     WHERE n.rank >= :rank
       AND NOT EXISTS (

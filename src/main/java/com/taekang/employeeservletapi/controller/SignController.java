@@ -54,7 +54,8 @@ public class SignController {
 
     String token = signService.signIn(loginRequestDTO);
 
-    ResponseCookie responseCookie = ResponseCookie.from("access-token", token).maxAge(expiration).path("/").build();
+    ResponseCookie responseCookie =
+        ResponseCookie.from("access-token", token).maxAge(expiration).path("/").build();
 
     return ResponseEntity.ok()
         .header(HttpHeaders.SET_COOKIE, responseCookie.toString())

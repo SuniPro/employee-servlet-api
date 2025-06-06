@@ -54,6 +54,7 @@ public class SecurityConfig {
 
     httpSecurity.formLogin(AbstractHttpConfigurer::disable);
     httpSecurity.httpBasic(AbstractHttpConfigurer::disable);
+    httpSecurity.logout(AbstractHttpConfigurer::disable);
 
     httpSecurity.addFilterBefore(
         new JwtAuthFilter(customEmployeeDetailService, jwtUtil),

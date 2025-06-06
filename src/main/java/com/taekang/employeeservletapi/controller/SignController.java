@@ -8,6 +8,7 @@ import com.taekang.employeeservletapi.service.auth.SignService;
 import jakarta.servlet.http.Cookie;
 import jakarta.servlet.http.HttpServletRequest;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.beans.factory.annotation.Value;
 import org.springframework.http.HttpHeaders;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseCookie;
@@ -20,6 +21,9 @@ public class SignController {
   private final EmployeeService employeeService;
   private final JwtUtil jwtUtil;
   private final SignService signService;
+
+  @Value("${jwt.expiration_time}")
+  private long expiration;
 
   @Autowired
   public SignController(EmployeeService employeeService, JwtUtil jwtUtil, SignService signService) {
@@ -50,7 +54,8 @@ public class SignController {
 
     String token = signService.signIn(loginRequestDTO);
 
-    ResponseCookie responseCookie = ResponseCookie.from("access-token", token).path("/").build();
+    ResponseCookie responseCookie =
+        ResponseCookie.from("access-token", token).maxAge(expiration).path("/").build();
 
     return ResponseEntity.ok()
         .header(HttpHeaders.SET_COOKIE, responseCookie.toString())

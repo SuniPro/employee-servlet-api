@@ -25,6 +25,9 @@ public class Employee {
   @Column(name = "level", nullable = false)
   private Level level;
 
+  @Column(name = "rank")
+  private int rank;
+
   @Column(name = "name", unique = true, nullable = false)
   private String name;
 

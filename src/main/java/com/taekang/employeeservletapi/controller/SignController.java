@@ -2,7 +2,6 @@ package com.taekang.employeeservletapi.controller;
 
 import com.taekang.employeeservletapi.DTO.LoginRequestDTO;
 import com.taekang.employeeservletapi.entity.employee.Employee;
-import com.taekang.employeeservletapi.error.TokenNotFoundedException;
 import com.taekang.employeeservletapi.service.EmployeeService;
 import com.taekang.employeeservletapi.service.auth.JwtUtil;
 import com.taekang.employeeservletapi.service.auth.SignService;
@@ -34,7 +33,7 @@ public class SignController {
     String token = getAccessTokenInCookie(request);
 
     if (token == null) {
-      throw new TokenNotFoundedException();
+      ResponseEntity.status(401).body(null);
     }
 
     boolean validationToken = jwtUtil.validateToken(token);

@@ -47,7 +47,7 @@ public class ReviewServiceImplements implements ReviewService {
     LocalDateTime end = today.atTime(LocalTime.MAX);
 
     if (commuteRepository.existsByEmployeeAndOnTimeBetween(commuteDTO.getEmployee(), start, end)) {
-      LocalDateTime now = LocalDateTime.now(ZoneId.of("Asia/Singapore"));
+      LocalDateTime now = LocalDateTime.now(ZoneId.of("Asia/Singapore")).minusHours(1);
       log.info("{}님 출근 처리: {}", commuteDTO.getEmployee().getName(), now);
 
       Commute commute = Commute.builder().employee(commuteDTO.getEmployee()).onTime(now).build();
@@ -62,7 +62,7 @@ public class ReviewServiceImplements implements ReviewService {
     LocalDateTime end = today.atTime(LocalTime.MAX);
 
     if (commuteRepository.existsByEmployeeAndOffTimeBetween(commuteDTO.getEmployee(), start, end)) {
-      LocalDateTime now = LocalDateTime.now(ZoneId.of("Asia/Singapore"));
+      LocalDateTime now = LocalDateTime.now(ZoneId.of("Asia/Singapore")).minusHours(1);
       log.info("{}님 퇴근 처리: {}", commuteDTO.getEmployee().getName(), now);
 
       Commute commute = Commute.builder().employee(commuteDTO.getEmployee()).offTime(now).build();

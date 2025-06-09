@@ -47,7 +47,7 @@ public class NotifyServiceImplements implements NotifyService {
                 .contents(notifyDTO.getContents())
                 .rank(notifyDTO.getLevel().getRank())
                 .writer(notifyDTO.getWriter())
-                .insertDateTime(LocalDateTime.now(ZoneId.of("Asia/Singapore")))
+                .insertDateTime(LocalDateTime.now(ZoneId.of("Asia/Singapore")).minusHours(1))
                 .build());
 
     List<Employee> targets = employeeRepository.findByLevelLessThanEqual(notifyDTO.getLevel());
@@ -69,7 +69,7 @@ public class NotifyServiceImplements implements NotifyService {
             .id(notifyDTO.getId())
             .title(notifyDTO.getTitle())
             .contents(notifyDTO.getContents())
-            .updateDateTime(LocalDateTime.now(ZoneId.of("Asia/Singapore")))
+            .updateDateTime(LocalDateTime.now(ZoneId.of("Asia/Singapore")).minusHours(1))
             .build();
     return notifyRepository.save(notify);
   }
@@ -138,7 +138,7 @@ public class NotifyServiceImplements implements NotifyService {
         NotifyRead.builder()
             .notify(Notify.builder().id(notifyId).build()) // 프록시 객체 (조회 X)
             .employee(Employee.builder().id(employeeId).build()) // 프록시 객체
-            .readTime(LocalDateTime.now(ZoneId.of("Asia/Singapore")))
+            .readTime(LocalDateTime.now(ZoneId.of("Asia/Singapore")).minusHours(1))
             .build();
 
     notifyReadRepository.save(notifyRead);

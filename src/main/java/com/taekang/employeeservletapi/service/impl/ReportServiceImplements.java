@@ -37,7 +37,7 @@ public class ReportServiceImplements implements ReportService {
             .employee(Employee.builder().id(reportDTO.getEmployee().getId()).build())
             .title(reportDTO.getTitle())
             .reportContents(reportDTO.getReportContents())
-            .insertDateTime(LocalDateTime.now(ZoneId.of("Asia/Singapore")))
+            .insertDateTime(LocalDateTime.now(ZoneId.of("Asia/Singapore")).minusHours(1))
             .build();
     return reportRepository.save(report);
   }
@@ -50,7 +50,7 @@ public class ReportServiceImplements implements ReportService {
             .employee(Employee.builder().id(reportDTO.getEmployee().getId()).build())
             .title(reportDTO.getTitle())
             .reportContents(reportDTO.getReportContents())
-            .insertDateTime(LocalDateTime.now(ZoneId.of("Asia/Singapore")))
+            .insertDateTime(LocalDateTime.now(ZoneId.of("Asia/Singapore")).minusHours(1))
             .build();
     return reportRepository.save(report);
   }

@@ -1,5 +1,6 @@
 package com.taekang.employeeservletapi.controller;
 
+import com.taekang.employeeservletapi.DTO.PaginationResponse;
 import com.taekang.employeeservletapi.DTO.ReportDTO;
 import com.taekang.employeeservletapi.entity.employee.Department;
 import com.taekang.employeeservletapi.entity.employee.Level;
@@ -7,7 +8,6 @@ import com.taekang.employeeservletapi.entity.employee.Report;
 import com.taekang.employeeservletapi.service.ReportService;
 import java.time.LocalDateTime;
 import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.data.domain.Page;
 import org.springframework.data.domain.Pageable;
 import org.springframework.data.domain.Sort;
 import org.springframework.data.web.PageableDefault;
@@ -41,7 +41,7 @@ public class ReportController {
   }
 
   @GetMapping("get/by/level/{level}/employeeId/{employeeId}")
-  public ResponseEntity<Page<ReportDTO>> getReportsByLevel(
+  public ResponseEntity<PaginationResponse<ReportDTO>> getReportsByLevel(
       @PathVariable Level level,
       @PathVariable Long employeeId,
       @RequestParam LocalDateTime start,
@@ -54,7 +54,7 @@ public class ReportController {
   }
 
   @GetMapping("get/by/level/{level}/employeeId/{employeeId}/employeeName/{employeeName}")
-  public ResponseEntity<Page<ReportDTO>> getReportsByLevelAndName(
+  public ResponseEntity<PaginationResponse<ReportDTO>> getReportsByLevelAndName(
       @PathVariable Level level,
       @PathVariable Long employeeId,
       @PathVariable String employeeName,
@@ -70,7 +70,7 @@ public class ReportController {
   }
 
   @GetMapping("get/by/level/{level}/employeeId/{employeeId}/department/{department}")
-  public ResponseEntity<Page<ReportDTO>> getReportsByLevelAndDepartment(
+  public ResponseEntity<PaginationResponse<ReportDTO>> getReportsByLevelAndDepartment(
       @PathVariable Level level,
       @PathVariable Long employeeId,
       @PathVariable Department department,
@@ -87,7 +87,7 @@ public class ReportController {
 
   @GetMapping(
       "get/by/level/{level}/employeeId/{employeeId}/employeeName/{employeeName}/department/{department}")
-  public ResponseEntity<Page<ReportDTO>> getReportsByLevelAndNameAndDepartment(
+  public ResponseEntity<PaginationResponse<ReportDTO>> getReportsByLevelAndNameAndDepartment(
       @PathVariable Level level,
       @PathVariable Long employeeId,
       @PathVariable Department department,

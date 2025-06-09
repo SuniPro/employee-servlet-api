@@ -32,7 +32,8 @@ public enum ErrorCode {
   CANNOT_DELETE("S500", "서버 에러로 삭제할 수 없습니다.", HttpStatus.INTERNAL_SERVER_ERROR),
   DEPOSIT_NOT_FOUND("D404", "입금 정보를 찾을 수 없습니다.", HttpStatus.NOT_FOUND),
   WORK_TABLE_NOT_FOUND("D404", "업무 관리 테이블을 찾을 수 없습니다.", HttpStatus.NOT_FOUND),
-  ALREADY_TETHER_WALLET("D400", "이미 존재하는 지갑입니다.", HttpStatus.BAD_REQUEST);
+  ALREADY_TETHER_WALLET("D400", "이미 존재하는 지갑입니다.", HttpStatus.BAD_REQUEST),
+  REPORT_NOT_FOUND("D404", "리포트를 찾을 수 없습니다.", HttpStatus.NOT_FOUND),;
 
   private final String code;
   private final String message;

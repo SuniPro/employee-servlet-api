@@ -1,23 +1,27 @@
 package com.taekang.employeeservletapi.service.impl;
 
-import com.taekang.employeeservletapi.DTO.EmployeeDTO;
+import com.taekang.employeeservletapi.DTO.PaginationResponse;
 import com.taekang.employeeservletapi.DTO.ReportDTO;
 import com.taekang.employeeservletapi.entity.employee.Department;
 import com.taekang.employeeservletapi.entity.employee.Employee;
 import com.taekang.employeeservletapi.entity.employee.Level;
 import com.taekang.employeeservletapi.entity.employee.Report;
+import com.taekang.employeeservletapi.error.ReportNotFoundException;
 import com.taekang.employeeservletapi.repository.employee.ReportRepository;
 import com.taekang.employeeservletapi.service.ReportService;
 import java.time.LocalDateTime;
 import java.time.ZoneId;
 import java.util.List;
+import lombok.extern.slf4j.Slf4j;
 import org.modelmapper.ModelMapper;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.PageImpl;
 import org.springframework.data.domain.Pageable;
 import org.springframework.stereotype.Service;
+import org.springframework.util.StopWatch;
 
+@Slf4j
 @Service
 public class ReportServiceImplements implements ReportService {
 
@@ -61,45 +65,42 @@ public class ReportServiceImplements implements ReportService {
   }
 
   @Override
-  public Page<ReportDTO> findReportsByLevel(
+  public ReportDTO getReportById(Long reportId) {
+    return reportRepository
+        .findById(reportId)
+        .map((report -> modelMapper.map(report, ReportDTO.class)))
+        .orElseThrow(ReportNotFoundException::new);
+  }
+
+  @Override
+  public PaginationResponse<ReportDTO> findReportsByLevel(
       Level level, Long employeeId, LocalDateTime start, LocalDateTime end, Pageable pageable) {
-    if (level == Level.STAFF) {
-      return reportRepository
-          .findByEmployee_idAndInsertDateTimeBetween(employeeId, start, end, pageable)
-          .map(this::toReportDto);
-    }
+    StopWatch stopWatch = new StopWatch();
+    stopWatch.start("쿼리");
 
-    long totalCount = reportRepository.countReportsByMaxLevelAndPeriod(level.getRank(), start, end);
+    Page<Report> page =
+        reportRepository.findReportsByRankAndPeriodWithEmployeeFetched(
+            level.getRank(), start, end, pageable);
 
-    long offset = pageable.getOffset();
-    int limit = pageable.getPageSize();
-    if (offset >= totalCount) {
-      int lastPage = (int) Math.ceil((double) totalCount / limit) - 1;
-      offset = Math.max(0, lastPage * limit);
-    }
+    stopWatch.stop();
 
-    List<Report> reports =
-        reportRepository.findReportsByLevelWithPaging(level.getRank(), start, end, limit, offset);
+    stopWatch.start("DTO 변환");
 
-    List<ReportDTO> content =
-        reports.stream()
-            .map(
-                r ->
-                    ReportDTO.builder()
-                        .id(r.getId())
-                        .employee(toEmployeeDTO(r.getEmployee()))
-                        .title(r.getTitle())
-                        .reportContents(r.getReportContents())
-                        .insertDateTime(r.getInsertDateTime())
-                        .updateDateTime(r.getUpdateDateTime())
-                        .build())
-            .toList();
+    List<ReportDTO> dtoList = page.getContent().stream().map(this::toReportDto).toList();
 
-    return new PageImpl<>(content, pageable, totalCount);
+    stopWatch.stop();
+
+    stopWatch.start("Pagination 응답 생성");
+    PaginationResponse<ReportDTO> response =
+        PaginationResponse.from(new PageImpl<>(dtoList, pageable, page.getTotalElements()));
+    stopWatch.stop();
+
+    log.info("처리 시간: \n{}", stopWatch.prettyPrint());
+    return response;
   }
 
   @Override
-  public Page<ReportDTO> findReportsByEmployeeName(
+  public PaginationResponse<ReportDTO> findReportsByEmployeeName(
       Level level,
       Long employeeId,
       String employeeName,
@@ -107,33 +108,23 @@ public class ReportServiceImplements implements ReportService {
       LocalDateTime end,
       Pageable pageable) {
     if (level == Level.STAFF) {
-      return reportRepository
-          .findByEmployee_idAndInsertDateTimeBetween(employeeId, start, end, pageable)
-          .map(this::toReportDto);
+      return PaginationResponse.from(
+          reportRepository
+              .findByEmployee_idAndInsertDateTimeBetween(employeeId, start, end, pageable)
+              .map(this::toReportDto));
     }
 
-    long totalCount =
-        reportRepository.countReportsByMaxLevelAndNameAndPeriod(
-            level.getRank(), employeeName.trim(), start, end);
-
-    long offset = pageable.getOffset();
-    int limit = pageable.getPageSize();
-    if (offset >= totalCount) {
-      int lastPage = (int) Math.ceil((double) totalCount / limit) - 1;
-      offset = Math.max(0, lastPage * limit);
-    }
-
-    List<Report> reports =
+    Page<Report> page =
         reportRepository.findReportsByLevelAndEmployeeNameWithPaging(
-            level.getRank(), employeeName, start, end, limit, offset);
+            level.getRank(), employeeName, start, end, pageable);
 
-    List<ReportDTO> content = toReportDtoList(reports);
+    List<ReportDTO> dtoList = page.getContent().stream().map(this::toReportDto).toList();
 
-    return new PageImpl<>(content, pageable, totalCount);
+    return PaginationResponse.from(new PageImpl<>(dtoList, pageable, page.getTotalElements()));
   }
 
   @Override
-  public Page<ReportDTO> findReportsByDepartment(
+  public PaginationResponse<ReportDTO> findReportsByDepartment(
       Level level,
       Long employeeId,
       Department department,
@@ -141,33 +132,23 @@ public class ReportServiceImplements implements ReportService {
       LocalDateTime end,
       Pageable pageable) {
     if (level == Level.STAFF) {
-      return reportRepository
-          .findByEmployee_idAndInsertDateTimeBetween(employeeId, start, end, pageable)
-          .map(this::toReportDto);
+      return PaginationResponse.from(
+          reportRepository
+              .findByEmployee_idAndInsertDateTimeBetween(employeeId, start, end, pageable)
+              .map(this::toReportDto));
     }
 
-    long totalCount =
-        reportRepository.countReportsByMaxLevelAndDepartmentAndPeriod(
-            level.getRank(), department, start, end);
-
-    long offset = pageable.getOffset();
-    int limit = pageable.getPageSize();
-    if (offset >= totalCount) {
-      int lastPage = (int) Math.ceil((double) totalCount / limit) - 1;
-      offset = Math.max(0, lastPage * limit);
-    }
-
-    List<Report> reports =
+    Page<Report> page =
         reportRepository.findReportsByLevelAndDepartmentWithPaging(
-            level.getRank(), department, start, end, limit, offset);
+            level.getRank(), department, start, end, pageable);
 
-    List<ReportDTO> content = toReportDtoList(reports);
+    List<ReportDTO> dtoList = page.getContent().stream().map(this::toReportDto).toList();
 
-    return new PageImpl<>(content, pageable, totalCount);
+    return PaginationResponse.from(new PageImpl<>(dtoList, pageable, page.getTotalElements()));
   }
 
   @Override
-  public Page<ReportDTO> findReportsByEmployeeNameAndDepartment(
+  public PaginationResponse<ReportDTO> findReportsByEmployeeNameAndDepartment(
       Level level,
       Long employeeId,
       Department department,
@@ -176,60 +157,22 @@ public class ReportServiceImplements implements ReportService {
       LocalDateTime end,
       Pageable pageable) {
     if (level == Level.STAFF) {
-      return reportRepository
-          .findByEmployee_idAndInsertDateTimeBetween(employeeId, start, end, pageable)
-          .map(this::toReportDto);
+      return PaginationResponse.from(
+          reportRepository
+              .findByEmployee_idAndInsertDateTimeBetween(employeeId, start, end, pageable)
+              .map(this::toReportDto));
     }
 
-    long totalCount =
-        reportRepository.countReportsByMaxLevelAndNameNadDepartmentAndPeriod(
-            level.getRank(), employeeName.trim(), department, start, end);
-
-    long offset = pageable.getOffset();
-    int limit = pageable.getPageSize();
-    if (offset >= totalCount) {
-      int lastPage = (int) Math.ceil((double) totalCount / limit) - 1;
-      offset = Math.max(0, lastPage * limit);
-    }
-
-    List<Report> reports =
+    Page<Report> page =
         reportRepository.findReportsByLevelAndDepartmentAndEmployeeNameWithPaging(
-            level.getRank(), department, employeeName, start, end, limit, offset);
+            level.getRank(), department, employeeName, start, end, pageable);
 
-    List<ReportDTO> content = toReportDtoList(reports);
+    List<ReportDTO> dtoList = page.getContent().stream().map(this::toReportDto).toList();
 
-    return new PageImpl<>(content, pageable, totalCount);
+    return PaginationResponse.from(new PageImpl<>(dtoList, pageable, page.getTotalElements()));
   }
 
   private ReportDTO toReportDto(Report report) {
-
-    return ReportDTO.builder()
-        .id(report.getId())
-        .employee(toEmployeeDTO(report.getEmployee()))
-        .title(report.getTitle())
-        .reportContents(report.getReportContents())
-        .insertDateTime(report.getInsertDateTime())
-        .updateDateTime(report.getUpdateDateTime())
-        .build();
-  }
-
-  private List<ReportDTO> toReportDtoList(List<Report> reports) {
-
-    return reports.stream()
-        .map(
-            r ->
-                ReportDTO.builder()
-                    .id(r.getId())
-                    .employee(toEmployeeDTO(r.getEmployee()))
-                    .title(r.getTitle())
-                    .reportContents(r.getReportContents())
-                    .insertDateTime(r.getInsertDateTime())
-                    .updateDateTime(r.getUpdateDateTime())
-                    .build())
-        .toList();
-  }
-
-  private EmployeeDTO toEmployeeDTO(Employee employee) {
-    return modelMapper.map(employee, EmployeeDTO.class);
+    return modelMapper.map(report, ReportDTO.class);
   }
 }

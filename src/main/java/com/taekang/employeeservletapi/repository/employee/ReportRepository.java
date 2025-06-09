@@ -19,7 +19,8 @@ public interface ReportRepository extends JpaRepository<Report, Long> {
       Pageable pageable);
 
   @EntityGraph(attributePaths = {"employee"})
-  @Query("""
+  @Query(
+      """
         SELECT r
         FROM Report r
         WHERE r.employee.rank <= :rank
@@ -27,11 +28,10 @@ public interface ReportRepository extends JpaRepository<Report, Long> {
         ORDER BY r.insertDateTime DESC
     """)
   Page<Report> findReportsByRankAndPeriodWithEmployeeFetched(
-          @Param("rank") int rank,
-          @Param("start") LocalDateTime start,
-          @Param("end") LocalDateTime end,
-          Pageable pageable
-  );
+      @Param("rank") int rank,
+      @Param("start") LocalDateTime start,
+      @Param("end") LocalDateTime end,
+      Pageable pageable);
 
   @EntityGraph(attributePaths = {"employee"})
   @Query(
@@ -49,13 +49,12 @@ public interface ReportRepository extends JpaRepository<Report, Long> {
       @Param("name") String name,
       @Param("start") LocalDateTime start,
       @Param("end") LocalDateTime end,
-      Pageable pageable
-  );
+      Pageable pageable);
 
   @EntityGraph(attributePaths = {"employee"})
   @Query(
-          value =
-                  """
+      value =
+          """
                     SELECT r
                     FROM Report r
                     WHERE r.employee.rank <= :rank
@@ -72,8 +71,8 @@ public interface ReportRepository extends JpaRepository<Report, Long> {
 
   @EntityGraph(attributePaths = {"employee"})
   @Query(
-          value =
-                  """
+      value =
+          """
                     SELECT r
                     FROM Report r
                     WHERE r.employee.rank <= :rank

@@ -1,6 +1,7 @@
 package com.taekang.employeeservletapi.service;
 
 import com.taekang.employeeservletapi.DTO.EmployeeDTO;
+import com.taekang.employeeservletapi.DTO.EmployeeUpdateDTO;
 import com.taekang.employeeservletapi.DTO.RegisterRequestDTO;
 import com.taekang.employeeservletapi.entity.employee.Department;
 import com.taekang.employeeservletapi.entity.employee.Employee;
@@ -13,7 +14,7 @@ public interface EmployeeService {
 
   Employee createEmployee(RegisterRequestDTO registerRequestDTO);
 
-  Employee updateEmployee(EmployeeDTO employeeDTO);
+  EmployeeDTO updateEmployee(EmployeeUpdateDTO employeeUpdateDTO);
 
   Employee getEmployeeById(Long id);
 

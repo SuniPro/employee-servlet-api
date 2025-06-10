@@ -6,7 +6,6 @@ import com.taekang.employeeservletapi.entity.employee.Department;
 import com.taekang.employeeservletapi.entity.employee.Employee;
 import com.taekang.employeeservletapi.entity.employee.Level;
 import com.taekang.employeeservletapi.entity.employee.Report;
-import com.taekang.employeeservletapi.error.ReportNotFoundException;
 import com.taekang.employeeservletapi.repository.employee.ReportRepository;
 import com.taekang.employeeservletapi.service.ReportService;
 import java.time.LocalDateTime;
@@ -67,14 +66,6 @@ public class ReportServiceImplements implements ReportService {
   @Override
   public void deleteReport(Long reportId) {
     reportRepository.deleteById(reportId);
-  }
-
-  @Override
-  public ReportDTO getReportById(Long reportId) {
-    return reportRepository
-        .findById(reportId)
-        .map((report -> modelMapper.map(report, ReportDTO.class)))
-        .orElseThrow(ReportNotFoundException::new);
   }
 
   @Override

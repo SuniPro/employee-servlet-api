@@ -12,6 +12,8 @@ import org.springframework.data.repository.query.Param;
 
 public interface ReportRepository extends JpaRepository<Report, Long> {
 
+  void deleteByEmployee_Id(Long employeeId);
+
   Page<Report> findByEmployee_idAndInsertDateTimeBetween(
       Long employeeId,
       LocalDateTime insertDateTimeAfter,

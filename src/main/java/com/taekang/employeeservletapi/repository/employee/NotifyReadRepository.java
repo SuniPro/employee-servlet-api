@@ -13,6 +13,8 @@ import org.springframework.stereotype.Repository;
 @Repository
 public interface NotifyReadRepository extends JpaRepository<NotifyRead, Long> {
 
+  void deleteByEmployee_Id(Long employeeId);
+
   // 1. 특정 공지 + 특정 직원 → 읽었는지 여부
   Optional<NotifyRead> findByNotifyAndEmployee(Notify notify, Employee employee);
 

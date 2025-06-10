@@ -45,12 +45,12 @@ public class NotifyServiceImplements implements NotifyService {
             Notify.builder()
                 .title(notifyDTO.getTitle())
                 .contents(notifyDTO.getContents())
-                .rank(notifyDTO.getLevel().getRank())
+                .rank(notifyDTO.getRank())
                 .writer(notifyDTO.getWriter())
                 .insertDateTime(LocalDateTime.now(ZoneId.of("Asia/Singapore")).minusHours(1))
                 .build());
 
-    List<Employee> targets = employeeRepository.findByLevelLessThanEqual(notifyDTO.getLevel());
+    List<Employee> targets = employeeRepository.findByRankLessThanEqual(notifyDTO.getRank());
 
     List<NotifyRead> reads =
         targets.stream()

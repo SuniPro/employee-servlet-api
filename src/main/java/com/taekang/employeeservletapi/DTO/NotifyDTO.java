@@ -1,6 +1,5 @@
 package com.taekang.employeeservletapi.DTO;
 
-import com.taekang.employeeservletapi.entity.employee.Level;
 import java.time.LocalDateTime;
 import lombok.*;
 
@@ -13,7 +12,7 @@ public class NotifyDTO {
 
   private Long id;
 
-  private Level level;
+  private int rank;
 
   private String writer;
 

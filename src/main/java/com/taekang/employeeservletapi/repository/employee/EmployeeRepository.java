@@ -95,7 +95,7 @@ public interface EmployeeRepository extends JpaRepository<Employee, Long> {
 
   //          countByLevelRankLessThan
 
-  List<Employee> findByLevelLessThanEqual(Level level);
+  List<Employee> findByRankLessThanEqual(int Rank);
 
   Page<Employee> findByLevelLessThanAndDepartment(
       Level level, Department department, Pageable pageable);

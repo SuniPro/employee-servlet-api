@@ -34,7 +34,8 @@ public class EmployeeController {
   }
 
   @PutMapping("update")
-  public ResponseEntity<EmployeeDTO> updateEmployee(@RequestBody EmployeeUpdateDTO employeeUpdateDTO) {
+  public ResponseEntity<EmployeeDTO> updateEmployee(
+      @RequestBody EmployeeUpdateDTO employeeUpdateDTO) {
     return ResponseEntity.ok().body(employeeService.updateEmployee(employeeUpdateDTO));
   }
 

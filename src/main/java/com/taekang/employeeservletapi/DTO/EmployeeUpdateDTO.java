@@ -11,22 +11,22 @@ import lombok.*;
 @NoArgsConstructor
 @AllArgsConstructor
 public class EmployeeUpdateDTO {
-    
-    private Long id;
 
-    private Department department;
+  private Long id;
 
-    private Level level;
+  private Department department;
 
-    private String name;
-    
-    private String password;
+  private Level level;
 
-    private String insertName;
+  private String name;
 
-    private LocalDateTime insertDateTime;
+  private String password;
 
-    private String updateName;
+  private String insertName;
 
-    private LocalDateTime updateDateTime;
+  private LocalDateTime insertDateTime;
+
+  private String updateName;
+
+  private LocalDateTime updateDateTime;
 }

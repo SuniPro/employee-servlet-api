@@ -4,7 +4,6 @@ import com.taekang.employeeservletapi.DTO.PaginationResponse;
 import com.taekang.employeeservletapi.DTO.ReportDTO;
 import com.taekang.employeeservletapi.entity.employee.Department;
 import com.taekang.employeeservletapi.entity.employee.Level;
-import com.taekang.employeeservletapi.entity.employee.Report;
 import com.taekang.employeeservletapi.service.ReportService;
 import java.time.LocalDateTime;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -26,12 +25,12 @@ public class ReportController {
   }
 
   @PostMapping("create")
-  public ResponseEntity<Report> createReport(@RequestBody ReportDTO reportDTO) {
+  public ResponseEntity<ReportDTO> createReport(@RequestBody ReportDTO reportDTO) {
     return ResponseEntity.ok().body(reportService.createReport(reportDTO));
   }
 
   @PutMapping("update")
-  public ResponseEntity<Report> updateReport(@RequestBody ReportDTO reportDTO) {
+  public ResponseEntity<ReportDTO> updateReport(@RequestBody ReportDTO reportDTO) {
     return ResponseEntity.ok().body(reportService.updateReport(reportDTO));
   }
 

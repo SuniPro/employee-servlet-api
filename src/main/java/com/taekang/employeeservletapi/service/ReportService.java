@@ -4,19 +4,16 @@ import com.taekang.employeeservletapi.DTO.PaginationResponse;
 import com.taekang.employeeservletapi.DTO.ReportDTO;
 import com.taekang.employeeservletapi.entity.employee.Department;
 import com.taekang.employeeservletapi.entity.employee.Level;
-import com.taekang.employeeservletapi.entity.employee.Report;
 import java.time.LocalDateTime;
 import org.springframework.data.domain.Pageable;
 
 public interface ReportService {
 
-  Report createReport(ReportDTO reportDTO);
+  ReportDTO createReport(ReportDTO reportDTO);
 
-  Report updateReport(ReportDTO reportDTO);
+  ReportDTO updateReport(ReportDTO reportDTO);
 
   void deleteReport(Long reportId);
-
-  ReportDTO getReportById(Long reportId);
 
   PaginationResponse<ReportDTO> findReportsByLevel(
       Level level, Long employeeId, LocalDateTime start, LocalDateTime end, Pageable pageable);

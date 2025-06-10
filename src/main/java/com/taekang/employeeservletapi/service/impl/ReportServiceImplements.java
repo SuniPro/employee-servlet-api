@@ -19,7 +19,7 @@ import org.springframework.data.domain.Page;
 import org.springframework.data.domain.PageImpl;
 import org.springframework.data.domain.Pageable;
 import org.springframework.stereotype.Service;
-import org.springframework.util.StopWatch;
+import org.springframework.transaction.annotation.Transactional;
 
 @Slf4j
 @Service
@@ -35,28 +35,33 @@ public class ReportServiceImplements implements ReportService {
   }
 
   @Override
-  public Report createReport(ReportDTO reportDTO) {
-    Report report =
-        Report.builder()
-            .employee(Employee.builder().id(reportDTO.getEmployee().getId()).build())
-            .title(reportDTO.getTitle())
-            .reportContents(reportDTO.getReportContents())
-            .insertDateTime(LocalDateTime.now(ZoneId.of("Asia/Singapore")).minusHours(1))
-            .build();
-    return reportRepository.save(report);
+  @Transactional
+  public ReportDTO createReport(ReportDTO reportDTO) {
+    return toReportDto(
+        reportRepository.save(
+            Report.builder()
+                .id(reportDTO.getId())
+                .employee(Employee.builder().id(reportDTO.getEmployee().getId()).build())
+                .title(reportDTO.getTitle())
+                .reportContents(reportDTO.getReportContents())
+                .insertDateTime(reportDTO.getInsertDateTime())
+                .updateDateTime(LocalDateTime.now(ZoneId.of("Asia/Singapore")).minusHours(1))
+                .build()));
   }
 
   @Override
-  public Report updateReport(ReportDTO reportDTO) {
-    Report report =
-        Report.builder()
-            .id(reportDTO.getId())
-            .employee(Employee.builder().id(reportDTO.getEmployee().getId()).build())
-            .title(reportDTO.getTitle())
-            .reportContents(reportDTO.getReportContents())
-            .insertDateTime(LocalDateTime.now(ZoneId.of("Asia/Singapore")).minusHours(1))
-            .build();
-    return reportRepository.save(report);
+  @Transactional
+  public ReportDTO updateReport(ReportDTO reportDTO) {
+    return toReportDto(
+        reportRepository.save(
+            Report.builder()
+                .id(reportDTO.getId())
+                .employee(Employee.builder().id(reportDTO.getEmployee().getId()).build())
+                .title(reportDTO.getTitle())
+                .reportContents(reportDTO.getReportContents())
+                .insertDateTime(reportDTO.getInsertDateTime())
+                .updateDateTime(LocalDateTime.now(ZoneId.of("Asia/Singapore")).minusHours(1))
+                .build()));
   }
 
   @Override
@@ -75,28 +80,19 @@ public class ReportServiceImplements implements ReportService {
   @Override
   public PaginationResponse<ReportDTO> findReportsByLevel(
       Level level, Long employeeId, LocalDateTime start, LocalDateTime end, Pageable pageable) {
-    StopWatch stopWatch = new StopWatch();
-    stopWatch.start("쿼리");
-
+    if (level == Level.STAFF) {
+      return PaginationResponse.from(
+          reportRepository
+              .findByEmployee_idAndInsertDateTimeBetween(employeeId, start, end, pageable)
+              .map(this::toReportDto));
+    }
     Page<Report> page =
         reportRepository.findReportsByRankAndPeriodWithEmployeeFetched(
             level.getRank(), start, end, pageable);
 
-    stopWatch.stop();
-
-    stopWatch.start("DTO 변환");
-
     List<ReportDTO> dtoList = page.getContent().stream().map(this::toReportDto).toList();
 
-    stopWatch.stop();
-
-    stopWatch.start("Pagination 응답 생성");
-    PaginationResponse<ReportDTO> response =
-        PaginationResponse.from(new PageImpl<>(dtoList, pageable, page.getTotalElements()));
-    stopWatch.stop();
-
-    log.info("처리 시간: \n{}", stopWatch.prettyPrint());
-    return response;
+    return PaginationResponse.from(new PageImpl<>(dtoList, pageable, page.getTotalElements()));
   }
 
   @Override

@@ -39,12 +39,10 @@ public class ReportServiceImplements implements ReportService {
     return toReportDto(
         reportRepository.save(
             Report.builder()
-                .id(reportDTO.getId())
                 .employee(Employee.builder().id(reportDTO.getEmployee().getId()).build())
                 .title(reportDTO.getTitle())
                 .reportContents(reportDTO.getReportContents())
                 .insertDateTime(reportDTO.getInsertDateTime())
-                .updateDateTime(LocalDateTime.now(ZoneId.of("Asia/Singapore")).minusHours(1))
                 .build()));
   }
 

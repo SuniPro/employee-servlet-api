@@ -283,6 +283,7 @@ public class ReviewServiceImplements implements ReviewService {
   }
 
   private AbilityDTO getAverageAbilityInfo(List<Ability> abilities) {
+    if (abilities.isEmpty()) return AbilityDTO.builder().build();
     return AbilityDTO.builder()
         .id(abilities.get(0).getId())
         .employee(abilities.get(0).getEmployee())

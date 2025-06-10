@@ -291,6 +291,10 @@ public class TetherServiceImplements implements TetherService {
       return new TetherDepositSummaryDTO(); // 빈 응답
     }
 
+    if (result.length == 0) {
+      return new TetherDepositSummaryDTO();
+    }
+
     Object[] row = (Object[]) result[0];
 
     return TetherDepositSummaryDTO.builder()

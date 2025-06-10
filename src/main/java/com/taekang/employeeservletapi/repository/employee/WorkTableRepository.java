@@ -8,6 +8,8 @@ import org.springframework.stereotype.Repository;
 @Repository
 public interface WorkTableRepository extends JpaRepository<WorkTable, Long> {
 
+  void deleteByEmployee_Id(Long employeeId);
+
   // 직원 이름 기반으로 조회
   Optional<WorkTable> findByEmployee_Name(String name);
 

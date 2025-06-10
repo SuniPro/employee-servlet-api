@@ -1,6 +1,7 @@
 package com.taekang.employeeservletapi.controller;
 
 import com.taekang.employeeservletapi.DTO.EmployeeDTO;
+import com.taekang.employeeservletapi.DTO.EmployeeUpdateDTO;
 import com.taekang.employeeservletapi.DTO.RegisterRequestDTO;
 import com.taekang.employeeservletapi.entity.employee.Department;
 import com.taekang.employeeservletapi.entity.employee.Employee;
@@ -33,8 +34,8 @@ public class EmployeeController {
   }
 
   @PutMapping("update")
-  public ResponseEntity<Employee> updateEmployee(@RequestBody EmployeeDTO employeeDTO) {
-    return ResponseEntity.ok().body(employeeService.updateEmployee(employeeDTO));
+  public ResponseEntity<EmployeeDTO> updateEmployee(@RequestBody EmployeeUpdateDTO employeeUpdateDTO) {
+    return ResponseEntity.ok().body(employeeService.updateEmployee(employeeUpdateDTO));
   }
 
   @GetMapping("get/by/{id}")

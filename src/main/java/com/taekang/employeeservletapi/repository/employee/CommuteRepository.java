@@ -10,6 +10,8 @@ import org.springframework.stereotype.Repository;
 @Repository
 public interface CommuteRepository extends JpaRepository<Commute, Long> {
 
+  void deleteByEmployee_Id(Long employeeId);
+
   boolean existsByEmployeeAndOnTimeBetween(
       Employee employee, LocalDateTime start, LocalDateTime end);
 

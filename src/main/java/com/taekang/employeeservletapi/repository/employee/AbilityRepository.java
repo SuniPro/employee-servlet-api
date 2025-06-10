@@ -12,6 +12,8 @@ import org.springframework.stereotype.Repository;
 @Repository
 public interface AbilityRepository extends JpaRepository<Ability, Long> {
 
+  void deleteByEmployee_Id(Long employeeId);
+
   List<Ability> findByEmployee(Employee employee);
 
   List<Ability> findByEmployee_Id(Long employeeId);

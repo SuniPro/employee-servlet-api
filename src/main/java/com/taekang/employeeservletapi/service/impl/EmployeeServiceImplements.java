@@ -1,17 +1,15 @@
 package com.taekang.employeeservletapi.service.impl;
 
 import com.taekang.employeeservletapi.DTO.EmployeeDTO;
+import com.taekang.employeeservletapi.DTO.EmployeeUpdateDTO;
 import com.taekang.employeeservletapi.DTO.RegisterRequestDTO;
-import com.taekang.employeeservletapi.entity.employee.Ability;
-import com.taekang.employeeservletapi.entity.employee.Department;
-import com.taekang.employeeservletapi.entity.employee.Employee;
-import com.taekang.employeeservletapi.entity.employee.Level;
+import com.taekang.employeeservletapi.entity.employee.*;
 import com.taekang.employeeservletapi.error.DuplicateEmployeeException;
 import com.taekang.employeeservletapi.error.EmployeeNotFoundException;
-import com.taekang.employeeservletapi.repository.employee.AbilityRepository;
-import com.taekang.employeeservletapi.repository.employee.EmployeeRepository;
+import com.taekang.employeeservletapi.repository.employee.*;
 import com.taekang.employeeservletapi.service.EmployeeService;
 import java.time.LocalDateTime;
+import java.time.ZoneId;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.stream.Collectors;
@@ -24,14 +22,20 @@ import org.springframework.data.domain.PageRequest;
 import org.springframework.data.domain.Pageable;
 import org.springframework.security.crypto.bcrypt.BCryptPasswordEncoder;
 import org.springframework.stereotype.Service;
+import org.springframework.transaction.annotation.Transactional;
 
 @Slf4j
 @Service
 public class EmployeeServiceImplements implements EmployeeService {
 
   private final EmployeeRepository employeeRepository;
-  private final BCryptPasswordEncoder bCryptPasswordEncoder;
   private final AbilityRepository abilityRepository;
+  private final CommuteRepository commuteRepository;
+  private final NotifyReadRepository notifyReadRepository;
+  private final ReportRepository reportRepository;
+  private final WorkTableRepository workTableRepository;
+
+  private final BCryptPasswordEncoder bCryptPasswordEncoder;
   private final ModelMapper modelMapper;
 
   @Autowired
@@ -39,10 +43,18 @@ public class EmployeeServiceImplements implements EmployeeService {
       EmployeeRepository employeeRepository,
       BCryptPasswordEncoder bCryptPasswordEncoder,
       AbilityRepository abilityRepository1,
+      CommuteRepository commuteRepository,
+      NotifyReadRepository notifyReadRepository,
+      ReportRepository reportRepository,
+      WorkTableRepository workTableRepository,
       ModelMapper modelMapper) {
     this.employeeRepository = employeeRepository;
     this.bCryptPasswordEncoder = bCryptPasswordEncoder;
     this.abilityRepository = abilityRepository1;
+    this.commuteRepository = commuteRepository;
+    this.notifyReadRepository = notifyReadRepository;
+    this.reportRepository = reportRepository;
+    this.workTableRepository = workTableRepository;
     this.modelMapper = modelMapper;
   }
 
@@ -53,8 +65,6 @@ public class EmployeeServiceImplements implements EmployeeService {
       throw new DuplicateEmployeeException();
     }
 
-    LocalDateTime now = LocalDateTime.now();
-
     Employee employee =
         Employee.builder()
             .name(registerRequestDTO.getName())
@@ -62,7 +72,7 @@ public class EmployeeServiceImplements implements EmployeeService {
             .password(bCryptPasswordEncoder.encode(registerRequestDTO.getPassword()))
             .level(registerRequestDTO.getLevel())
             .insertName(registerRequestDTO.getInsertName())
-            .insertDateTime(now)
+            .insertDateTime(LocalDateTime.now(ZoneId.of("Asia/Singapore")).minusHours(1))
             .build();
 
     Employee result = employeeRepository.save(employee);
@@ -82,25 +92,41 @@ public class EmployeeServiceImplements implements EmployeeService {
   }
 
   @Override
-  public Employee updateEmployee(EmployeeDTO employeeDTO) {
+  public EmployeeDTO updateEmployee(EmployeeUpdateDTO employeeUpdateDTO) {
+    Employee employee =
+        employeeRepository
+            .findById(employeeUpdateDTO.getId())
+            .orElseThrow(EmployeeNotFoundException::new);
 
-    if (!employeeRepository.existsById(employeeDTO.getId())) {
-      throw new EmployeeNotFoundException();
+    if (employeeUpdateDTO.getPassword().isBlank()) {
+      return toEmployeeDTO(
+          employeeRepository.save(
+              Employee.builder()
+                  .id(employeeUpdateDTO.getId())
+                  .department(employeeUpdateDTO.getDepartment())
+                  .level(employeeUpdateDTO.getLevel())
+                  .name(employeeUpdateDTO.getName())
+                  .password(employeeUpdateDTO.getPassword())
+                  .insertName(employeeUpdateDTO.getInsertName())
+                  .insertDateTime(employeeUpdateDTO.getInsertDateTime())
+                  .updateName(employeeUpdateDTO.getUpdateName())
+                  .updateDateTime(LocalDateTime.now(ZoneId.of("Asia/Singapore")).minusHours(1))
+                  .build()));
     }
 
-    LocalDateTime now = LocalDateTime.now();
-
-    Employee employee =
-        Employee.builder()
-            .id(employeeDTO.getId())
-            .name(employeeDTO.getName())
-            .department(employeeDTO.getDepartment())
-            .level(employeeDTO.getLevel())
-            .updateName(employeeDTO.getUpdateName())
-            .updateDateTime(now)
-            .build();
-
-    return employeeRepository.save(employee);
+    return toEmployeeDTO(
+        employeeRepository.save(
+            Employee.builder()
+                .id(employeeUpdateDTO.getId())
+                .department(employeeUpdateDTO.getDepartment())
+                .level(employeeUpdateDTO.getLevel())
+                .name(employeeUpdateDTO.getName())
+                .password(bCryptPasswordEncoder.encode(employeeUpdateDTO.getPassword()))
+                .insertName(employeeUpdateDTO.getInsertName())
+                .insertDateTime(employeeUpdateDTO.getInsertDateTime())
+                .updateName(employeeUpdateDTO.getUpdateName())
+                .updateDateTime(LocalDateTime.now(ZoneId.of("Asia/Singapore")).minusHours(1))
+                .build()));
   }
 
   @Override
@@ -179,7 +205,17 @@ public class EmployeeServiceImplements implements EmployeeService {
   }
 
   @Override
+  @Transactional
   public void deleteEmployeeById(Long id) {
+    commuteRepository.deleteByEmployee_Id(id);
+    abilityRepository.deleteByEmployee_Id(id);
+    notifyReadRepository.deleteByEmployee_Id(id);
+    reportRepository.deleteByEmployee_Id(id);
+    workTableRepository.deleteByEmployee_Id(id);
     employeeRepository.deleteById(id);
+  }
+
+  private EmployeeDTO toEmployeeDTO(Employee employee) {
+    return modelMapper.map(employee, EmployeeDTO.class);
   }
 }

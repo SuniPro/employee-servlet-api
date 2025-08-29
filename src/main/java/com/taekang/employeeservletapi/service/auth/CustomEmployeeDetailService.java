@@ -28,7 +28,7 @@ public class CustomEmployeeDetailService implements UserDetailsService {
   public UserDetails loadUserByUsername(String name) throws UsernameNotFoundException {
     Employee employee =
         employeeRepository
-            .findByName(name)
+            .findByNameAndDeleteNameIsNull(name)
             .orElseThrow(() -> new UsernameNotFoundException(name + "는 없는 직원입니다."));
 
     CustomEmployeeDTO dto = modelMapper.map(employee, CustomEmployeeDTO.class);

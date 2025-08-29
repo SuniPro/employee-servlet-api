@@ -17,8 +17,8 @@ public class Notify {
   @GeneratedValue(strategy = GenerationType.IDENTITY)
   private Long id;
 
-  @Column(name = "rank", nullable = false)
-  private int rank;
+  @Column(name = "level", nullable = false)
+  private Level level;
 
   @Column(name = "writer", nullable = false)
   private String writer;
@@ -28,6 +28,9 @@ public class Notify {
 
   @Column(name = "contents", nullable = false)
   private String contents;
+
+  @Column(name= "site", nullable = false)
+  private String site;
 
   @Column(name = "insert_date_time", nullable = false)
   private LocalDateTime insertDateTime;

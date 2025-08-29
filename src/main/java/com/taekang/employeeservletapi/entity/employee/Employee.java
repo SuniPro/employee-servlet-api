@@ -1,5 +1,7 @@
 package com.taekang.employeeservletapi.entity.employee;
 
+import com.taekang.employeeservletapi.entity.BaseTimeEntity;
+import com.taekang.employeeservletapi.tools.converter.LevelConverter;
 import jakarta.persistence.*;
 import java.time.LocalDateTime;
 import lombok.*;
@@ -9,8 +11,8 @@ import lombok.*;
 @NoArgsConstructor(access = AccessLevel.PROTECTED)
 @AllArgsConstructor(access = AccessLevel.PRIVATE) // 빌더 사용 시 필수
 @Table(name = "employee")
-@Builder
-public class Employee {
+@Builder(toBuilder = true)
+public class Employee extends BaseTimeEntity {
 
   @Id
   @Column(name = "id")
@@ -21,12 +23,13 @@ public class Employee {
   @Column(name = "department", nullable = false)
   private Department department;
 
-  @Enumerated(EnumType.STRING)
+  @Column(name = "site", unique = true, nullable = false)
+  private String site;
+
+  // @Enumerated를 @Convert로 대체합니다.
+  @Convert(converter = LevelConverter.class)
   @Column(name = "level", nullable = false)
   private Level level;
-
-  @Column(name = "rank")
-  private int rank;
 
   @Column(name = "name", unique = true, nullable = false)
   private String name;
@@ -37,14 +40,8 @@ public class Employee {
   @Column(name = "insert_name", nullable = false)
   private String insertName;
 
-  @Column(name = "insert_date_time", nullable = false)
-  private LocalDateTime insertDateTime;
-
   @Column(name = "update_name")
   private String updateName;
-
-  @Column(name = "update_date_time")
-  private LocalDateTime updateDateTime;
 
   @Column(name = "delete_name")
   private String deleteName;

@@ -107,6 +107,29 @@ public class GlobalExceptionHandler {
         .body(new ErrorResponse(e.getErrorCode()));
   }
 
+  @ExceptionHandler(CannotFoundSiteException.class)
+  public ResponseEntity<ErrorResponse> handleCannotFoundSiteException(
+          CannotFoundSiteException e) {
+    return ResponseEntity.status(e.getErrorCode().getHttpStatus())
+            .body(new ErrorResponse(e.getErrorCode()));
+  }
+
+  @ExceptionHandler(IsNotAccessTokenException.class)
+  public ResponseEntity<ErrorResponse> handleIsNotAccessTokenException(
+          IsNotAccessTokenException e) {
+
+    return ResponseEntity.status(e.getErrorCode().getHttpStatus())
+            .body(new ErrorResponse(e.getErrorCode()));
+  }
+
+  @ExceptionHandler(IsNotRefreshTokenException.class)
+  public ResponseEntity<ErrorResponse> handleIsNotRefreshTokenException(
+          IsNotRefreshTokenException e) {
+
+    return ResponseEntity.status(e.getErrorCode().getHttpStatus())
+            .body(new ErrorResponse(e.getErrorCode()));
+  }
+
   // 다른 커스텀 예외들도 이렇게 추가하면 됨
   //  @ExceptionHandler(Exception.class)
   //  public ResponseEntity<ErrorResponse> handleOther() {

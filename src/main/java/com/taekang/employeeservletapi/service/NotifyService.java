@@ -2,7 +2,6 @@ package com.taekang.employeeservletapi.service;
 
 import com.taekang.employeeservletapi.DTO.NotifyDTO;
 import com.taekang.employeeservletapi.DTO.NotifyWithReadDTO;
-import com.taekang.employeeservletapi.entity.employee.Level;
 import com.taekang.employeeservletapi.entity.employee.Notify;
 import java.util.List;
 
@@ -20,19 +19,19 @@ public interface NotifyService {
 
   Notify getLatestNotify();
 
-  List<Notify> getAllNotifyForLevel(Level level); // level 이하만 반환
+  List<Notify> getAllNotifyForLevel(String name); // level 이하만 반환
 
-  List<NotifyWithReadDTO> getAllNotifyWithReadState(Long employeeId, Level employeeLevel);
+  List<NotifyWithReadDTO> getAllNotifyWithReadState(String name);
 
-  void markAsRead(Long notifyId, Long employeeId);
+  void markAsRead(Long notifyId, String name);
 
-  boolean isNotifyRead(Long notifyId, Long employeeId);
+  boolean isNotifyRead(Long notifyId, String name);
 
-  long countUnreadNotify(Long employeeId, Level employeeLevel);
+  long countUnreadNotify(String name);
 
-  List<Notify> getReadNotifyListByEmployee(Long employeeId, Level employeeLevel);
+  List<Notify> getReadNotifyListByEmployee(String name);
 
-  List<Notify> getUnreadNotifyListByEmployee(Long employeeId, Level employeeLevel);
+  List<Notify> getUnreadNotifyListByEmployee(String name);
 
-  List<Notify> getAllUnreadNotifyListByEmployee(Long employeeId, Level employeeLevel);
+  List<Notify> getAllUnreadNotifyListByEmployee(String name);
 }

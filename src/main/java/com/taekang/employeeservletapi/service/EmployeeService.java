@@ -3,35 +3,25 @@ package com.taekang.employeeservletapi.service;
 import com.taekang.employeeservletapi.DTO.EmployeeDTO;
 import com.taekang.employeeservletapi.DTO.EmployeeUpdateDTO;
 import com.taekang.employeeservletapi.DTO.RegisterRequestDTO;
-import com.taekang.employeeservletapi.entity.employee.Department;
 import com.taekang.employeeservletapi.entity.employee.Employee;
-import com.taekang.employeeservletapi.entity.employee.Level;
-import java.util.List;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.Pageable;
 
 public interface EmployeeService {
 
-  Employee createEmployee(RegisterRequestDTO registerRequestDTO);
+  Employee createEmployee(String name, RegisterRequestDTO registerRequestDTO);
 
   EmployeeDTO updateEmployee(EmployeeUpdateDTO employeeUpdateDTO);
 
-  Employee getEmployeeById(Long id);
+  EmployeeDTO getEmployeeById(Long id);
 
-  Employee getEmployeeByName(String name);
+  EmployeeDTO getEmployeeByName(String name);
 
-  Page<Employee> getAllEmployees(Pageable pageable);
+  Page<EmployeeDTO> getEmployeeList(Pageable pageable);
 
-  List<Employee> getEmployeeListByDepartment(Department department);
+  Page<EmployeeDTO> getEmployeeListBySite(String site, Pageable pageable);
 
-  List<Employee> getEmployeeListByLevel(Level level);
+//  Page<EmployeeDTO> getEmployeeListByLevel(Level level);
 
-  Page<EmployeeDTO> getEmployeeListByLevelLessThen(Level level, Pageable pageable);
-
-  Page<EmployeeDTO> getEmployeeListByLevelAndDepartmentLessThen(
-      Level level, Department department, Pageable pageable);
-
-  List<EmployeeDTO> getEmployeeListByLevelGreaterThen(Level level);
-
-  void deleteEmployeeById(Long id);
+  void deleteEmployeeById(String name, Long id);
 }

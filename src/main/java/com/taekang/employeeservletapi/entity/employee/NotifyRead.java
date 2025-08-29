@@ -11,7 +11,7 @@ import lombok.*;
     uniqueConstraints = @UniqueConstraint(columnNames = {"employee_id", "notify_id"}))
 @NoArgsConstructor(access = AccessLevel.PROTECTED)
 @AllArgsConstructor(access = AccessLevel.PRIVATE) // 빌더 사용 시 필수
-@Builder
+@Builder(toBuilder = true)
 public class NotifyRead {
 
   @Id

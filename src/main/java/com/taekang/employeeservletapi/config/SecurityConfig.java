@@ -6,8 +6,10 @@ import com.taekang.employeeservletapi.service.auth.JwtUtil;
 import com.taekang.employeeservletapi.utils.CustomAccessDeniedHandler;
 import com.taekang.employeeservletapi.utils.CustomAuthenticationEntryPoint;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.beans.factory.annotation.Value;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
+import org.springframework.http.HttpMethod;
 import org.springframework.security.config.Customizer;
 import org.springframework.security.config.annotation.method.configuration.EnableMethodSecurity;
 import org.springframework.security.config.annotation.web.builders.HttpSecurity;
@@ -17,63 +19,112 @@ import org.springframework.security.config.http.SessionCreationPolicy;
 import org.springframework.security.crypto.bcrypt.BCryptPasswordEncoder;
 import org.springframework.security.web.SecurityFilterChain;
 import org.springframework.security.web.authentication.UsernamePasswordAuthenticationFilter;
+import org.springframework.web.cors.CorsConfiguration;
+import org.springframework.web.cors.CorsConfigurationSource;
+import org.springframework.web.cors.UrlBasedCorsConfigurationSource;
+
+import java.util.List;
 
 @Configuration
 @EnableWebSecurity
 @EnableMethodSecurity(securedEnabled = true)
 public class SecurityConfig {
 
-  private static final String[] AUTH_WHITELIST = {"/employee/get/**"};
+  @Value("${jwt.auth.whitelist}")
+  private String[] authWhitelist;
 
   private final CustomEmployeeDetailService customEmployeeDetailService;
   private final JwtUtil jwtUtil;
-  private final CustomAccessDeniedHandler customAccessDeniedHandler;
-  private final CustomAuthenticationEntryPoint customAuthenticationEntryPoint;
+  private final JwtAuthFilter jwtAuthFilter;
+  private final CustomAccessDeniedHandler accessDeniedHandler;
+  private final CustomAuthenticationEntryPoint authenticationEntryPoint;
 
   @Autowired
   public SecurityConfig(
       CustomEmployeeDetailService customEmployeeDetailService,
       JwtUtil jwtUtil,
-      CustomAccessDeniedHandler customAccessDeniedHandler,
-      CustomAuthenticationEntryPoint customAuthenticationEntryPoint) {
+      JwtAuthFilter jwtAuthFilter,
+      CustomAccessDeniedHandler accessDeniedHandler,
+      CustomAuthenticationEntryPoint authenticationEntryPoint) {
     this.customEmployeeDetailService = customEmployeeDetailService;
+    this.jwtAuthFilter = jwtAuthFilter;
+    this.accessDeniedHandler = accessDeniedHandler;
+    this.authenticationEntryPoint = authenticationEntryPoint;
     this.jwtUtil = jwtUtil;
-    this.customAccessDeniedHandler = customAccessDeniedHandler;
-    this.customAuthenticationEntryPoint = customAuthenticationEntryPoint;
   }
 
   @Bean
-  public SecurityFilterChain filterChain(HttpSecurity httpSecurity) throws Exception {
-    httpSecurity.csrf(AbstractHttpConfigurer::disable);
-    httpSecurity.cors(Customizer.withDefaults());
+  public SecurityFilterChain filterChain(HttpSecurity http) throws Exception {
+    // CSRF & CORS 설정
+    http.csrf(AbstractHttpConfigurer::disable).cors(Customizer.withDefaults());
 
-    // 상태 관리 상태 없음으로 구성, Spring security 가 세션 생성 or 사용을 못하게 합니다.
-    httpSecurity.sessionManagement(
-        sessionManagement ->
-            sessionManagement.sessionCreationPolicy(SessionCreationPolicy.STATELESS));
+    // 세션 관리 (STATELESS: 세션을 사용하지 않음)
+    http.sessionManagement(
+        session -> session.sessionCreationPolicy(SessionCreationPolicy.STATELESS));
 
-    httpSecurity.formLogin(AbstractHttpConfigurer::disable);
-    httpSecurity.httpBasic(AbstractHttpConfigurer::disable);
-    httpSecurity.logout(AbstractHttpConfigurer::disable);
+    // 기본 로그인 방식(FormLogin, HttpBasic) 비활성화
+    http.formLogin(AbstractHttpConfigurer::disable)
+        .httpBasic(AbstractHttpConfigurer::disable)
+        .logout(AbstractHttpConfigurer::disable);
+    ;
 
-    httpSecurity.addFilterBefore(
-        new JwtAuthFilter(customEmployeeDetailService, jwtUtil),
+    http.exceptionHandling(
+        ex ->
+            ex.authenticationEntryPoint(authenticationEntryPoint)
+                .accessDeniedHandler(accessDeniedHandler));
+
+    // JWT 인증 필터 추가 (UsernamePasswordAuthenticationFilter 앞에 배치)
+    http.addFilterBefore(
+        jwtAuthFilter, // 'new' 키워드로 직접 생성
         UsernamePasswordAuthenticationFilter.class);
 
-    httpSecurity.exceptionHandling(
+    http.exceptionHandling(
         (exception) ->
             exception
-                .authenticationEntryPoint(customAuthenticationEntryPoint)
-                .accessDeniedHandler(customAccessDeniedHandler));
+                .authenticationEntryPoint(authenticationEntryPoint)
+                .accessDeniedHandler(accessDeniedHandler));
 
-    httpSecurity.authorizeHttpRequests(
+    http.authorizeHttpRequests(
         authorizeRequests ->
-            // @PreAuthorization 을 사용 예정이라 모든 경로에 대한 인증처리는 일단 허가합니다.
-            authorizeRequests.requestMatchers(AUTH_WHITELIST).permitAll().anyRequest().permitAll()
-        //            .anyRequest().authenticated()
-        );
+            authorizeRequests
+                .requestMatchers(HttpMethod.OPTIONS, "/**")
+                .permitAll() // CORS preflight
+                .requestMatchers(authWhitelist)
+                .permitAll()
+                .anyRequest()
+                .permitAll());
 
-    return httpSecurity.build();
+    return http.build();
+  }
+
+  @Bean
+  public CorsConfigurationSource corsConfigurationSource() {
+    CorsConfiguration config = new CorsConfiguration();
+    // 허용할 프론트 도메인
+    config.setAllowedOrigins(
+        List.of(
+            "https://tie-ed.com",
+            "https://icointext.com",
+            "https://anycast.world",
+            "http://localhost:5020",
+            "http://localhost:5010",
+            "http://192.168.3.159:5020",
+            "http://192.168.3.159:5010"));
+
+    // 허용 HTTP 메서드
+    config.setAllowedMethods(List.of("GET", "POST", "PUT", "PATCH", "DELETE", "OPTIONS"));
+
+    // 허용 헤더
+    config.setAllowedHeaders(List.of("*"));
+
+    config.setExposedHeaders(List.of("Authorization", "Location", "Content-Type"));
+
+    // 자격증명(Cookie, Authorization 헤더) 허용
+    config.setAllowCredentials(true);
+
+    UrlBasedCorsConfigurationSource source = new UrlBasedCorsConfigurationSource();
+    source.registerCorsConfiguration("/**", config);
+    return source;
   }
 
   @Bean

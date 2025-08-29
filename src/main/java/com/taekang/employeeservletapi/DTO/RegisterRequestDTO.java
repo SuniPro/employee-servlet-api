@@ -2,11 +2,14 @@ package com.taekang.employeeservletapi.DTO;
 
 import com.taekang.employeeservletapi.entity.employee.Department;
 import com.taekang.employeeservletapi.entity.employee.Level;
-import lombok.Getter;
-import org.springframework.stereotype.Service;
+import lombok.*;
 
 @Getter
-@Service
+@Setter
+@Builder(toBuilder = true)
+@NoArgsConstructor
+@AllArgsConstructor
+@ToString
 public class RegisterRequestDTO {
 
   private String name;
@@ -15,7 +18,9 @@ public class RegisterRequestDTO {
 
   private Department department;
 
+  private String site;
+
   private Level level;
 
-  private String insertName;
+  private String cryptoWallet;
 }

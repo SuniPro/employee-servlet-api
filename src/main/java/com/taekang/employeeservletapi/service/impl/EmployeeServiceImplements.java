@@ -10,30 +10,20 @@ import com.taekang.employeeservletapi.repository.employee.*;
 import com.taekang.employeeservletapi.service.EmployeeService;
 import java.time.LocalDateTime;
 import java.time.ZoneId;
-import java.util.ArrayList;
-import java.util.List;
-import java.util.stream.Collectors;
 import lombok.extern.slf4j.Slf4j;
 import org.modelmapper.ModelMapper;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.data.domain.Page;
-import org.springframework.data.domain.PageImpl;
-import org.springframework.data.domain.PageRequest;
 import org.springframework.data.domain.Pageable;
 import org.springframework.security.crypto.bcrypt.BCryptPasswordEncoder;
 import org.springframework.stereotype.Service;
-import org.springframework.transaction.annotation.Transactional;
 
 @Slf4j
 @Service
 public class EmployeeServiceImplements implements EmployeeService {
 
   private final EmployeeRepository employeeRepository;
-  private final AbilityRepository abilityRepository;
-  private final CommuteRepository commuteRepository;
-  private final NotifyReadRepository notifyReadRepository;
-  private final ReportRepository reportRepository;
-  private final WorkTableRepository workTableRepository;
+  private final SiteRepository siteRepository;
 
   private final BCryptPasswordEncoder bCryptPasswordEncoder;
   private final ModelMapper modelMapper;
@@ -41,25 +31,17 @@ public class EmployeeServiceImplements implements EmployeeService {
   @Autowired
   public EmployeeServiceImplements(
       EmployeeRepository employeeRepository,
+      SiteRepository siteRepository,
       BCryptPasswordEncoder bCryptPasswordEncoder,
-      AbilityRepository abilityRepository1,
-      CommuteRepository commuteRepository,
-      NotifyReadRepository notifyReadRepository,
-      ReportRepository reportRepository,
-      WorkTableRepository workTableRepository,
       ModelMapper modelMapper) {
     this.employeeRepository = employeeRepository;
+    this.siteRepository = siteRepository;
     this.bCryptPasswordEncoder = bCryptPasswordEncoder;
-    this.abilityRepository = abilityRepository1;
-    this.commuteRepository = commuteRepository;
-    this.notifyReadRepository = notifyReadRepository;
-    this.reportRepository = reportRepository;
-    this.workTableRepository = workTableRepository;
     this.modelMapper = modelMapper;
   }
 
   @Override
-  public Employee createEmployee(RegisterRequestDTO registerRequestDTO) {
+  public Employee createEmployee(String name, RegisterRequestDTO registerRequestDTO) {
 
     if (employeeRepository.existsByName(registerRequestDTO.getName())) {
       throw new DuplicateEmployeeException();
@@ -67,28 +49,31 @@ public class EmployeeServiceImplements implements EmployeeService {
 
     Employee employee =
         Employee.builder()
-            .name(registerRequestDTO.getName())
             .department(registerRequestDTO.getDepartment())
-            .password(bCryptPasswordEncoder.encode(registerRequestDTO.getPassword()))
             .level(registerRequestDTO.getLevel())
-            .insertName(registerRequestDTO.getInsertName())
-            .insertDateTime(LocalDateTime.now(ZoneId.of("Asia/Singapore")).minusHours(1))
+            .name(registerRequestDTO.getName())
+            .password(bCryptPasswordEncoder.encode(registerRequestDTO.getPassword()))
+            .site(registerRequestDTO.getSite())
+            .insertName(name)
             .build();
 
-    Employee result = employeeRepository.save(employee);
-    Ability ability =
-        Ability.builder()
-            .employee(result)
-            .attitude(0)
-            .knowledgeLevel(0)
-            .teamwork(0)
-            .creativity(0)
-            .workPerformance(0)
-            .build();
+    employeeRepository.save(employee);
 
-    abilityRepository.save(ability);
+    /*
+     * 존재하지 않는 사이트일 경우에만 CryptoWallet이 존재함
+     * */
+    if (!siteRepository.existsBySite(registerRequestDTO.getSite())) {
+      Site site =
+          Site.builder()
+              .site(registerRequestDTO.getSite())
+              .insertId(name)
+              .cryptoWallet(registerRequestDTO.getCryptoWallet())
+              .build();
 
-    return result;
+      siteRepository.save(site);
+    }
+
+    return modelMapper.map(employee, Employee.class);
   }
 
   @Override
@@ -98,7 +83,7 @@ public class EmployeeServiceImplements implements EmployeeService {
             .findById(employeeUpdateDTO.getId())
             .orElseThrow(EmployeeNotFoundException::new);
 
-    if (employeeUpdateDTO.getPassword().isBlank()) {
+    if (employeeUpdateDTO.getPassword().isEmpty()) {
       return toEmployeeDTO(
           employeeRepository.save(
               Employee.builder()
@@ -106,113 +91,55 @@ public class EmployeeServiceImplements implements EmployeeService {
                   .department(employeeUpdateDTO.getDepartment())
                   .level(employeeUpdateDTO.getLevel())
                   .name(employeeUpdateDTO.getName())
-                  .password(employeeUpdateDTO.getPassword())
+                  .password(employee.getPassword())
                   .insertName(employeeUpdateDTO.getInsertName())
-                  .insertDateTime(employeeUpdateDTO.getInsertDateTime())
                   .updateName(employeeUpdateDTO.getUpdateName())
-                  .updateDateTime(LocalDateTime.now(ZoneId.of("Asia/Singapore")).minusHours(1))
+                  .build()));
+    } else {
+      return toEmployeeDTO(
+          employeeRepository.save(
+              Employee.builder()
+                  .id(employeeUpdateDTO.getId())
+                  .department(employeeUpdateDTO.getDepartment())
+                  .level(employeeUpdateDTO.getLevel())
+                  .name(employeeUpdateDTO.getName())
+                  .password(bCryptPasswordEncoder.encode(employeeUpdateDTO.getPassword()))
+                  .insertName(employeeUpdateDTO.getInsertName())
+                  .updateName(employeeUpdateDTO.getUpdateName())
                   .build()));
     }
-
-    return toEmployeeDTO(
-        employeeRepository.save(
-            Employee.builder()
-                .id(employeeUpdateDTO.getId())
-                .department(employeeUpdateDTO.getDepartment())
-                .level(employeeUpdateDTO.getLevel())
-                .name(employeeUpdateDTO.getName())
-                .password(bCryptPasswordEncoder.encode(employeeUpdateDTO.getPassword()))
-                .insertName(employeeUpdateDTO.getInsertName())
-                .insertDateTime(employeeUpdateDTO.getInsertDateTime())
-                .updateName(employeeUpdateDTO.getUpdateName())
-                .updateDateTime(LocalDateTime.now(ZoneId.of("Asia/Singapore")).minusHours(1))
-                .build()));
   }
 
   @Override
-  public Employee getEmployeeById(Long id) {
-    return employeeRepository.findById(id).orElseThrow(EmployeeNotFoundException::new);
+  public EmployeeDTO getEmployeeById(Long id) {
+    Employee employee = employeeRepository.findById(id).orElseThrow(EmployeeNotFoundException::new);
+    return modelMapper.map(employee, EmployeeDTO.class);
   }
 
   @Override
-  public List<Employee> getEmployeeListByDepartment(Department department) {
-    return employeeRepository.findByDepartment(department);
+  public EmployeeDTO getEmployeeByName(String name) {
+    Employee employee = employeeRepository.findByNameAndDeleteNameIsNull(name).orElseThrow(EmployeeNotFoundException::new);
+    return modelMapper.map(employee, EmployeeDTO.class);
   }
 
   @Override
-  public List<Employee> getEmployeeListByLevel(Level level) {
-    return employeeRepository.findByLevel(level);
+  public Page<EmployeeDTO> getEmployeeList(Pageable pageable) {
+    return employeeRepository.findAllByDeleteNameIsNull(pageable).map(this::toEmployeeDTO);
   }
 
   @Override
-  public Page<EmployeeDTO> getEmployeeListByLevelLessThen(Level level, Pageable pageable) {
-    int rank = level.getRank();
-    long totalCount = employeeRepository.countByLevelRankLessThan(rank);
-
-    int limit = pageable.getPageSize();
-    long totalPages = totalCount / limit;
-
-    // OFFSET 값 보정
-    long offset = pageable.getOffset();
-    if (offset >= totalCount) {
-      int lastPage = (int) Math.ceil((double) totalCount / limit) - 1;
-      if (lastPage < 0) lastPage = 0;
-      offset = (long) lastPage * limit;
-    }
-
-    // 1. 엔티티 리스트 조회
-    List<Employee> employeeList = employeeRepository.findByLevelRankLessThan(rank, limit, offset);
-
-    // 2. DTO로 변환
-    List<EmployeeDTO> content =
-        employeeList.stream()
-            .map(employee -> modelMapper.map(employee, EmployeeDTO.class))
-            .collect(Collectors.toList());
-
-    // 3. Page 객체 생성 (수정된 부분)
-    return new PageImpl<>(
-        content,
-        PageRequest.of(
-            pageable.getPageNumber(), pageable.getPageSize(), pageable.getSort()), // 정렬 정보 유지
-        totalPages);
+  public Page<EmployeeDTO> getEmployeeListBySite(String site, Pageable pageable) {
+    return employeeRepository.findBySiteAndDeleteNameIsNull(site, pageable).map(this::toEmployeeDTO);
   }
 
   @Override
-  public Page<EmployeeDTO> getEmployeeListByLevelAndDepartmentLessThen(
-      Level level, Department department, Pageable pageable) {
-    Page<Employee> employeePage =
-        employeeRepository.findByLevelLessThanAndDepartment(level, department, pageable);
-    return employeePage.map(employee -> modelMapper.map(employee, EmployeeDTO.class));
-  }
+  public void deleteEmployeeById(String name, Long id) {
+    Employee employee = employeeRepository.findById(id).orElseThrow(EmployeeNotFoundException::new);
+    
+    LocalDateTime seoulTime = LocalDateTime.now(ZoneId.of("Asia/Seoul"));
 
-  @Override
-  public List<EmployeeDTO> getEmployeeListByLevelGreaterThen(Level level) {
-    List<EmployeeDTO> employeeDTOList = new ArrayList<>();
-    employeeRepository
-        .findByLevelGreaterThan(level)
-        .forEach(employee -> employeeDTOList.add(modelMapper.map(employee, EmployeeDTO.class)));
-    return employeeDTOList;
-  }
-
-  @Override
-  public Employee getEmployeeByName(String name) {
-    return employeeRepository.findByName(name).orElseThrow(EmployeeNotFoundException::new);
-  }
-
-  @Override
-  public Page<Employee> getAllEmployees(Pageable pageable) {
-    return employeeRepository.findAll(pageable);
-  }
-
-  @Override
-  @Transactional
-  public void deleteEmployeeById(Long id) {
-    commuteRepository.deleteByEmployee_Id(id);
-    abilityRepository.deleteByEmployee_Id(id);
-    notifyReadRepository.deleteByEmployee_Id(id);
-    reportRepository.deleteByEmployee_Id(id);
-    workTableRepository.deleteByEmployee_Id(id);
-    employeeRepository.deleteById(id);
+    employee.toBuilder().deleteName(name).deleteDateTime(seoulTime).build();
+    employeeRepository.save(employee);
   }
 
   private EmployeeDTO toEmployeeDTO(Employee employee) {

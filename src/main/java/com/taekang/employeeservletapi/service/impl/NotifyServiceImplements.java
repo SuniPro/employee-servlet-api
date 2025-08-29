@@ -3,9 +3,9 @@ package com.taekang.employeeservletapi.service.impl;
 import com.taekang.employeeservletapi.DTO.NotifyDTO;
 import com.taekang.employeeservletapi.DTO.NotifyWithReadDTO;
 import com.taekang.employeeservletapi.entity.employee.Employee;
-import com.taekang.employeeservletapi.entity.employee.Level;
 import com.taekang.employeeservletapi.entity.employee.Notify;
 import com.taekang.employeeservletapi.entity.employee.NotifyRead;
+import com.taekang.employeeservletapi.error.EmployeeNotFoundException;
 import com.taekang.employeeservletapi.error.NotifyNotFoundedException;
 import com.taekang.employeeservletapi.repository.employee.EmployeeRepository;
 import com.taekang.employeeservletapi.repository.employee.NotifyReadRepository;
@@ -45,12 +45,13 @@ public class NotifyServiceImplements implements NotifyService {
             Notify.builder()
                 .title(notifyDTO.getTitle())
                 .contents(notifyDTO.getContents())
-                .rank(notifyDTO.getRank())
+                .level(notifyDTO.getLevel())
                 .writer(notifyDTO.getWriter())
+                    .site(notifyDTO.getSite())
                 .insertDateTime(LocalDateTime.now(ZoneId.of("Asia/Singapore")).minusHours(1))
                 .build());
 
-    List<Employee> targets = employeeRepository.findByRankLessThanEqual(notifyDTO.getRank());
+    List<Employee> targets = employeeRepository.findByLevelLessThanEqualAndDeleteNameIsNull(notifyDTO.getLevel());
 
     List<NotifyRead> reads =
         targets.stream()
@@ -69,6 +70,7 @@ public class NotifyServiceImplements implements NotifyService {
             .id(notifyDTO.getId())
             .title(notifyDTO.getTitle())
             .contents(notifyDTO.getContents())
+                .site(notifyDTO.getSite())
             .updateDateTime(LocalDateTime.now(ZoneId.of("Asia/Singapore")).minusHours(1))
             .build();
     return notifyRepository.save(notify);
@@ -97,14 +99,17 @@ public class NotifyServiceImplements implements NotifyService {
   }
 
   @Override
-  public List<Notify> getAllNotifyForLevel(Level level) {
-    return notifyRepository.findByRankGreaterThanEqual(level.getRank());
+  public List<Notify> getAllNotifyForLevel(String name) {
+    Employee employee = employeeRepository.findByNameAndDeleteNameIsNull(name).orElseThrow(EmployeeNotFoundException::new);
+    return notifyRepository.findByLevelGreaterThanEqualAndSite(employee.getLevel(), employee.getSite());
   }
 
   @Override
-  public List<NotifyWithReadDTO> getAllNotifyWithReadState(Long employeeId, Level employeeLevel) {
+  public List<NotifyWithReadDTO> getAllNotifyWithReadState(String name) {
+    Employee employee = employeeRepository.findByNameAndDeleteNameIsNull(name).orElseThrow(EmployeeNotFoundException::new);
+    Long employeeId = employee.getId();
     // 1. 전체 공지 가져오기 (레벨 이하)
-    List<Notify> notifies = notifyRepository.findByRankGreaterThanEqual(employeeLevel.getRank());
+    List<Notify> notifies = notifyRepository.findByLevelGreaterThanEqualAndSite(employee.getLevel(), employee.getSite());
 
     List<NotifyRead> readList = notifyReadRepository.findByEmployee_Id(employeeId);
 
@@ -127,7 +132,9 @@ public class NotifyServiceImplements implements NotifyService {
 
   @Override
   @Transactional
-  public void markAsRead(Long notifyId, Long employeeId) {
+  public void markAsRead(Long notifyId, String name) {
+    Employee employee = employeeRepository.findByNameAndDeleteNameIsNull(name).orElseThrow(EmployeeNotFoundException::new);
+    Long employeeId = employee.getId();
     // 이미 읽었는지 먼저 확인
     boolean alreadyRead =
         notifyReadRepository.existsByNotify_IdAndEmployee_Id(notifyId, employeeId);
@@ -145,27 +152,32 @@ public class NotifyServiceImplements implements NotifyService {
   }
 
   @Override
-  public boolean isNotifyRead(Long notifyId, Long employeeId) {
-    return notifyReadRepository.existsByNotify_IdAndEmployee_Id(notifyId, employeeId);
+  public boolean isNotifyRead(Long notifyId, String name) {
+    Employee employee = employeeRepository.findByNameAndDeleteNameIsNull(name).orElseThrow(EmployeeNotFoundException::new);
+    return notifyReadRepository.existsByNotify_IdAndEmployee_Id(notifyId, employee.getId());
   }
 
   @Override
-  public long countUnreadNotify(Long employeeId, Level employeeLevel) {
-    return notifyReadRepository.countUnreadNotifyByEmployee(employeeId, employeeLevel.getRank());
+  public long countUnreadNotify(String name) {
+    Employee employee = employeeRepository.findByNameAndDeleteNameIsNull(name).orElseThrow(EmployeeNotFoundException::new);
+    return notifyReadRepository.countUnreadNotifyByEmployee(employee.getId(), employee.getLevel(), employee.getSite());
   }
 
   @Override
-  public List<Notify> getReadNotifyListByEmployee(Long employeeId, Level employeeLevel) {
-    return notifyReadRepository.findReadNotifyListByEmployee(employeeId, employeeLevel.getRank());
+  public List<Notify> getReadNotifyListByEmployee(String name) {
+    Employee employee = employeeRepository.findByNameAndDeleteNameIsNull(name).orElseThrow(EmployeeNotFoundException::new);
+    return notifyReadRepository.findReadNotifyListByEmployee(employee.getId(), employee.getLevel(), employee.getSite());
   }
 
   @Override
-  public List<Notify> getUnreadNotifyListByEmployee(Long employeeId, Level employeeLevel) {
-    return notifyReadRepository.findUnreadNotifyListByEmployee(employeeId, employeeLevel.getRank());
+  public List<Notify> getUnreadNotifyListByEmployee(String name) {
+    Employee employee = employeeRepository.findByNameAndDeleteNameIsNull(name).orElseThrow(EmployeeNotFoundException::new);
+    return notifyReadRepository.findUnreadNotifyListByEmployee(employee.getId(), employee.getLevel(), employee.getSite());
   }
 
   @Override
-  public List<Notify> getAllUnreadNotifyListByEmployee(Long employeeId, Level employeeLevel) {
-    return notifyReadRepository.findUnreadNotifyAllLevelByEmployee(employeeId);
+  public List<Notify> getAllUnreadNotifyListByEmployee(String name) {
+    Employee employee = employeeRepository.findByNameAndDeleteNameIsNull(name).orElseThrow(EmployeeNotFoundException::new);
+    return notifyReadRepository.findUnreadNotifyAllLevelByEmployee(employee.getId(), employee.getSite());
   }
 }

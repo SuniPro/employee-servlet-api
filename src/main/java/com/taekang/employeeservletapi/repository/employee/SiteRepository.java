@@ -11,7 +11,7 @@ public interface SiteRepository extends JpaRepository<Site, Integer> {
     Optional<Site> findBySite(String site);
 
     List<Site> findByDeleteDateTimeIsNull();
-    
+
     boolean existsBySite(String site);
 
     Optional<Site> findByTelegramLinkToken(String token);

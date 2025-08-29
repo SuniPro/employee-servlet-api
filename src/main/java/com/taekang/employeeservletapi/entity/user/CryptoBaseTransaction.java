@@ -14,24 +14,41 @@ import lombok.experimental.SuperBuilder;
 @SuperBuilder(toBuilder = true)
 @NoArgsConstructor(access = AccessLevel.PROTECTED)
 @AllArgsConstructor(access = AccessLevel.PRIVATE)
-public abstract class TetherBaseTransaction {
+public abstract class CryptoBaseTransaction {
 
   @ManyToOne(fetch = FetchType.LAZY)
-  @JoinColumn(name = "tether_account_id", nullable = false)
-  private TetherAccount tetherAccount;
+  @JoinColumn(name = "crypto_account_id", nullable = false)
+  private CryptoAccount cryptoAccount;
+
+  @Enumerated(EnumType.STRING)
+  @Column(name = "chain_type")
+  private ChainType chainType;
+
+  @Enumerated(EnumType.STRING)
+  @Column(name = "crypto_type")
+  private CryptoType cryptoType;
+
+  @Column(name = "from_address")
+  private String fromAddress;
+
+  @Column(name = "to_address")
+  private String toAddress;
 
   @Column(name = "amount")
   private BigDecimal amount;
 
+  @Column(name = "krw_amount")
+  private BigDecimal krwAmount;
+
   @Column(name = "accepted")
   private Boolean accepted;
 
-  @Column(name = "usdt_amount")
-  private BigDecimal usdtAmount;
-
-  @Column(name = "accepted_at")
+  @Column(name = "accepted_at", nullable = true)
   private LocalDateTime acceptedAt;
 
   @Column(name = "requested_at")
   private LocalDateTime requestedAt;
+
+  @Column(name = "is_send")
+  private boolean isSend;
 }

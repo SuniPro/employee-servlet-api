@@ -1,5 +1,6 @@
-package com.taekang.employeeservletapi.DTO.tether;
+package com.taekang.employeeservletapi.DTO.crypto;
 
+import com.taekang.employeeservletapi.entity.user.ChainType;
 import java.time.LocalDateTime;
 import lombok.*;
 
@@ -8,11 +9,13 @@ import lombok.*;
 @AllArgsConstructor
 @NoArgsConstructor
 @Builder(toBuilder = true)
-public class TetherAccountDTO {
+public class CryptoAccountDTO {
 
   private Long id;
 
-  private String tetherWallet;
+  private String cryptoWallet;
+
+  private ChainType chainType;
 
   private String email;
 

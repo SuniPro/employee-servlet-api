@@ -1,11 +1,12 @@
 package com.taekang.employeeservletapi.controller;
 
-import com.taekang.employeeservletapi.DTO.tether.*;
-import com.taekang.employeeservletapi.entity.user.TetherAccount;
-import com.taekang.employeeservletapi.entity.user.TetherDeposit;
+import com.taekang.employeeservletapi.DTO.UpdateIsSendDTO;
+import com.taekang.employeeservletapi.DTO.UpdateMemoDTO;
+import com.taekang.employeeservletapi.DTO.UpdateSiteDTO;
+import com.taekang.employeeservletapi.DTO.crypto.*;
+import com.taekang.employeeservletapi.entity.user.ChainType;
 import com.taekang.employeeservletapi.entity.user.TransactionStatus;
-import com.taekang.employeeservletapi.service.TetherService;
-import java.math.BigDecimal;
+import com.taekang.employeeservletapi.service.CryptoService;
 import java.time.LocalDateTime;
 import java.util.List;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -21,184 +22,313 @@ import org.springframework.web.bind.annotation.*;
 @RequestMapping("financial")
 public class FinancialController {
 
-  private static final String MANAGER_ACCESS =
-      "hasAnyAuthority('LEVEL_CEO', 'LEVEL_COO', 'LEVEL_CFO', 'LEVEL_CIO', 'LEVEL_CTO','LEVEL_CDO',"
-          + " 'LEVEL_MANAGER', 'LEVEL_OFFICEMANAGER', 'LEVEL_SENIORMANAGER')";
+  private static final String DEFAULT_ACCESS =
+      "hasAnyAuthority('LEVEL_ADMINISTRATOR','LEVEL_MANAGER', 'LEVEL_OFFICEMANAGER', 'LEVEL_SENIORMANAGER')";
 
-  private final TetherService tetherService;
+  private static final String MANAGER_ACCESS =
+      "hasAnyAuthority('LEVEL_ADMINISTRATOR','LEVEL_MANAGER')";
+
+  private final CryptoService cryptoService;
 
   @Autowired
-  public FinancialController(TetherService tetherService) {
-    this.tetherService = tetherService;
+  public FinancialController(CryptoService cryptoService) {
+    this.cryptoService = cryptoService;
   }
 
-  @PreAuthorize(MANAGER_ACCESS)
-  @GetMapping("tether/get/account/by/email/{email}")
-  public ResponseEntity<Page<TetherAccountDTO>> getAccount(
-      @PathVariable String email,
+  @PreAuthorize("hasAnyAuthority('LEVEL_ADMINISTRATOR')")
+  @GetMapping("get/crypto/account")
+  public ResponseEntity<Page<CryptoAccountDTO>> getAllCryptoAccount(
       @PageableDefault(size = 10, sort = "insertDateTime", direction = Sort.Direction.DESC)
           Pageable pageable) {
-    return ResponseEntity.ok().body(tetherService.getTetherAccount(email, pageable));
+    return ResponseEntity.ok().body(cryptoService.getCryptoAccountList(pageable));
   }
 
-  @PreAuthorize(MANAGER_ACCESS)
-  @GetMapping("tether/get/account/all")
-  public ResponseEntity<Page<TetherAccountDTO>> getAllAccounts(
+  @PreAuthorize("hasAnyAuthority('LEVEL_ADMINISTRATOR')")
+  @GetMapping("get/crypto/account/email/{email}")
+  public ResponseEntity<List<CryptoAccountDTO>> getCryptoAccountByEmail(
+      @PathVariable String email) {
+    return ResponseEntity.ok().body(cryptoService.getCryptoAccountByEmail(email));
+  }
+
+  @PreAuthorize("hasAnyAuthority('LEVEL_ADMINISTRATOR')")
+  @GetMapping("get/crypto/deposit/wallet/{cryptoWallet}")
+  public ResponseEntity<Page<CryptoDepositDTO>> getDepositsByCryptoWallet(
       @PageableDefault(size = 10, sort = "insertDateTime", direction = Sort.Direction.DESC)
-          Pageable pageable) {
-    return ResponseEntity.ok().body(tetherService.getAllTetherAccount(pageable));
+          Pageable pageable,
+      @PathVariable String cryptoWallet) {
+    return ResponseEntity.ok()
+        .body(cryptoService.getDepositsByCryptoWallet(cryptoWallet, pageable));
   }
 
-  @PreAuthorize(MANAGER_ACCESS)
-  @PatchMapping("tether/update/wallet")
-  public ResponseEntity<TetherAccount> updateTetherWallet(
-      @RequestBody TetherWalletUpdateDTO tetherWalletUpdateDTO) {
+  @PreAuthorize("hasAnyAuthority('LEVEL_ADMINISTRATOR')")
+  @GetMapping("get/crypto/deposit/status/{status}/address/to/{address}")
+  public ResponseEntity<Page<CryptoDepositDTO>> getDepositsByToAddressAndStatus(
+      @PageableDefault(size = 10, sort = "insertDateTime", direction = Sort.Direction.DESC)
+          Pageable pageable,
+      @PathVariable String address,
+      @PathVariable TransactionStatus status) {
+    return ResponseEntity.ok()
+        .body(cryptoService.getDepositsByToAddressAndStatus(status, address, pageable));
+  }
+
+  @PreAuthorize("hasAnyAuthority('LEVEL_ADMINISTRATOR')")
+  @GetMapping("get/crypto/deposit/status/{status}/address/from/{address}")
+  public ResponseEntity<Page<CryptoDepositDTO>> getDepositsByFromAddressAndStatus(
+      @PageableDefault(size = 10, sort = "insertDateTime", direction = Sort.Direction.DESC)
+          Pageable pageable,
+      @PathVariable String address,
+      @PathVariable TransactionStatus status) {
+    return ResponseEntity.ok()
+        .body(cryptoService.getDepositsByFromAddressAndStatus(status, address, pageable));
+  }
+
+  @PreAuthorize("hasAnyAuthority('LEVEL_ADMINISTRATOR')")
+  @GetMapping("get/crypto/deposit/range")
+  public ResponseEntity<Page<CryptoDepositDTO>> getDepositsInRange(
+      @RequestParam LocalDateTime start,
+      @RequestParam LocalDateTime end,
+      @PageableDefault(size = 10, sort = "requestedAt", direction = Sort.Direction.DESC)
+          Pageable pageable) {
+    return ResponseEntity.ok().body(cryptoService.getDepositsInRange(start, end, pageable));
+  }
+
+  @PreAuthorize("hasAnyAuthority('LEVEL_ADMINISTRATOR')")
+  @GetMapping("get/crypto/deposit/range/address/to/{address}/send/{isSend}")
+  public ResponseEntity<Page<CryptoDepositDTO>> getDepositsInRangeByToAddressAndIsSend(
+      @RequestParam LocalDateTime start,
+      @RequestParam LocalDateTime end,
+      @PageableDefault(size = 10, sort = "requestedAt", direction = Sort.Direction.DESC)
+          Pageable pageable,
+      @PathVariable String address,
+      @PathVariable boolean isSend) {
     return ResponseEntity.ok()
         .body(
-            tetherService.updateTetherWallet(
-                tetherWalletUpdateDTO.getId(), tetherWalletUpdateDTO.getTetherWallet()));
+            cryptoService.getDepositsInRangeByToAddressAndIsSend(
+                isSend, address, start, end, pageable));
   }
 
-  @PreAuthorize(MANAGER_ACCESS)
-  @PatchMapping("tether/update/site")
-  public void updateSite(@RequestBody TetherAccountUpdateDTO tetherAccountUpdateDTO) {
-    tetherService.updateSite(tetherAccountUpdateDTO.getId(), tetherAccountUpdateDTO.getSite());
-  }
-
-  @PreAuthorize(MANAGER_ACCESS)
-  @PatchMapping("tether/update/memo")
-  public void updateMemo(@RequestBody TetherAccountUpdateDTO tetherAccountUpdateDTO) {
-    tetherService.updateMemo(tetherAccountUpdateDTO.getId(), tetherAccountUpdateDTO.getMemo());
-  }
-
-  @PreAuthorize(MANAGER_ACCESS)
-  @PatchMapping("tether/accept/deposit")
-  public ResponseEntity<Boolean> approveDeposit(
-      @RequestBody TetherDepositChangeStatusDTO tetherDepositChangeStatusDTO) {
-    return ResponseEntity.ok().body(tetherService.depositAccept(tetherDepositChangeStatusDTO));
-  }
-
-  @PreAuthorize(MANAGER_ACCESS)
-  @PatchMapping("tether/cancel/deposit")
-  public ResponseEntity<Boolean> cancelDeposit(
-      @RequestBody TetherDepositChangeStatusDTO tetherDepositChangeStatusDTO) {
-    return ResponseEntity.ok().body(tetherService.depositCancel(tetherDepositChangeStatusDTO));
-  }
-
-  @PreAuthorize(MANAGER_ACCESS)
-  @GetMapping("tether/get/deposits/by/id/{id}")
-  public ResponseEntity<List<TetherDeposit>> getDepositsByAccountId(@PathVariable Long id) {
-    return ResponseEntity.ok().body(tetherService.getDepositsForAccount(id));
-  }
-
-  @PreAuthorize(MANAGER_ACCESS)
-  @GetMapping("tether/get/deposits/by/status/{status}")
-  public ResponseEntity<Page<TetherDepositDTO>> getDepositsByStatus(
-      @PathVariable TransactionStatus status,
-      @PageableDefault(size = 10, sort = "requestedAt", direction = Sort.Direction.DESC)
-          Pageable pageable) {
-    return ResponseEntity.ok().body(tetherService.getDepositsByStatus(status, pageable));
-  }
-
-  @PreAuthorize(MANAGER_ACCESS)
-  @GetMapping("tether/get/deposits/by/status/{status}/email/{email}")
-  public ResponseEntity<Page<TetherDepositDTO>> getDepositsByTetherWalletAndStatus(
-      @PathVariable String email,
-      @PathVariable TransactionStatus status,
-      @PageableDefault(size = 10, sort = "requestedAt", direction = Sort.Direction.DESC)
-          Pageable pageable) {
-    return ResponseEntity.ok()
-        .body(tetherService.getDepositsByEmailAndStatus(status, email, pageable));
-  }
-
-  @PreAuthorize(MANAGER_ACCESS)
-  @GetMapping("tether/get/{status}/deposits/by/id/{id}")
-  public ResponseEntity<List<TetherDeposit>> getDepositsByAccountIdAndStatus(
-      @PathVariable Long id, @PathVariable TransactionStatus status) {
-    return ResponseEntity.ok().body(tetherService.getApprovedDepositsForAccountById(id, status));
-  }
-
-  @PreAuthorize(MANAGER_ACCESS)
-  @GetMapping("tether/get/approved/deposits/by/tether/wallet/{tetherWallet}")
-  public ResponseEntity<List<TetherDeposit>> getApprovedDepositsByTetherWallet(
-      @PathVariable String tetherWallet) {
-    return ResponseEntity.ok()
-        .body(tetherService.getApprovedDepositsForAccountByTetherWallet(tetherWallet));
-  }
-
-  @PreAuthorize(MANAGER_ACCESS)
-  @DeleteMapping("tether/delete/deposit/by/id/{id}")
-  public void deleteDepositById(@PathVariable Long id) {
-    tetherService.deleteDepositById(id);
-  }
-
-  @PreAuthorize(MANAGER_ACCESS)
-  @GetMapping("tether/get/non/approved/deposits/by/tether/wallet/{tetherWallet}")
-  public ResponseEntity<List<TetherDepositDTO>> getNonApprovedDepositsByTetherWallet(
-      @PathVariable String tetherWallet) {
-    return ResponseEntity.ok()
-        .body(tetherService.getNonApprovedDepositsForAccountByTetherWallet(tetherWallet));
-  }
-
-  @PreAuthorize(MANAGER_ACCESS)
-  @GetMapping("tether/get/latest/deposit/by/id/{id}")
-  public ResponseEntity<TetherDeposit> getLatestDeposit(@PathVariable Long id) {
-    return ResponseEntity.ok().body(tetherService.getLatestDeposit(id));
-  }
-
-  @PreAuthorize(MANAGER_ACCESS)
-  @GetMapping("tether/get/latest/deposit/by/tether/wallet/{tetherWallet}")
-  public ResponseEntity<TetherDeposit> getLatestDepositByWallet(@PathVariable String tetherWallet) {
-    return ResponseEntity.ok().body(tetherService.getLatestDepositByTetherWallet(tetherWallet));
-  }
-
-  @PreAuthorize(MANAGER_ACCESS)
-  @GetMapping("tether/get/deposits/range")
-  public ResponseEntity<List<TetherDeposit>> getDepositsByDateRange(
-      @RequestParam LocalDateTime start, @RequestParam LocalDateTime end) {
-    return ResponseEntity.ok().body(tetherService.getDepositsInRange(start, end));
-  }
-
-  @PreAuthorize(MANAGER_ACCESS)
-  @GetMapping("tether/get/deposits/range/by/status/{status}")
-  public ResponseEntity<Page<TetherDepositDTO>> getDepositsByDateRangeAndStatus(
-      @PathVariable TransactionStatus status,
+  @PreAuthorize("hasAnyAuthority('LEVEL_ADMINISTRATOR')")
+  @GetMapping("get/crypto/deposit/range/address/from/{address}/send/{isSend}")
+  public ResponseEntity<Page<CryptoDepositDTO>> getDepositsInRangeByFromAddressAndIsSend(
       @RequestParam LocalDateTime start,
       @RequestParam LocalDateTime end,
       @PageableDefault(size = 10, sort = "requestedAt", direction = Sort.Direction.DESC)
-          Pageable pageable) {
+          Pageable pageable,
+      @PathVariable String address,
+      @PathVariable boolean isSend) {
     return ResponseEntity.ok()
-        .body(tetherService.getDepositsInRangeByStatus(start, end, status, pageable));
+        .body(
+            cryptoService.getDepositsInRangeByFromAddressAndIsSend(
+                isSend, address, start, end, pageable));
+  }
+
+  @PreAuthorize("hasAnyAuthority('LEVEL_ADMINISTRATOR')")
+  @DeleteMapping("delete/deposit/{id}")
+  public void deleteDeposit(@PathVariable Long id) {
+    cryptoService.deleteDepositById(id);
   }
 
   @PreAuthorize(MANAGER_ACCESS)
-  @GetMapping("tether/get/deposits/range/by/status/{status}/email/{email}")
-  public ResponseEntity<Page<TetherDepositDTO>> getDepositsByStatusAndWalletAndDateRange(
-      @PathVariable TransactionStatus status,
+  @PatchMapping("update/site/{site}/by/{id}")
+  public void updateSite(@RequestBody UpdateSiteDTO updateSiteDTO) {
+    cryptoService.updateSite(updateSiteDTO);
+  }
+
+  @PreAuthorize(DEFAULT_ACCESS)
+  @PatchMapping("update/memo")
+  public void updateMemo(@RequestBody UpdateMemoDTO updateMemoDTO) {
+    cryptoService.updateMemo(updateMemoDTO);
+  }
+
+  @PreAuthorize(DEFAULT_ACCESS)
+  @PatchMapping("update/send")
+  public ResponseEntity<Boolean> updateSend(@RequestBody UpdateIsSendDTO updateIsSendDTO) {
+    return ResponseEntity.ok().body(cryptoService.updateSend(updateIsSendDTO));
+  }
+
+  @PreAuthorize(DEFAULT_ACCESS)
+  // cryptoWallet 이라고 적어야하지만 CamelCase는 url에서 권장되지 않기에 wallet으로 명명함.
+  @PatchMapping("update/wallet")
+  public ResponseEntity<CryptoAccountDTO> updateCryptoWallet(
+      @RequestBody CryptoWalletUpdateDTO cryptoWalletUpdateDTO) {
+    return ResponseEntity.ok().body(cryptoService.updateCryptoWallet(cryptoWalletUpdateDTO));
+  }
+
+  @PreAuthorize(DEFAULT_ACCESS)
+  @GetMapping("get/crypto/account/by/site/{site}")
+  public ResponseEntity<Page<CryptoAccountDTO>> getAllCryptoAccountBySite(
+      @PageableDefault(size = 10, sort = "insertDateTime", direction = Sort.Direction.DESC)
+          Pageable pageable,
+      @PathVariable String site) {
+    return ResponseEntity.ok().body(cryptoService.getCryptoAccountListBySite(site, pageable));
+  }
+
+  @PreAuthorize(DEFAULT_ACCESS)
+  @GetMapping("get/crypto/account/email/{email}/by/site/{site}")
+  public ResponseEntity<List<CryptoAccountDTO>> getCryptoAccountByEmailAndSite(
+      @PathVariable String email, @PathVariable String site) {
+    return ResponseEntity.ok().body(cryptoService.getCryptoAccountByEmailAndSite(email, site));
+  }
+
+  @PreAuthorize(DEFAULT_ACCESS)
+  @GetMapping("get/crypto/account/wallet/{cryptoWallet}")
+  public ResponseEntity<CryptoAccountDTO> getCryptoAccountByCryptoWallet(
+      @PageableDefault(size = 10, sort = "insertDateTime", direction = Sort.Direction.DESC)
+          Pageable pageable,
+      @PathVariable String cryptoWallet) {
+    return ResponseEntity.ok()
+        .body(cryptoService.getCryptoAccountByCryptoWallet(cryptoWallet, pageable));
+  }
+
+  @PreAuthorize(DEFAULT_ACCESS)
+  @GetMapping("get/crypto/deposit/by/site/{site}")
+  public ResponseEntity<Page<CryptoDepositDTO>> getDepositsBySite(
+      @PageableDefault(size = 10, sort = "requestedAt", direction = Sort.Direction.DESC)
+          Pageable pageable,
+      @PathVariable String site) {
+    return ResponseEntity.ok().body(cryptoService.getDepositsBySite(site, pageable));
+  }
+
+  @PreAuthorize(DEFAULT_ACCESS)
+  @GetMapping("get/crypto/deposit/send/{send}/by/site/{site}")
+  public ResponseEntity<Page<CryptoDepositDTO>> getSendDepositsBySite(
+      @PageableDefault(size = 10, sort = "requestedAt", direction = Sort.Direction.DESC)
+          Pageable pageable,
+      @PathVariable String site,
+      @PathVariable boolean send) {
+    return ResponseEntity.ok().body(cryptoService.getSendDepositsBySite(site, send, pageable));
+  }
+
+  @PreAuthorize(DEFAULT_ACCESS)
+  @GetMapping("get/crypto/deposit/email/{email}/by/site/{site}")
+  public ResponseEntity<Page<CryptoDepositDTO>> getDepositsByEmailAndSite(
+      @PageableDefault(size = 10, sort = "requestedAt", direction = Sort.Direction.DESC)
+          Pageable pageable,
       @PathVariable String email,
+      @PathVariable String site) {
+    return ResponseEntity.ok().body(cryptoService.getDepositsByEmailAndSite(email, site, pageable));
+  }
+
+  @PreAuthorize(DEFAULT_ACCESS)
+  @GetMapping("get/crypto/deposit/wallet/{cryptoWallet}/by/site/{site}")
+  public ResponseEntity<Page<CryptoDepositDTO>> getDepositsByCryptoWalletBySite(
+      @PageableDefault(size = 10, sort = "requestedAt", direction = Sort.Direction.DESC)
+          Pageable pageable,
+      @PathVariable String cryptoWallet,
+      @PathVariable String site) {
+    return ResponseEntity.ok()
+        .body(cryptoService.getDepositsByCryptoWalletAndSite(cryptoWallet, site, pageable));
+  }
+
+  @PreAuthorize(DEFAULT_ACCESS)
+  @GetMapping("get/crypto/deposit/to/address/{address}/by/site/{site}")
+  public ResponseEntity<Page<CryptoDepositDTO>> getDepositsByToAddressAndSite(
+      @PageableDefault(size = 10, sort = "requestedAt", direction = Sort.Direction.DESC)
+          Pageable pageable,
+      @PathVariable String address,
+      @PathVariable String site) {
+    return ResponseEntity.ok()
+        .body(cryptoService.getDepositsByToAddressAndSite(address, site, pageable));
+  }
+
+  @PreAuthorize(DEFAULT_ACCESS)
+  @GetMapping("get/crypto/deposit/from/address/{address}/by/site/{site}")
+  public ResponseEntity<Page<CryptoDepositDTO>> getDepositsByFromAddressAndSite(
+      @PageableDefault(size = 10, sort = "requestedAt", direction = Sort.Direction.DESC)
+          Pageable pageable,
+      @PathVariable String address,
+      @PathVariable String site) {
+    return ResponseEntity.ok()
+        .body(cryptoService.getDepositsByFromAddressAndSite(address, site, pageable));
+  }
+
+  @PreAuthorize(DEFAULT_ACCESS)
+  @GetMapping("get/crypto/deposit/send/{send}/wallet/{cryptoWallet}/by/site/{site}")
+  public ResponseEntity<Page<CryptoDepositDTO>> getSendDepositsByCryptoWalletAndSite(
+      @PageableDefault(size = 10, sort = "requestedAt", direction = Sort.Direction.DESC)
+          Pageable pageable,
+      @PathVariable String cryptoWallet,
+      @PathVariable String site,
+      @PathVariable boolean send) {
+    return ResponseEntity.ok()
+        .body(
+            cryptoService.getSendDepositsByCryptoWalletAndSite(cryptoWallet, site, send, pageable));
+  }
+
+  @PreAuthorize(DEFAULT_ACCESS)
+  @GetMapping("get/crypto/deposit/send/{send}/to/address/{address}/by/site/{site}")
+  public ResponseEntity<Page<CryptoDepositDTO>> getDepositsByToAddressAndIsSendAndSite(
+      @PageableDefault(size = 10, sort = "requestedAt", direction = Sort.Direction.DESC)
+          Pageable pageable,
+      @PathVariable boolean send,
+      @PathVariable String site,
+      @PathVariable String address) {
+    return ResponseEntity.ok()
+        .body(cryptoService.getDepositsByToAddressAndIsSendAndSite(address, send, site, pageable));
+  }
+
+  @PreAuthorize(DEFAULT_ACCESS)
+  @GetMapping("get/crypto/deposit/send/{send}/from/address/{address}/by/site/{site}")
+  public ResponseEntity<Page<CryptoDepositDTO>> getDepositsByFromAddressAndIsSendAndSite(
+      @PageableDefault(size = 10, sort = "requestedAt", direction = Sort.Direction.DESC)
+          Pageable pageable,
+      @PathVariable boolean send,
+      @PathVariable String site,
+      @PathVariable String address) {
+    return ResponseEntity.ok()
+        .body(
+            cryptoService.getDepositsByFromAddressAndIsSendAndSite(address, send, site, pageable));
+  }
+
+  @PreAuthorize(DEFAULT_ACCESS)
+  @GetMapping("get/crypto/account/range/by/site/{site}")
+  public ResponseEntity<Page<CryptoDepositDTO>> getDepositsInRangeBySite(
       @RequestParam LocalDateTime start,
       @RequestParam LocalDateTime end,
       @PageableDefault(size = 10, sort = "requestedAt", direction = Sort.Direction.DESC)
-          Pageable pageable) {
+          Pageable pageable,
+      @PathVariable String site) {
     return ResponseEntity.ok()
-        .body(tetherService.getDepositsInRangeByEmail(status, email, start, end, pageable));
+        .body(cryptoService.getDepositsInRangeBySite(start, end, site, pageable));
   }
 
-  @PreAuthorize(MANAGER_ACCESS)
-  @GetMapping("tether/get/total/deposit/amount/by/status/{status}/email/{email}")
-  public ResponseEntity<TetherDepositSummaryDTO> getTotalDepositSummaryByStatusAndEmail(
-      @PathVariable TransactionStatus status,
-      @PathVariable(required = false) String email,
+  @PreAuthorize(DEFAULT_ACCESS)
+  @GetMapping("get/crypto/account/range/address/to/{address}/send/{isSend}/by/site/{site}")
+  public ResponseEntity<Page<CryptoDepositDTO>> getDepositsInRangeByToAddressAndIsSendAndSite(
       @RequestParam LocalDateTime start,
-      @RequestParam LocalDateTime end) {
-    return ResponseEntity.ok().body(tetherService.getStatistics(status, email, start, end));
+      @RequestParam LocalDateTime end,
+      @PageableDefault(size = 10, sort = "requestedAt", direction = Sort.Direction.DESC)
+          Pageable pageable,
+      @PathVariable String address,
+      @PathVariable boolean isSend,
+      @PathVariable String site) {
+    return ResponseEntity.ok()
+        .body(
+            cryptoService.getDepositsInRangeByToAddressAndIsSendAndSite(
+                isSend, address, site, start, end, pageable));
   }
 
-  @PreAuthorize(MANAGER_ACCESS)
-  @GetMapping("tether/get/total/deposit/amount/by/status/{status}/wallet/{tetherWallet}")
-  public ResponseEntity<BigDecimal> getTotalDepositAmountByStatusAndWallet(
-      @PathVariable TransactionStatus status, @PathVariable String tetherWallet) {
+  @PreAuthorize(DEFAULT_ACCESS)
+  @GetMapping("get/crypto/account/range/address/from/{address}/send/{isSend}/by/site/{site}")
+  public ResponseEntity<Page<CryptoDepositDTO>> getDepositsInRangeByFromAddressAndIsSendAndSite(
+      @RequestParam LocalDateTime start,
+      @RequestParam LocalDateTime end,
+      @PageableDefault(size = 10, sort = "requestedAt", direction = Sort.Direction.DESC)
+          Pageable pageable,
+      @PathVariable String address,
+      @PathVariable boolean isSend,
+      @PathVariable String site) {
     return ResponseEntity.ok()
-        .body(tetherService.getTotalDepositAmountByStatusAndWallet(status, tetherWallet));
+        .body(
+            cryptoService.getDepositsInRangeByFromAddressAndIsSendAndSite(
+                isSend, address, site, start, end, pageable));
+  }
+
+  @PreAuthorize(DEFAULT_ACCESS)
+  @GetMapping("get/crypto/account/info/chain/{chain}/wallet/{cryptoWallet}/by/site/{site}")
+  public ResponseEntity<AccountSummaryInfoDTO> getAccountSummaryInfoBySite(
+      @PathVariable ChainType chain, @PathVariable String cryptoWallet, @PathVariable String site) {
+    return ResponseEntity.ok()
+        .body(cryptoService.getAccountSummaryInfoBySite(site, cryptoWallet, chain));
   }
 }

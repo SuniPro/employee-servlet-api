@@ -4,16 +4,14 @@ import com.taekang.employeeservletapi.DTO.BalanceResponseDTO;
 import com.taekang.employeeservletapi.DTO.UpdateIsSendDTO;
 import com.taekang.employeeservletapi.DTO.UpdateMemoDTO;
 import com.taekang.employeeservletapi.DTO.UpdateSiteDTO;
-import com.taekang.employeeservletapi.DTO.crypto.AccountSummaryInfoDTO;
-import com.taekang.employeeservletapi.DTO.crypto.CryptoAccountDTO;
-import com.taekang.employeeservletapi.DTO.crypto.CryptoDepositDTO;
-import com.taekang.employeeservletapi.DTO.crypto.CryptoWalletUpdateDTO;
+import com.taekang.employeeservletapi.DTO.crypto.*;
 import com.taekang.employeeservletapi.api.CryptoBalanceAPI;
 import com.taekang.employeeservletapi.entity.user.ChainType;
 import com.taekang.employeeservletapi.entity.user.CryptoAccount;
 import com.taekang.employeeservletapi.entity.user.CryptoDeposit;
 import com.taekang.employeeservletapi.entity.user.TransactionStatus;
 import com.taekang.employeeservletapi.error.AccountNotFoundException;
+import com.taekang.employeeservletapi.rabbitMQ.MessageProducer;
 import com.taekang.employeeservletapi.repository.user.CryptoAccountRepository;
 import com.taekang.employeeservletapi.repository.user.CryptoDepositRepository;
 import com.taekang.employeeservletapi.service.CryptoService;
@@ -37,6 +35,8 @@ public class CryptoServiceImplements implements CryptoService {
   private final CryptoDepositRepository cryptoDepositRepository;
 
   private final CryptoBalanceAPI cryptoBalanceAPI;
+
+  private final MessageProducer messageProducer;
   private final ModelMapper modelMapper;
 
   @Autowired
@@ -44,10 +44,12 @@ public class CryptoServiceImplements implements CryptoService {
       CryptoAccountRepository cryptoAccountRepository,
       CryptoDepositRepository cryptoDepositRepository,
       CryptoBalanceAPI cryptoBalanceAPI,
+      MessageProducer messageProducer,
       ModelMapper modelMapper) {
     this.cryptoAccountRepository = cryptoAccountRepository;
     this.cryptoDepositRepository = cryptoDepositRepository;
     this.cryptoBalanceAPI = cryptoBalanceAPI;
+    this.messageProducer = messageProducer;
     this.modelMapper = modelMapper;
   }
 
@@ -162,6 +164,20 @@ public class CryptoServiceImplements implements CryptoService {
                 .id(updateIsSendDTO.getId())
                 .isSend(updateIsSendDTO.isSend())
                 .build());
+
+    CryptoAccount cryptoAccount =
+        cryptoAccountRepository
+            .findByCryptoWallet(save.getFromAddress())
+            .orElseThrow(AccountNotFoundException::new);
+
+    DepositSentApprovalNotifyDTO message = DepositSentApprovalNotifyDTO.builder()
+            .email(cryptoAccount.getEmail())
+            .cryptoType(save.getCryptoType())
+            .amount(save.getAmount())
+            .requestAt(save.getRequestedAt())
+            .build();
+
+    messageProducer.sendDepositSendMessage(message);
     return save.isSend();
   }
 
@@ -234,12 +250,12 @@ public class CryptoServiceImplements implements CryptoService {
       }
     }
 
-      return AccountSummaryInfoDTO.builder()
-          .balance(balance.getBalance())
-          .depositHistoryLength(depositHistoryLength)
-          .todayDepositAmount(todayDepositAmount)
-          .weeksDepositAmount(weeksDepositAmount)
-          .build();
+    return AccountSummaryInfoDTO.builder()
+        .balance(balance.getBalance())
+        .depositHistoryLength(depositHistoryLength)
+        .todayDepositAmount(todayDepositAmount)
+        .weeksDepositAmount(weeksDepositAmount)
+        .build();
   }
 
   @Override

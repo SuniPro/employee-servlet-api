@@ -2,9 +2,9 @@ package com.taekang.employeeservletapi.controller;
 
 import com.taekang.employeeservletapi.DTO.NotifyDTO;
 import com.taekang.employeeservletapi.DTO.NotifyWithReadDTO;
-import com.taekang.employeeservletapi.entity.employee.Level;
 import com.taekang.employeeservletapi.entity.employee.Notify;
 import com.taekang.employeeservletapi.service.NotifyService;
+import com.taekang.employeeservletapi.service.auth.JwtUtil;
 import java.util.List;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.ResponseEntity;
@@ -16,14 +16,15 @@ import org.springframework.web.bind.annotation.*;
 public class NotifyController {
 
   private static final String MANAGER_ACCESS =
-      "hasAnyAuthority('LEVEL_CEO', 'LEVEL_COO', 'LEVEL_CFO', 'LEVEL_CIO', 'LEVEL_CTO',"
-          + " 'LEVEL_CDO', 'LEVEL_MANAGER', 'LEVEL_OFFICEMANAGER', 'LEVEL_SENIORMANAGER')";
+      "hasAnyAuthority('LEVEL_ADMINISTRATOR','LEVEL_MANAGER')";
 
   private final NotifyService notifyService;
+  private final JwtUtil jwtUtil;
 
   @Autowired
-  public NotifyController(NotifyService notifyService) {
+  public NotifyController(NotifyService notifyService, JwtUtil jwtUtil) {
     this.notifyService = notifyService;
+    this.jwtUtil = jwtUtil;
   }
 
   @PostMapping("create")
@@ -48,9 +49,10 @@ public class NotifyController {
     return ResponseEntity.ok().body(notifyService.getNotifyById(id));
   }
 
-  @GetMapping("get/by/level/{level}")
-  public ResponseEntity<List<Notify>> getNotifyById(@PathVariable Level level) {
-    return ResponseEntity.ok().body(notifyService.getAllNotifyForLevel(level));
+  @GetMapping("get/by/level")
+  public ResponseEntity<List<Notify>> getNotifyByLevel(
+      @CookieValue("access-token") String token) {
+    return ResponseEntity.ok().body(notifyService.getAllNotifyForLevel(jwtUtil.getEmployeeName(token)));
   }
 
   @GetMapping("get/latest")
@@ -58,10 +60,10 @@ public class NotifyController {
     return ResponseEntity.ok().body(notifyService.getLatestNotify());
   }
 
-  @GetMapping("get/all/with/read/{id}/{level}")
+  @GetMapping("get/all/with/read")
   public ResponseEntity<List<NotifyWithReadDTO>> getAllNotifyWithReadState(
-      @PathVariable Long id, @PathVariable Level level) {
-    return ResponseEntity.ok().body(notifyService.getAllNotifyWithReadState(id, level));
+      @CookieValue("access-token") String token) {
+    return ResponseEntity.ok().body(notifyService.getAllNotifyWithReadState(jwtUtil.getEmployeeName(token)));
   }
 
   @DeleteMapping("delete/{id}")
@@ -70,41 +72,38 @@ public class NotifyController {
     notifyService.deleteNotify(id);
   }
 
-  @PatchMapping("read/{id}/{employeeId}")
-  public void read(@PathVariable Long id, @PathVariable Long employeeId) {
-    notifyService.markAsRead(id, employeeId);
+  @PatchMapping("read/{id}")
+  public void read(@CookieValue("access-token") String token, @PathVariable Long id) {
+    notifyService.markAsRead(id, jwtUtil.getEmployeeName(token));
   }
 
-  @GetMapping("read/about/notify/{id}/{employeeId}")
-  public ResponseEntity<Boolean> isRead(@PathVariable Long id, @PathVariable Long employeeId) {
-    return ResponseEntity.ok().body(notifyService.isNotifyRead(id, employeeId));
+  @GetMapping("read/about/notify/{id}/{name}")
+  public ResponseEntity<Boolean> isRead(@PathVariable Long id, @PathVariable String name) {
+    return ResponseEntity.ok().body(notifyService.isNotifyRead(id, name));
   }
 
-  @GetMapping("count/notify/{id}/{level}")
+  @GetMapping("count/notify")
   public ResponseEntity<Long> getUnreadNotifyCount(
-      @PathVariable Long id, @PathVariable Level level) {
-    return ResponseEntity.ok().body(notifyService.countUnreadNotify(id, level));
-  }
-
-  @GetMapping("get/read/{employeeId}/{level}")
-  @PreAuthorize(MANAGER_ACCESS)
-  public ResponseEntity<List<Notify>> getNotifyListByReadEmployee(
-      @PathVariable Long employeeId, @PathVariable Level level) {
-    return ResponseEntity.ok().body(notifyService.getReadNotifyListByEmployee(employeeId, level));
-  }
-
-  @GetMapping("get/unread/{employeeId}/{level}")
-  @PreAuthorize(MANAGER_ACCESS)
-  public ResponseEntity<List<Notify>> getNotifyListByUnReadEmployee(
-      @PathVariable Long employeeId, @PathVariable Level level) {
-    return ResponseEntity.ok().body(notifyService.getUnreadNotifyListByEmployee(employeeId, level));
-  }
-
-  @GetMapping("get/unread/all/{employeeId}/{level}")
-  @PreAuthorize(MANAGER_ACCESS)
-  public ResponseEntity<List<Notify>> getAllNotifyListByUnReadEmployee(
-      @PathVariable Long employeeId, @PathVariable Level level) {
+      @CookieValue("access-token") String token) {
     return ResponseEntity.ok()
-        .body(notifyService.getAllUnreadNotifyListByEmployee(employeeId, level));
+        .body(notifyService.countUnreadNotify(jwtUtil.getEmployeeName(token)));
+  }
+
+  @GetMapping("get/read")
+  public ResponseEntity<List<Notify>> getNotifyListByReadEmployee(
+      @CookieValue("access-token") String token) {
+    return ResponseEntity.ok()
+        .body(notifyService.getReadNotifyListByEmployee(jwtUtil.getEmployeeName(token)));
+  }
+
+  @GetMapping("get/unread/list")
+  public ResponseEntity<List<Notify>> getNotifyListByUnReadEmployee(@CookieValue("access-token") String token) {
+    return ResponseEntity.ok().body(notifyService.getUnreadNotifyListByEmployee(jwtUtil.getEmployeeName(token)));
+  }
+
+  @GetMapping("get/unread/all")
+  public ResponseEntity<List<Notify>> getAllNotifyListByUnReadEmployee(
+          @CookieValue("access-token") String token) {
+    return ResponseEntity.ok().body(notifyService.getAllUnreadNotifyListByEmployee(jwtUtil.getEmployeeName(token)));
   }
 }

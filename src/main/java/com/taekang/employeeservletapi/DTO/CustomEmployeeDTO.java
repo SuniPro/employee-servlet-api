@@ -16,6 +16,8 @@ public class CustomEmployeeDTO extends EmployeeDTO {
 
   private String name;
 
+  private String site;
+
   private String insertName;
 
   private LocalDateTime insertDateTime;

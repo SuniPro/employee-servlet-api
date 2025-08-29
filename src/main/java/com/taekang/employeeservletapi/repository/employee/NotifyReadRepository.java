@@ -1,8 +1,6 @@
 package com.taekang.employeeservletapi.repository.employee;
 
-import com.taekang.employeeservletapi.entity.employee.Employee;
-import com.taekang.employeeservletapi.entity.employee.Notify;
-import com.taekang.employeeservletapi.entity.employee.NotifyRead;
+import com.taekang.employeeservletapi.entity.employee.*;
 import java.util.List;
 import java.util.Optional;
 import org.springframework.data.jpa.repository.JpaRepository;
@@ -35,13 +33,13 @@ public interface NotifyReadRepository extends JpaRepository<NotifyRead, Long> {
   @Query(
       """
     SELECT COUNT(n) FROM Notify n
-    WHERE n.rank >= :rank
+    WHERE n.level >= :level AND n.site = :site
       AND NOT EXISTS (
         SELECT 1 FROM NotifyRead r
         WHERE r.notify = n AND r.employee.id = :employeeId
       )
 """)
-  long countUnreadNotifyByEmployee(@Param("employeeId") Long employeeId, @Param("rank") int rank);
+  long countUnreadNotifyByEmployee(@Param("employeeId") Long employeeId, @Param("level") Level level, @Param("site") String site);
 
   @Query("SELECT r.notify.id FROM NotifyRead r WHERE r.employee.id = :employeeId")
   List<Long> findNotifyIdsByEmployeeId(@Param("employeeId") Long employeeId);
@@ -50,7 +48,7 @@ public interface NotifyReadRepository extends JpaRepository<NotifyRead, Long> {
       value =
           """
             SELECT n.* FROM notify n
-            WHERE n.rank >= :rank
+            WHERE n.level >= :level AND n.site = :site
               AND EXISTS (
                 SELECT 1 FROM notify_read r
                 WHERE r.notify_id = n.id
@@ -60,13 +58,13 @@ public interface NotifyReadRepository extends JpaRepository<NotifyRead, Long> {
         """,
       nativeQuery = true)
   List<Notify> findReadNotifyListByEmployee(
-      @Param("employeeId") Long employeeId, @Param("rank") int rank);
+          @Param("employeeId") Long employeeId, @Param("level") Level level, @Param("site") String site);
 
   @Query(
       value =
           """
     SELECT n.* FROM notify n
-    WHERE n.rank >= :rank
+    WHERE n.level >= :level AND n.site = :site
       AND NOT EXISTS (
         SELECT 1 FROM notify_read r
         WHERE r.notify_id = n.id
@@ -76,14 +74,16 @@ public interface NotifyReadRepository extends JpaRepository<NotifyRead, Long> {
 """,
       nativeQuery = true)
   List<Notify> findUnreadNotifyListByEmployee(
-      @Param("employeeId") Long employeeId, @Param("rank") int rank);
+      @Param("employeeId") Long employeeId, @Param("level") Level level, @Param("site") String site);
 
   @Query(
       value =
           """
               SELECT n.*
               FROM notify n
-              WHERE n.id NOT IN (
+              WHERE n.site = :site
+                            AND
+                            n.id NOT IN (
                   SELECT notify_id
                   FROM notify_read
                   WHERE employee_id = :employeeId
@@ -91,5 +91,5 @@ public interface NotifyReadRepository extends JpaRepository<NotifyRead, Long> {
               ORDER BY n.insert_date_time DESC
           """,
       nativeQuery = true)
-  List<Notify> findUnreadNotifyAllLevelByEmployee(@Param("employeeId") Long employeeId);
+  List<Notify> findUnreadNotifyAllLevelByEmployee(@Param("employeeId") Long employeeId, @Param("site") String site);
 }

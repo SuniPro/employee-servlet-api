@@ -6,18 +6,22 @@ import lombok.*;
 
 @Getter
 @Entity
-@Table(name = "tether_account")
+@Table(name = "crypto_account")
 @NoArgsConstructor(access = AccessLevel.PROTECTED)
 @AllArgsConstructor(access = AccessLevel.PRIVATE) // 빌더 사용 시 필수
 @Builder(toBuilder = true)
-public class TetherAccount {
+public class CryptoAccount {
 
   @Id
   @GeneratedValue(strategy = GenerationType.IDENTITY)
   private Long id;
 
-  @Column(name = "tether_wallet", unique = true, nullable = false)
-  private String tetherWallet;
+  @Column(name = "crypto_wallet", unique = true, nullable = false)
+  private String cryptoWallet;
+
+  @Enumerated(EnumType.STRING)
+  @Column(name = "chain_type")
+  private ChainType chainType;
 
   @Column(name = "email", nullable = false)
   private String email;

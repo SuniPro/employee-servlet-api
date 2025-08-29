@@ -7,11 +7,13 @@ import com.taekang.employeeservletapi.entity.employee.Site;
 import com.taekang.employeeservletapi.error.TokenNotValidateException;
 import com.taekang.employeeservletapi.service.TelegramLinkService;
 import java.util.Map;
+import java.util.Objects;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.http.ResponseEntity;
 import org.springframework.security.access.prepost.PreAuthorize;
+import org.springframework.util.StringUtils;
 import org.springframework.web.bind.annotation.*;
 
 @Slf4j
@@ -20,7 +22,7 @@ public class TelegramWebhookController {
 
   @Value("${telegram.webhook-secret:}")
   private String webhookSecret;
-  
+
   private static final String MANAGER_ACCESS =
       "hasAnyAuthority('LEVEL_ADMINISTRATOR','LEVEL_MANAGER')";
 
@@ -29,23 +31,21 @@ public class TelegramWebhookController {
 
   @Autowired
   public TelegramWebhookController(
-      TelegramLinkService telegramLinkService,
-      TelegramBot telegramBot) {
+      TelegramLinkService telegramLinkService, TelegramBot telegramBot) {
     this.telegramLinkService = telegramLinkService;
     this.telegramBot = telegramBot;
   }
-  
+
   @PostMapping("${telegram.webhook-path:/telegram/webhook}")
   public ResponseEntity<Void> onUpdate(
-//          @RequestHeader(value = "X-Telegram-Bot-Api-Secret-Token", required = false) String secret,
-          @RequestBody Update update) {
-    // 시크릿이 설정된 환경에서만 검증
-//    if (StringUtils.hasText(webhookSecret)) {
-//      if (!Objects.equals(secret, webhookSecret)) {
-//        // 비정상 요청은 조용히 무시
-//        return ResponseEntity.ok().build();
-//      }
-//    }
+      @RequestHeader(value = "X-Telegram-Bot-Api-Secret-Token", required = false) String secret,
+      @RequestBody Update update) {
+    if (StringUtils.hasText(webhookSecret)) {
+      if (!Objects.equals(secret, webhookSecret)) {
+        // 비정상 요청은 조용히 무시
+        return ResponseEntity.ok().build();
+      }
+    }
 
     var msg = update.message();
     if (msg == null) return ResponseEntity.ok().build();

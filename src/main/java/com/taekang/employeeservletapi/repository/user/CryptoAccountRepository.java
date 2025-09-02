@@ -5,6 +5,9 @@ import java.util.Optional;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.Pageable;
 import org.springframework.data.jpa.repository.JpaRepository;
+import org.springframework.data.jpa.repository.Modifying;
+import org.springframework.data.jpa.repository.Query;
+import org.springframework.data.repository.query.Param;
 
 public interface CryptoAccountRepository extends JpaRepository<CryptoAccount, Long> {
 
@@ -13,8 +16,16 @@ public interface CryptoAccountRepository extends JpaRepository<CryptoAccount, Lo
   Optional<CryptoAccount> findByCryptoWallet(String cryptoWallet);
 
   Page<CryptoAccount> findBySite(String site, Pageable pageable);
-
   Optional<CryptoAccount> findByEmailAndSite(String email, String site);
+
+  @Modifying(clearAutomatically = true, flushAutomatically = true)
+  @Query("""
+     update CryptoAccount c
+        set c.site = :newSite
+      where c.site = :oldSite
+  """)
+  int bulkUpdateSite(@Param("oldSite") String oldSite,
+                     @Param("newSite") String newSite);
 
 //  Page<CryptoAccount> findByEmailContainingIgnoreCase(String email, Pageable pageable);
 //

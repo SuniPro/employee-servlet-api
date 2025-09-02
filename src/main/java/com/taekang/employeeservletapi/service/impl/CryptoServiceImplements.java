@@ -1,22 +1,18 @@
 package com.taekang.employeeservletapi.service.impl;
 
-import com.taekang.employeeservletapi.DTO.BalanceResponseDTO;
-import com.taekang.employeeservletapi.DTO.UpdateIsSendDTO;
-import com.taekang.employeeservletapi.DTO.UpdateMemoDTO;
-import com.taekang.employeeservletapi.DTO.UpdateSiteDTO;
+import com.taekang.employeeservletapi.DTO.*;
 import com.taekang.employeeservletapi.DTO.crypto.*;
 import com.taekang.employeeservletapi.api.CryptoBalanceAPI;
-import com.taekang.employeeservletapi.entity.user.ChainType;
 import com.taekang.employeeservletapi.entity.user.CryptoAccount;
 import com.taekang.employeeservletapi.entity.user.CryptoDeposit;
 import com.taekang.employeeservletapi.entity.user.TransactionStatus;
 import com.taekang.employeeservletapi.error.AccountNotFoundException;
 import com.taekang.employeeservletapi.rabbitMQ.MessageProducer;
+import com.taekang.employeeservletapi.repository.employee.SiteRepository;
+import com.taekang.employeeservletapi.repository.employee.SiteWalletRepository;
 import com.taekang.employeeservletapi.repository.user.CryptoAccountRepository;
 import com.taekang.employeeservletapi.repository.user.CryptoDepositRepository;
 import com.taekang.employeeservletapi.service.CryptoService;
-import java.math.BigDecimal;
-import java.time.LocalDate;
 import java.time.LocalDateTime;
 import java.util.*;
 import lombok.extern.slf4j.Slf4j;
@@ -38,19 +34,23 @@ public class CryptoServiceImplements implements CryptoService {
 
   private final MessageProducer messageProducer;
   private final ModelMapper modelMapper;
+  private final SiteRepository siteRepository;
+  private final SiteWalletRepository siteWalletRepository;
 
   @Autowired
   public CryptoServiceImplements(
-      CryptoAccountRepository cryptoAccountRepository,
-      CryptoDepositRepository cryptoDepositRepository,
-      CryptoBalanceAPI cryptoBalanceAPI,
-      MessageProducer messageProducer,
-      ModelMapper modelMapper) {
+          CryptoAccountRepository cryptoAccountRepository,
+          CryptoDepositRepository cryptoDepositRepository,
+          CryptoBalanceAPI cryptoBalanceAPI,
+          MessageProducer messageProducer,
+          ModelMapper modelMapper, SiteRepository siteRepository, SiteWalletRepository siteWalletRepository) {
     this.cryptoAccountRepository = cryptoAccountRepository;
     this.cryptoDepositRepository = cryptoDepositRepository;
     this.cryptoBalanceAPI = cryptoBalanceAPI;
     this.messageProducer = messageProducer;
     this.modelMapper = modelMapper;
+    this.siteRepository = siteRepository;
+    this.siteWalletRepository = siteWalletRepository;
   }
 
   private CryptoAccountDTO toCryptoAccountDTO(CryptoAccount cryptoAccount) {
@@ -182,15 +182,15 @@ public class CryptoServiceImplements implements CryptoService {
   }
 
   @Override
-  public CryptoAccountDTO updateCryptoWallet(CryptoWalletUpdateDTO cryptoWalletUpdateDTO) {
+  public CryptoAccountDTO updateCryptoWallet(UpdateCryptoWalletDTO updateCryptoWalletDTO) {
     CryptoAccount cryptoAccount =
         cryptoAccountRepository
-            .findByCryptoWallet(cryptoWalletUpdateDTO.getCryptoWallet())
+            .findById(updateCryptoWalletDTO.getId())
             .orElseThrow(AccountNotFoundException::new);
     CryptoAccount save =
         cryptoAccountRepository.save(
             cryptoAccount.toBuilder()
-                .cryptoWallet(cryptoWalletUpdateDTO.getCryptoWallet())
+                .cryptoWallet(updateCryptoWalletDTO.getCryptoWallet())
                 .build());
 
     return modelMapper.map(save, CryptoAccountDTO.class);
@@ -220,42 +220,6 @@ public class CryptoServiceImplements implements CryptoService {
     result.add(modelMapper.map(cryptoAccount, CryptoAccountDTO.class));
 
     return result;
-  }
-
-  @Override
-  public AccountSummaryInfoDTO getAccountSummaryInfoBySite(
-      String site, String cryptoWallet, ChainType chainType) {
-    Long depositHistoryLength = cryptoDepositRepository.countAllByCryptoAccount_Site(site);
-    BalanceResponseDTO balance = cryptoBalanceAPI.getBalance(chainType, cryptoWallet);
-
-    LocalDateTime now = LocalDateTime.now();
-    LocalDateTime beforeOneWeeks = now.minusWeeks(1);
-
-    List<CryptoDeposit> deposits =
-        cryptoDepositRepository.findByCryptoAccount_SiteAndRequestedAtBetween(
-            site, beforeOneWeeks, beforeOneWeeks);
-
-    BigDecimal weeksDepositAmount = BigDecimal.ZERO;
-    BigDecimal todayDepositAmount = BigDecimal.ZERO;
-
-    LocalDate today = now.toLocalDate();
-
-    for (CryptoDeposit deposit : deposits) {
-      BigDecimal amount = deposit.getKrwAmount();
-      weeksDepositAmount = weeksDepositAmount.add(amount);
-
-      // 날짜가 오늘과 같은 경우
-      if (deposit.getRequestedAt().toLocalDate().isEqual(today)) {
-        todayDepositAmount = todayDepositAmount.add(amount);
-      }
-    }
-
-    return AccountSummaryInfoDTO.builder()
-        .balance(balance.getBalance())
-        .depositHistoryLength(depositHistoryLength)
-        .todayDepositAmount(todayDepositAmount)
-        .weeksDepositAmount(weeksDepositAmount)
-        .build();
   }
 
   @Override

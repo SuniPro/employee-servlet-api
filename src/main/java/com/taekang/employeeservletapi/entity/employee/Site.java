@@ -1,7 +1,6 @@
 package com.taekang.employeeservletapi.entity.employee;
 
 import com.taekang.employeeservletapi.entity.BaseTimeEntity;
-import com.taekang.employeeservletapi.entity.user.ChainType;
 import jakarta.persistence.*;
 import java.time.LocalDateTime;
 import lombok.*;
@@ -21,13 +20,6 @@ public class Site extends BaseTimeEntity {
 
   @Column(name = "site", unique = true, nullable = false)
   private String site;
-
-  @Column(name = "crypto_wallet", nullable = false)
-  private String cryptoWallet;
-
-  @Enumerated(EnumType.STRING)
-  @Column(name = "chain_type")
-  private ChainType chainType;
 
   @Column(name = "telegram_username")  // 선택
   private String telegramUsername;

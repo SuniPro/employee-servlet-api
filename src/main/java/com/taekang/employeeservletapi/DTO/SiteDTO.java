@@ -1,7 +1,7 @@
 package com.taekang.employeeservletapi.DTO;
 
-import com.taekang.employeeservletapi.entity.user.ChainType;
 import java.time.LocalDateTime;
+import java.util.List;
 import lombok.*;
 
 @Getter
@@ -10,18 +10,20 @@ import lombok.*;
 @NoArgsConstructor
 @AllArgsConstructor
 public class SiteDTO {
-    
-    private Long id;
-    
-    private String site;
-    
-    private String cryptoWallet;
-    private ChainType chainType;
 
-    private LocalDateTime insertDateTime;
-    private String insertId;
-    private LocalDateTime updateDateTime;
-    private String updateId;
-    private LocalDateTime deleteDateTime;
-    private String deleteId;
+  private Long id;
+
+  private String site;
+
+  private List<SiteWalletDTO> siteWalletList;
+
+  private String telegramUsername;
+  private Long telegramChatId;
+
+  private LocalDateTime insertDateTime;
+  private String insertId;
+  private LocalDateTime updateDateTime;
+  private String updateId;
+  private LocalDateTime deleteDateTime;
+  private String deleteId;
 }

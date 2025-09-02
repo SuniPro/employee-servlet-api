@@ -1,14 +1,15 @@
 package com.taekang.employeeservletapi.controller;
 
-import com.taekang.employeeservletapi.DTO.CreateSiteDTO;
-import com.taekang.employeeservletapi.DTO.SiteDTO;
-import com.taekang.employeeservletapi.error.TokenNotFoundedException;
-import com.taekang.employeeservletapi.error.TokenNotValidateException;
+import com.taekang.employeeservletapi.DTO.*;
+import com.taekang.employeeservletapi.DTO.crypto.UpdateCryptoWalletDTO;
 import com.taekang.employeeservletapi.service.SiteService;
 import com.taekang.employeeservletapi.service.auth.JwtUtil;
-import jakarta.servlet.http.HttpServletRequest;
 import java.util.List;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.data.domain.Page;
+import org.springframework.data.domain.Pageable;
+import org.springframework.data.domain.Sort;
+import org.springframework.data.web.PageableDefault;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
 
@@ -30,59 +31,52 @@ public class SiteController {
     return ResponseEntity.ok().body(siteService.getAllSite());
   }
 
+  @GetMapping("get/all/through/page")
+  public ResponseEntity<Page<SiteDTO>> getAllThroughPage(
+      @PageableDefault(size = 10, sort = "insertDateTime", direction = Sort.Direction.DESC)
+          Pageable pageable) {
+    return ResponseEntity.ok().body(siteService.getAllThoughPage(pageable));
+  }
+
   @GetMapping("get/{site}")
   public ResponseEntity<SiteDTO> getSite(@PathVariable String site) {
     return ResponseEntity.ok().body(siteService.getBySite(site));
   }
 
   @PostMapping("create")
-  public ResponseEntity<SiteDTO> createSite(HttpServletRequest request, @RequestBody CreateSiteDTO createSiteDTO) {
+  public ResponseEntity<SiteDTO> createSite(
+      @CookieValue("access-token") String token, @RequestBody CreateSiteDTO createSiteDTO) {
+    String name = jwtUtil.getEmployeeName(token);
 
-    String token = jwtUtil.getAccessTokenInCookie(request);
-
-    if (token == null) {
-      throw new TokenNotFoundedException();
-    }
-
-    boolean validationToken = jwtUtil.validateToken(token);
-    if (!validationToken) {
-      throw new TokenNotValidateException();
-    }
-
-    return ResponseEntity.ok().body(siteService.createSite(createSiteDTO, jwtUtil.getEmployeeName(token)));
+    return ResponseEntity.ok().body(siteService.createSite(createSiteDTO, name));
   }
 
-  @PostMapping("update")
-  public ResponseEntity<SiteDTO> updateSite(HttpServletRequest request, @RequestBody SiteDTO siteDTO) {
+  @PatchMapping("update/only/site")
+  public ResponseEntity<SiteOnlyDTO> updateOnlySite(
+      @CookieValue("access-token") String token, @RequestBody UpdateSiteDTO updateSiteDTO) {
 
-    String token = jwtUtil.getAccessTokenInCookie(request);
+    return ResponseEntity.ok()
+        .body(siteService.updateOnlySite(updateSiteDTO, jwtUtil.getEmployeeName(token)));
+  }
 
-    if (token == null) {
-      throw new TokenNotFoundedException();
-    }
+  @PatchMapping("update/only/wallet")
+  public ResponseEntity<SiteWalletDTO> updateSiteWallet(
+      @CookieValue("access-token") String token,
+      @RequestBody UpdateCryptoWalletDTO updateCryptoWalletDTO) {
 
-    boolean validationToken = jwtUtil.validateToken(token);
-    if (!validationToken) {
-      throw new TokenNotValidateException();
-    }
-
-    return ResponseEntity.ok().body(siteService.updateSite(siteDTO, jwtUtil.getEmployeeName(token)));
+    return ResponseEntity.ok()
+        .body(siteService.updateSiteWallet(updateCryptoWalletDTO, jwtUtil.getEmployeeName(token)));
   }
 
   @PostMapping("delete")
-  public ResponseEntity<SiteDTO> updateSite(HttpServletRequest request, @RequestBody Long siteId) {
-
-    String token = jwtUtil.getAccessTokenInCookie(request);
-
-    if (token == null) {
-      throw new TokenNotFoundedException();
-    }
-
-    boolean validationToken = jwtUtil.validateToken(token);
-    if (!validationToken) {
-      throw new TokenNotValidateException();
-    }
-
+  public ResponseEntity<SiteDTO> updateSite(
+      @CookieValue("access-token") String token, @RequestBody Long siteId) {
     return ResponseEntity.ok().body(siteService.deleteSite(siteId, jwtUtil.getEmployeeName(token)));
+  }
+
+  @GetMapping("get/wallet/info")
+  public ResponseEntity<List<SiteWalletInfoDTO>> getSiteWalletInfoBySite(
+      @CookieValue("access-token") String token) {
+    return ResponseEntity.ok().body(siteService.getSiteWalletInfoBySite(jwtUtil.getSite(token)));
   }
 }

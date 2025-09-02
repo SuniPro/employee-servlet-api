@@ -130,6 +130,22 @@ public class GlobalExceptionHandler {
             .body(new ErrorResponse(e.getErrorCode()));
   }
 
+  @ExceptionHandler(IsNotSupportWalletTypeException.class)
+  public ResponseEntity<ErrorResponse> handleIsNotSupportWalletTypeException(
+          IsNotSupportWalletTypeException e) {
+
+    return ResponseEntity.status(e.getErrorCode().getHttpStatus())
+            .body(new ErrorResponse(e.getErrorCode()));
+  }
+
+  @ExceptionHandler(CannotFoundWalletException.class)
+  public ResponseEntity<ErrorResponse> handleCannotFoundWalletException(
+          CannotFoundWalletException e) {
+
+    return ResponseEntity.status(e.getErrorCode().getHttpStatus())
+            .body(new ErrorResponse(e.getErrorCode()));
+  }
+
   // 다른 커스텀 예외들도 이렇게 추가하면 됨
   //  @ExceptionHandler(Exception.class)
   //  public ResponseEntity<ErrorResponse> handleOther() {

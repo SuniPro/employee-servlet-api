@@ -48,9 +48,11 @@ public enum ErrorCode {
           "C400", "입금기록을 찾을 수 없거나, 이미 승인되었습니다.", HttpStatus.BAD_REQUEST),
   DEPOSIT_NOT_FOUND("D404", "입금 정보를 찾을 수 없습니다.", HttpStatus.NOT_FOUND),
   ALREADY_TETHER_WALLET("D400", "이미 존재하는 지갑입니다.", HttpStatus.BAD_REQUEST),
+  IS_NOT_SUPPORT_WALLET_TYPE("S400", "지원하지 않는 지갑 형식입니다.", HttpStatus.BAD_REQUEST),
+  CANNOT_FOUND_WALLET("C404", "지갑을 찾을 수 없습니다.", HttpStatus.NOT_FOUND),
 
   /* Site */
-  CANNOT_FOUND_SITE("S404", "사이트를 찾을 수 없습니다.", HttpStatus.INTERNAL_SERVER_ERROR),
+  CANNOT_FOUND_SITE("C404", "사이트를 찾을 수 없습니다.", HttpStatus.INTERNAL_SERVER_ERROR),
 
   /* Telegram */
   ALREADY_TELEGRAM_ID("C400", "텔레그램 ID가 이미 존재합니다.", HttpStatus.BAD_REQUEST),

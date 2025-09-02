@@ -109,7 +109,8 @@ public class SecurityConfig {
             "http://localhost:5020",
             "http://localhost:5010",
             "http://192.168.3.159:5020",
-            "http://192.168.3.159:5010"));
+            "http://192.168.3.159:5010",
+            "http://172.168.0.47:5020"));
 
     // 허용 HTTP 메서드
     config.setAllowedMethods(List.of("GET", "POST", "PUT", "PATCH", "DELETE", "OPTIONS"));

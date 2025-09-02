@@ -7,6 +7,8 @@ import com.taekang.employeeservletapi.entity.employee.Employee;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.Pageable;
 
+import java.util.List;
+
 public interface EmployeeService {
 
   Employee createEmployee(String name, RegisterRequestDTO registerRequestDTO);
@@ -17,7 +19,9 @@ public interface EmployeeService {
 
   EmployeeDTO getEmployeeByName(String name);
 
-  Page<EmployeeDTO> getEmployeeList(Pageable pageable);
+  List<EmployeeDTO> getEmployeeByNameThroughList(String name);
+
+  Page<EmployeeDTO> getAllEmployeeList(Pageable pageable);
 
   Page<EmployeeDTO> getEmployeeListBySite(String site, Pageable pageable);
 

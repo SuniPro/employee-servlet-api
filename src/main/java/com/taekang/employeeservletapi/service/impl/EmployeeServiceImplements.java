@@ -6,10 +6,15 @@ import com.taekang.employeeservletapi.DTO.RegisterRequestDTO;
 import com.taekang.employeeservletapi.entity.employee.*;
 import com.taekang.employeeservletapi.error.DuplicateEmployeeException;
 import com.taekang.employeeservletapi.error.EmployeeNotFoundException;
+import com.taekang.employeeservletapi.error.IsNotSupportWalletTypeException;
 import com.taekang.employeeservletapi.repository.employee.*;
+import com.taekang.employeeservletapi.service.CryptoValidationService;
 import com.taekang.employeeservletapi.service.EmployeeService;
+import com.taekang.employeeservletapi.utils.WalletAddressType;
 import java.time.LocalDateTime;
 import java.time.ZoneId;
+import java.util.ArrayList;
+import java.util.List;
 import lombok.extern.slf4j.Slf4j;
 import org.modelmapper.ModelMapper;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -17,6 +22,7 @@ import org.springframework.data.domain.Page;
 import org.springframework.data.domain.Pageable;
 import org.springframework.security.crypto.bcrypt.BCryptPasswordEncoder;
 import org.springframework.stereotype.Service;
+import org.springframework.transaction.annotation.Transactional;
 
 @Slf4j
 @Service
@@ -24,6 +30,9 @@ public class EmployeeServiceImplements implements EmployeeService {
 
   private final EmployeeRepository employeeRepository;
   private final SiteRepository siteRepository;
+  private final SiteWalletRepository siteWalletRepository;
+
+  private final CryptoValidationService cryptoValidationService;
 
   private final BCryptPasswordEncoder bCryptPasswordEncoder;
   private final ModelMapper modelMapper;
@@ -32,15 +41,20 @@ public class EmployeeServiceImplements implements EmployeeService {
   public EmployeeServiceImplements(
       EmployeeRepository employeeRepository,
       SiteRepository siteRepository,
+      SiteWalletRepository siteWalletRepository,
+      CryptoValidationService cryptoValidationService,
       BCryptPasswordEncoder bCryptPasswordEncoder,
       ModelMapper modelMapper) {
     this.employeeRepository = employeeRepository;
     this.siteRepository = siteRepository;
+    this.siteWalletRepository = siteWalletRepository;
+    this.cryptoValidationService = cryptoValidationService;
     this.bCryptPasswordEncoder = bCryptPasswordEncoder;
     this.modelMapper = modelMapper;
   }
 
   @Override
+  @Transactional
   public Employee createEmployee(String name, RegisterRequestDTO registerRequestDTO) {
 
     if (employeeRepository.existsByName(registerRequestDTO.getName())) {
@@ -63,14 +77,24 @@ public class EmployeeServiceImplements implements EmployeeService {
      * 존재하지 않는 사이트일 경우에만 CryptoWallet이 존재함
      * */
     if (!siteRepository.existsBySite(registerRequestDTO.getSite())) {
-      Site site =
-          Site.builder()
-              .site(registerRequestDTO.getSite())
-              .insertId(name)
-              .cryptoWallet(registerRequestDTO.getCryptoWallet())
-              .build();
+      Site site = Site.builder().site(registerRequestDTO.getSite()).insertId(name).build();
 
       siteRepository.save(site);
+
+      WalletAddressType type = WalletAddressType.of(registerRequestDTO.getCryptoWallet());
+
+      if (!type.isInvalid(cryptoValidationService, registerRequestDTO.getCryptoWallet())) {
+        throw new IsNotSupportWalletTypeException();
+      }
+
+      SiteWallet siteWallet =
+          SiteWallet.builder()
+              .cryptoWallet(registerRequestDTO.getCryptoWallet())
+              .chainType(type.toChainType())
+              .insertId(name)
+              .build();
+
+      siteWalletRepository.save(siteWallet);
     }
 
     return modelMapper.map(employee, Employee.class);
@@ -118,24 +142,40 @@ public class EmployeeServiceImplements implements EmployeeService {
 
   @Override
   public EmployeeDTO getEmployeeByName(String name) {
-    Employee employee = employeeRepository.findByNameAndDeleteNameIsNull(name).orElseThrow(EmployeeNotFoundException::new);
+    Employee employee =
+        employeeRepository
+            .findByNameAndDeleteNameIsNull(name)
+            .orElseThrow(EmployeeNotFoundException::new);
     return modelMapper.map(employee, EmployeeDTO.class);
   }
 
   @Override
-  public Page<EmployeeDTO> getEmployeeList(Pageable pageable) {
+  public List<EmployeeDTO> getEmployeeByNameThroughList(String name) {
+    List<EmployeeDTO> employeeDTOList = new ArrayList<>();
+    Employee employee =
+        employeeRepository
+            .findByNameAndDeleteNameIsNull(name)
+            .orElseThrow(EmployeeNotFoundException::new);
+    employeeDTOList.add(modelMapper.map(employee, EmployeeDTO.class));
+    return employeeDTOList;
+  }
+
+  @Override
+  public Page<EmployeeDTO> getAllEmployeeList(Pageable pageable) {
     return employeeRepository.findAllByDeleteNameIsNull(pageable).map(this::toEmployeeDTO);
   }
 
   @Override
   public Page<EmployeeDTO> getEmployeeListBySite(String site, Pageable pageable) {
-    return employeeRepository.findBySiteAndDeleteNameIsNull(site, pageable).map(this::toEmployeeDTO);
+    return employeeRepository
+        .findBySiteAndDeleteNameIsNull(site, pageable)
+        .map(this::toEmployeeDTO);
   }
 
   @Override
   public void deleteEmployeeById(String name, Long id) {
     Employee employee = employeeRepository.findById(id).orElseThrow(EmployeeNotFoundException::new);
-    
+
     LocalDateTime seoulTime = LocalDateTime.now(ZoneId.of("Asia/Seoul"));
 
     employee.toBuilder().deleteName(name).deleteDateTime(seoulTime).build();

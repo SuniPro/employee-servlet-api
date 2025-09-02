@@ -15,6 +15,8 @@ import org.springframework.http.ResponseEntity;
 import org.springframework.security.access.prepost.PreAuthorize;
 import org.springframework.web.bind.annotation.*;
 
+import java.util.List;
+
 @RestController
 @RequestMapping("employee")
 public class EmployeeController {
@@ -58,15 +60,20 @@ public class EmployeeController {
     return ResponseEntity.ok().body(employeeService.getEmployeeByName(name));
   }
 
+  @GetMapping("get/by/{name}/through/list")
+  public ResponseEntity<List<EmployeeDTO>> getEmployeeByNameThroughList(@PathVariable String name) {
+    return ResponseEntity.ok().body(employeeService.getEmployeeByNameThroughList(name));
+  }
+
   @GetMapping("get/all")
-  public ResponseEntity<Page<EmployeeDTO>> getAllEmployees(
+  public ResponseEntity<Page<EmployeeDTO>> getAllEmployeeList(
       @PageableDefault(size = 10, sort = "insertDateTime", direction = Sort.Direction.DESC)
           Pageable pageable) {
-    return ResponseEntity.ok().body(employeeService.getEmployeeList(pageable));
+    return ResponseEntity.ok().body(employeeService.getAllEmployeeList(pageable));
   }
 
   @GetMapping("get/all/{site}")
-  public ResponseEntity<Page<EmployeeDTO>> getAllEmployees(
+  public ResponseEntity<Page<EmployeeDTO>> getAllEmployeeListBySite(
           @PageableDefault(size = 10, sort = "insertDateTime", direction = Sort.Direction.DESC)
           Pageable pageable, @PathVariable String site) {
     return ResponseEntity.ok().body(employeeService.getEmployeeListBySite(site, pageable));

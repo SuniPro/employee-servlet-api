@@ -1,6 +1,6 @@
 package com.taekang.employeeservletapi.DTO;
 
-import com.taekang.employeeservletapi.entity.user.ChainType;
+import java.util.List;
 import lombok.*;
 
 @AllArgsConstructor
@@ -11,6 +11,6 @@ import lombok.*;
 @ToString
 public class CreateSiteDTO {
     private String site;
-    private String cryptoWallet;
-    private ChainType chainType;
+    
+    private List<SiteWalletDTO> siteWalletList;
 }

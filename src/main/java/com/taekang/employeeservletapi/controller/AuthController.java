@@ -18,6 +18,8 @@ public class AuthController {
 
   @Value("${server.servlet.context-path}")
   private String contextPath;
+  @Value("${admin.domain}")
+  private String adminDomain;
 
   private final JwtUtil jwtUtil;
   private final AuthService authService;
@@ -47,7 +49,8 @@ public class AuthController {
             .httpOnly(true)
             //                    일단 프로토타입은 Http도 혀용
             //                    .secure(true)
-            .path(contextPath)
+                .domain(adminDomain)
+                .path("/")
             .maxAge(tokenResponse.getAccessTokenExpiresIn())
             .sameSite("Strict")
             .build();
@@ -58,7 +61,8 @@ public class AuthController {
             .httpOnly(true)
             //                    일단 프로토타입은 Http도 혀용
             //                    .secure(true)
-            .path(contextPath)
+                .domain(adminDomain)
+            .path("/")
             .maxAge(tokenResponse.getRefreshTokenExpiresIn())
             .sameSite("Strict")
             .build();
@@ -90,7 +94,8 @@ public class AuthController {
                     .httpOnly(true)
                     //                    일단 프로토타입은 Http도 혀용
                     //                    .secure(true)
-                    .path(contextPath)
+                    .domain(adminDomain)
+                    .path("/")
                     .maxAge(tokenResponse.getAccessTokenExpiresIn())
                     .sameSite("Strict")
                     .build();
@@ -101,7 +106,8 @@ public class AuthController {
                     .httpOnly(true)
                     //                    일단 프로토타입은 Http도 혀용
                     //                    .secure(true)
-                    .path(contextPath)
+                    .domain(adminDomain)
+                    .path("/")
                     .maxAge(tokenResponse.getRefreshTokenExpiresIn())
                     .sameSite("Strict")
                     .build();

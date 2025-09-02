@@ -8,7 +8,6 @@ import com.taekang.employeeservletapi.service.TelegramNotifyService;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.amqp.rabbit.annotation.RabbitListener;
 import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.messaging.handler.annotation.Header;
 import org.springframework.stereotype.Service;
 
 @Slf4j
@@ -25,10 +24,10 @@ public class MessageConsumer {
     }
 
     @RabbitListener(queues = "${rabbitmq.deposit.request.queue}")
-    public void receiveDepositMessage(DepositNotifyDTO message, @Header("site") String siteCode) {
+    public void receiveDepositMessage(DepositNotifyDTO message) {
         log.info("Received deposit message: {}", message.toString());
 
-        Site site = siteRepository.findBySite(siteCode).orElseThrow(CannotFoundSiteException::new);
+        Site site = siteRepository.findBySite(message.getSite()).orElseThrow(CannotFoundSiteException::new);
 
         boolean ok = telegramNotifyService.sendDepositRequest(site.getTelegramChatId(), message);
 

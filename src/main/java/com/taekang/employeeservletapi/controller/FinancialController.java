@@ -1,12 +1,10 @@
 package com.taekang.employeeservletapi.controller;
 
-import com.taekang.employeeservletapi.DTO.UpdateIsSendDTO;
-import com.taekang.employeeservletapi.DTO.UpdateMemoDTO;
-import com.taekang.employeeservletapi.DTO.UpdateSiteDTO;
+import com.taekang.employeeservletapi.DTO.*;
 import com.taekang.employeeservletapi.DTO.crypto.*;
-import com.taekang.employeeservletapi.entity.user.ChainType;
 import com.taekang.employeeservletapi.entity.user.TransactionStatus;
 import com.taekang.employeeservletapi.service.CryptoService;
+import com.taekang.employeeservletapi.service.auth.JwtUtil;
 import java.time.LocalDateTime;
 import java.util.List;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -29,10 +27,12 @@ public class FinancialController {
       "hasAnyAuthority('LEVEL_ADMINISTRATOR','LEVEL_MANAGER')";
 
   private final CryptoService cryptoService;
+  private final JwtUtil jwtUtil;
 
   @Autowired
-  public FinancialController(CryptoService cryptoService) {
+  public FinancialController(CryptoService cryptoService, JwtUtil jwtUtil) {
     this.cryptoService = cryptoService;
+    this.jwtUtil = jwtUtil;
   }
 
   @PreAuthorize("hasAnyAuthority('LEVEL_ADMINISTRATOR')")
@@ -150,8 +150,8 @@ public class FinancialController {
   // cryptoWallet 이라고 적어야하지만 CamelCase는 url에서 권장되지 않기에 wallet으로 명명함.
   @PatchMapping("update/wallet")
   public ResponseEntity<CryptoAccountDTO> updateCryptoWallet(
-      @RequestBody CryptoWalletUpdateDTO cryptoWalletUpdateDTO) {
-    return ResponseEntity.ok().body(cryptoService.updateCryptoWallet(cryptoWalletUpdateDTO));
+      @RequestBody UpdateCryptoWalletDTO updateCryptoWalletDTO) {
+    return ResponseEntity.ok().body(cryptoService.updateCryptoWallet(updateCryptoWalletDTO));
   }
 
   @PreAuthorize(DEFAULT_ACCESS)
@@ -322,13 +322,5 @@ public class FinancialController {
         .body(
             cryptoService.getDepositsInRangeByFromAddressAndIsSendAndSite(
                 isSend, address, site, start, end, pageable));
-  }
-
-  @PreAuthorize(DEFAULT_ACCESS)
-  @GetMapping("get/crypto/account/info/chain/{chain}/wallet/{cryptoWallet}/by/site/{site}")
-  public ResponseEntity<AccountSummaryInfoDTO> getAccountSummaryInfoBySite(
-      @PathVariable ChainType chain, @PathVariable String cryptoWallet, @PathVariable String site) {
-    return ResponseEntity.ok()
-        .body(cryptoService.getAccountSummaryInfoBySite(site, cryptoWallet, chain));
   }
 }

@@ -1,15 +1,10 @@
 package com.taekang.employeeservletapi.service;
 
-import com.taekang.employeeservletapi.DTO.UpdateIsSendDTO;
-import com.taekang.employeeservletapi.DTO.UpdateMemoDTO;
-import com.taekang.employeeservletapi.DTO.UpdateSiteDTO;
-import com.taekang.employeeservletapi.DTO.crypto.AccountSummaryInfoDTO;
+import com.taekang.employeeservletapi.DTO.*;
 import com.taekang.employeeservletapi.DTO.crypto.CryptoAccountDTO;
 import com.taekang.employeeservletapi.DTO.crypto.CryptoDepositDTO;
-import com.taekang.employeeservletapi.DTO.crypto.CryptoWalletUpdateDTO;
-import com.taekang.employeeservletapi.entity.user.ChainType;
+import com.taekang.employeeservletapi.DTO.crypto.UpdateCryptoWalletDTO;
 import com.taekang.employeeservletapi.entity.user.TransactionStatus;
-import java.math.BigDecimal;
 import java.time.LocalDateTime;
 import java.util.List;
 import org.springframework.data.domain.Page;
@@ -59,7 +54,7 @@ public interface CryptoService {
   /* Deposit 상태 변경 */
   Boolean updateSend(UpdateIsSendDTO updateIsSendDTO);
 
-  CryptoAccountDTO updateCryptoWallet(CryptoWalletUpdateDTO cryptoWalletUpdateDTO);
+  CryptoAccountDTO updateCryptoWallet(UpdateCryptoWalletDTO updateCryptoWalletDTO);
   
   /* 유저 영역 */
 
@@ -108,6 +103,4 @@ public interface CryptoService {
           LocalDateTime start,
           LocalDateTime end,
           Pageable pageable);
-
-  AccountSummaryInfoDTO getAccountSummaryInfoBySite(String site, String cryptoWallet, ChainType chainType);
 }

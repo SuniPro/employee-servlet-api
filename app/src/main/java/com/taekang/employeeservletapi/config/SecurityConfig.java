@@ -32,6 +32,12 @@ public class SecurityConfig {
   @Value("${jwt.auth.whitelist}")
   private String[] authWhitelist;
 
+  @Value("${admin.domain}")
+  private String adminDomain;
+
+  @Value("${icoin.domain}")
+  private String icoinDomain;
+
   private final CustomEmployeeDetailService customEmployeeDetailService;
   private final JwtUtil jwtUtil;
   private final JwtAuthFilter jwtAuthFilter;
@@ -100,16 +106,7 @@ public class SecurityConfig {
   public CorsConfigurationSource corsConfigurationSource() {
     CorsConfiguration config = new CorsConfiguration();
     // 허용할 프론트 도메인
-    config.setAllowedOrigins(
-        List.of(
-            "https://tie-ed.com",
-            "https://icointext.com",
-            "https://anycast.world",
-            "http://localhost:5020",
-            "http://localhost:5010",
-            "http://192.168.3.159:5020",
-            "http://192.168.3.159:5010",
-            "http://172.168.0.47:5020"));
+    config.setAllowedOrigins(List.of("https://" + adminDomain, "https://" + icoinDomain));
 
     // 허용 HTTP 메서드
     config.setAllowedMethods(List.of("GET", "POST", "PUT", "PATCH", "DELETE", "OPTIONS"));

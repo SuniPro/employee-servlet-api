@@ -45,4 +45,4 @@ jobs:
             docker pull ariel250225/employee-servlet-api:1.0.0
             docker stop employee-servlet-api || true
             docker rm employee-servlet-api || true
-            docker run -d -p 8010:8010 --restart unless-stopped -v /home/ec2-user/employee-servlet-api-log:/app/log --name employee-servlet-api ariel250225/employee-servlet-api:1.0.0
+            docker run -d -p 8010:8010 --restart unless-stopped --network app-network -v  /home/ec2-user/employee-servlet-api-log:/app/log --name employee-servlet-api ariel250225/employee-servlet-api:1.0.0

@@ -42,7 +42,19 @@ jobs:
           username: ${{ secrets.EC2_USER }}
           key: ${{ secrets.EC2_KEY }}
           script: |
+            docker stop redis || true
+            docker rm redis || true
+
+            docker run -d --restart unless-stopped \
+            --network app-network \
+            -v /home/ec2-user/redis-data:/data \
+            --name redis redis:latest \
+            redis-server --appendonly yes
+            
+            echo "⏳ Waiting for Redis to start..."
+            sleep 5
+      
             docker pull ariel250225/employee-servlet-api:1.0.0
             docker stop employee-servlet-api || true
             docker rm employee-servlet-api || true
-            docker run -d -p 8010:8010 --restart unless-stopped -v /home/ec2-user/employee-servlet-api-log:/app/log --name employee-servlet-api ariel250225/employee-servlet-api:1.0.0
+            docker run -d -p 8010:8010 --restart unless-stopped --network app-network -v  /home/ec2-user/employee-servlet-api-log:/app/log --name employee-servlet-api ariel250225/employee-servlet-api:1.0.0

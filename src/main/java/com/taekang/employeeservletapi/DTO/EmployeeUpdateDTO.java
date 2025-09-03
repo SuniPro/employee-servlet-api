@@ -21,12 +21,4 @@ public class EmployeeUpdateDTO {
   private String name;
 
   private String password;
-
-  private String insertName;
-
-  private LocalDateTime insertDateTime;
-
-  private String updateName;
-
-  private LocalDateTime updateDateTime;
 }

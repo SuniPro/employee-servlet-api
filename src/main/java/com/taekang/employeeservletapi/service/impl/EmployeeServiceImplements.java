@@ -98,7 +98,7 @@ public class EmployeeServiceImplements implements EmployeeService {
   }
 
   @Override
-  public EmployeeDTO updateEmployee(EmployeeUpdateDTO employeeUpdateDTO) {
+  public EmployeeDTO updateEmployee(String name, EmployeeUpdateDTO employeeUpdateDTO) {
     Employee employee =
         employeeRepository
             .findById(employeeUpdateDTO.getId())
@@ -113,8 +113,7 @@ public class EmployeeServiceImplements implements EmployeeService {
                   .level(employeeUpdateDTO.getLevel())
                   .name(employeeUpdateDTO.getName())
                   .password(employee.getPassword())
-                  .insertName(employeeUpdateDTO.getInsertName())
-                  .updateName(employeeUpdateDTO.getUpdateName())
+                  .updateName(name)
                   .build()));
     } else {
       return toEmployeeDTO(
@@ -125,8 +124,7 @@ public class EmployeeServiceImplements implements EmployeeService {
                   .level(employeeUpdateDTO.getLevel())
                   .name(employeeUpdateDTO.getName())
                   .password(bCryptPasswordEncoder.encode(employeeUpdateDTO.getPassword()))
-                  .insertName(employeeUpdateDTO.getInsertName())
-                  .updateName(employeeUpdateDTO.getUpdateName())
+                  .updateName(name)
                   .build()));
     }
   }

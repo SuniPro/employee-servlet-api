@@ -45,8 +45,8 @@ public class EmployeeController {
 
   @PreAuthorize(MANAGER_ACCESS)
   @PutMapping("update")
-  public ResponseEntity<EmployeeDTO> updateEmployee(@CookieValue String token,
-      @RequestBody EmployeeUpdateDTO employeeUpdateDTO) {
+  public ResponseEntity<EmployeeDTO> updateEmployee(
+      @CookieValue String token, @RequestBody EmployeeUpdateDTO employeeUpdateDTO) {
     String name = jwtUtil.getEmployeeName(token);
     return ResponseEntity.ok().body(employeeService.updateEmployee(name, employeeUpdateDTO));
   }

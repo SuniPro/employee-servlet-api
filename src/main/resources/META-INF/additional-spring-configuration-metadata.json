@@ -1,0 +1,48 @@
+{
+  "properties": [
+    {
+      "name": "spring.datasource.employee.url",
+      "type": "java.lang.String",
+      "description": "Description for spring.datasource.employee.url."
+    },
+    {
+      "name": "spring.datasource.employee.username",
+      "type": "java.lang.String",
+      "description": "Description for spring.datasource.employee.username."
+    },
+    {
+      "name": "spring.datasource.employee.password",
+      "type": "java.lang.String",
+      "description": "Description for spring.datasource.employee.password."
+    },
+    {
+      "name": "spring.datasource.employee.driver-class-name",
+      "type": "java.lang.String",
+      "description": "Description for spring.datasource.employee.driver-class-name."
+    },
+    {
+      "name": "spring.datasource.user.url",
+      "type": "java.lang.String",
+      "description": "Description for spring.datasource.user.url."
+    },
+    {
+      "name": "spring.datasource.user.username",
+      "type": "java.lang.String",
+      "description": "Description for spring.datasource.user.username."
+    },
+    {
+      "name": "spring.datasource.user.password",
+      "type": "java.lang.String",
+      "description": "Description for spring.datasource.user.password."
+    },
+    {
+      "name": "spring.datasource.user.driver-class-name",
+      "type": "java.lang.String",
+      "description": "Description for spring.datasource.user.driver-class-name."
+    },
+    {
+      "name": "app.redis.refresh-token-prefix",
+      "type": "java.lang.String",
+      "description": "Description for app.redis.refresh-token-prefix."
+    }
+  ] }

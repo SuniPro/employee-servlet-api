@@ -12,7 +12,7 @@ public interface EmployeeService {
 
   Employee createEmployee(String name, RegisterRequestDTO registerRequestDTO);
 
-  EmployeeDTO updateEmployee(EmployeeUpdateDTO employeeUpdateDTO);
+  EmployeeDTO updateEmployee(String name, EmployeeUpdateDTO employeeUpdateDTO);
 
   EmployeeDTO getEmployeeById(Long id);
 

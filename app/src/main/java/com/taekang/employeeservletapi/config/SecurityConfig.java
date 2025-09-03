@@ -106,10 +106,7 @@ public class SecurityConfig {
   public CorsConfigurationSource corsConfigurationSource() {
     CorsConfiguration config = new CorsConfiguration();
     // 허용할 프론트 도메인
-    config.setAllowedOrigins(
-        List.of(
-            "https://" + adminDomain,
-            "https://" + icoinDomain));
+    config.setAllowedOrigins(List.of("https://" + adminDomain, "https://" + icoinDomain));
 
     // 허용 HTTP 메서드
     config.setAllowedMethods(List.of("GET", "POST", "PUT", "PATCH", "DELETE", "OPTIONS"));

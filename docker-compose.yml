@@ -5,6 +5,8 @@ services:
     build:
       context: ./app
     container_name: spring-app
+    volumes:
+      - ./log:/app/log
     ports:
       - "8010:8010"
     networks:

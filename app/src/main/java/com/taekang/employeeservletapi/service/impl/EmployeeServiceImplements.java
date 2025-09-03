@@ -84,7 +84,7 @@ public class EmployeeServiceImplements implements EmployeeService {
               .map(
                   wallet ->
                       SiteWallet.builder()
-                              .site(save)
+                          .site(save)
                           .cryptoWallet(wallet.getCryptoWallet())
                           .chainType(wallet.getChainType())
                           .insertId(name)

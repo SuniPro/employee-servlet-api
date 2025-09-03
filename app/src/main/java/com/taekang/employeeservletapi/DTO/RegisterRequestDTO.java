@@ -2,9 +2,8 @@ package com.taekang.employeeservletapi.DTO;
 
 import com.taekang.employeeservletapi.entity.employee.Department;
 import com.taekang.employeeservletapi.entity.employee.Level;
-import lombok.*;
-
 import java.util.List;
+import lombok.*;
 
 @Getter
 @Setter

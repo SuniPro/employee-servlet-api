@@ -50,9 +50,9 @@ public class NotifyController {
   }
 
   @GetMapping("get/by/level")
-  public ResponseEntity<List<Notify>> getNotifyByLevel(
-      @CookieValue("access-token") String token) {
-    return ResponseEntity.ok().body(notifyService.getAllNotifyForLevel(jwtUtil.getEmployeeName(token)));
+  public ResponseEntity<List<Notify>> getNotifyByLevel(@CookieValue("access-token") String token) {
+    return ResponseEntity.ok()
+        .body(notifyService.getAllNotifyForLevel(jwtUtil.getEmployeeName(token)));
   }
 
   @GetMapping("get/latest")
@@ -63,7 +63,8 @@ public class NotifyController {
   @GetMapping("get/all/with/read")
   public ResponseEntity<List<NotifyWithReadDTO>> getAllNotifyWithReadState(
       @CookieValue("access-token") String token) {
-    return ResponseEntity.ok().body(notifyService.getAllNotifyWithReadState(jwtUtil.getEmployeeName(token)));
+    return ResponseEntity.ok()
+        .body(notifyService.getAllNotifyWithReadState(jwtUtil.getEmployeeName(token)));
   }
 
   @DeleteMapping("delete/{id}")
@@ -83,8 +84,7 @@ public class NotifyController {
   }
 
   @GetMapping("count/notify")
-  public ResponseEntity<Long> getUnreadNotifyCount(
-      @CookieValue("access-token") String token) {
+  public ResponseEntity<Long> getUnreadNotifyCount(@CookieValue("access-token") String token) {
     return ResponseEntity.ok()
         .body(notifyService.countUnreadNotify(jwtUtil.getEmployeeName(token)));
   }
@@ -97,13 +97,16 @@ public class NotifyController {
   }
 
   @GetMapping("get/unread/list")
-  public ResponseEntity<List<Notify>> getNotifyListByUnReadEmployee(@CookieValue("access-token") String token) {
-    return ResponseEntity.ok().body(notifyService.getUnreadNotifyListByEmployee(jwtUtil.getEmployeeName(token)));
+  public ResponseEntity<List<Notify>> getNotifyListByUnReadEmployee(
+      @CookieValue("access-token") String token) {
+    return ResponseEntity.ok()
+        .body(notifyService.getUnreadNotifyListByEmployee(jwtUtil.getEmployeeName(token)));
   }
 
   @GetMapping("get/unread/all")
   public ResponseEntity<List<Notify>> getAllNotifyListByUnReadEmployee(
-          @CookieValue("access-token") String token) {
-    return ResponseEntity.ok().body(notifyService.getAllUnreadNotifyListByEmployee(jwtUtil.getEmployeeName(token)));
+      @CookieValue("access-token") String token) {
+    return ResponseEntity.ok()
+        .body(notifyService.getAllUnreadNotifyListByEmployee(jwtUtil.getEmployeeName(token)));
   }
 }

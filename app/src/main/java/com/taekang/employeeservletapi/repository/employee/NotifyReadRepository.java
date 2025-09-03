@@ -39,7 +39,10 @@ public interface NotifyReadRepository extends JpaRepository<NotifyRead, Long> {
         WHERE r.notify = n AND r.employee.id = :employeeId
       )
 """)
-  long countUnreadNotifyByEmployee(@Param("employeeId") Long employeeId, @Param("level") Level level, @Param("site") String site);
+  long countUnreadNotifyByEmployee(
+      @Param("employeeId") Long employeeId,
+      @Param("level") Level level,
+      @Param("site") String site);
 
   @Query("SELECT r.notify.id FROM NotifyRead r WHERE r.employee.id = :employeeId")
   List<Long> findNotifyIdsByEmployeeId(@Param("employeeId") Long employeeId);
@@ -58,7 +61,9 @@ public interface NotifyReadRepository extends JpaRepository<NotifyRead, Long> {
         """,
       nativeQuery = true)
   List<Notify> findReadNotifyListByEmployee(
-          @Param("employeeId") Long employeeId, @Param("level") Level level, @Param("site") String site);
+      @Param("employeeId") Long employeeId,
+      @Param("level") Level level,
+      @Param("site") String site);
 
   @Query(
       value =
@@ -74,7 +79,9 @@ public interface NotifyReadRepository extends JpaRepository<NotifyRead, Long> {
 """,
       nativeQuery = true)
   List<Notify> findUnreadNotifyListByEmployee(
-      @Param("employeeId") Long employeeId, @Param("level") Level level, @Param("site") String site);
+      @Param("employeeId") Long employeeId,
+      @Param("level") Level level,
+      @Param("site") String site);
 
   @Query(
       value =
@@ -91,5 +98,6 @@ public interface NotifyReadRepository extends JpaRepository<NotifyRead, Long> {
               ORDER BY n.insert_date_time DESC
           """,
       nativeQuery = true)
-  List<Notify> findUnreadNotifyAllLevelByEmployee(@Param("employeeId") Long employeeId, @Param("site") String site);
+  List<Notify> findUnreadNotifyAllLevelByEmployee(
+      @Param("employeeId") Long employeeId, @Param("site") String site);
 }

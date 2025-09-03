@@ -7,22 +7,24 @@ import org.springframework.stereotype.Component;
 
 @Component
 public class TelegramBotInfo {
-    private final TelegramBot bot;
-    private volatile String username;
+  private final TelegramBot bot;
+  private volatile String username;
 
-    @Autowired
-    public TelegramBotInfo(TelegramBot bot) {
-        this.bot = bot;
+  @Autowired
+  public TelegramBotInfo(TelegramBot bot) {
+    this.bot = bot;
+  }
+
+  @PostConstruct
+  public void init() {
+    var resp = bot.execute(new com.pengrad.telegrambot.request.GetMe());
+    if (!resp.isOk() || resp.user() == null || resp.user().username() == null) {
+      throw new IllegalStateException("Telegram getMe failed: " + resp.description());
     }
+    username = resp.user().username();
+  }
 
-    @PostConstruct
-    public void init() {
-        var resp = bot.execute(new com.pengrad.telegrambot.request.GetMe());
-        if (!resp.isOk() || resp.user() == null || resp.user().username() == null) {
-            throw new IllegalStateException("Telegram getMe failed: " + resp.description());
-        }
-        username = resp.user().username();
-    }
-
-    public String username() { return username; }
+  public String username() {
+    return username;
+  }
 }

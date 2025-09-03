@@ -21,10 +21,10 @@ public class Site extends BaseTimeEntity {
   @Column(name = "site", unique = true, nullable = false)
   private String site;
 
-  @Column(name = "telegram_username")  // 선택
+  @Column(name = "telegram_username") // 선택
   private String telegramUsername;
 
-  @Column(name = "telegram_chat_id", unique = true)   // 발송 키
+  @Column(name = "telegram_chat_id", unique = true) // 발송 키
   private Long telegramChatId;
 
   @Column(name = "telegram_link_token") // 1회용/기한부 토큰(선택)
@@ -44,9 +44,9 @@ public class Site extends BaseTimeEntity {
 
   public Site linkedTelegram(Long chatId, String username) {
     return this.toBuilder()
-            .telegramChatId(chatId)
-            .telegramUsername(username)
-            .telegramLinkToken(null) // 1회용 토큰 소모
-            .build();
+        .telegramChatId(chatId)
+        .telegramUsername(username)
+        .telegramLinkToken(null) // 1회용 토큰 소모
+        .build();
   }
 }

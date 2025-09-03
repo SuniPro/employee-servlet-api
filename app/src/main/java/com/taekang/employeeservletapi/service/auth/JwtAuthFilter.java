@@ -40,11 +40,11 @@ public class JwtAuthFilter extends OncePerRequestFilter {
   protected void doFilterInternal(
       HttpServletRequest request, HttpServletResponse response, FilterChain filterChain)
       throws ServletException, IOException {
-    
+
     // 2. 현재 요청 경로가 Whitelist에 있는지 확인
     String requestURI = request.getRequestURI();
     boolean isWhitelisted =
-            Arrays.stream(authWhitelist).anyMatch(pattern -> pathMatcher.match(pattern, requestURI));
+        Arrays.stream(authWhitelist).anyMatch(pattern -> pathMatcher.match(pattern, requestURI));
 
     // 3. Whitelist에 있다면, 토큰 검사를 생략하고 다음 필터로 바로 이동
     if (isWhitelisted) {
@@ -72,11 +72,11 @@ public class JwtAuthFilter extends OncePerRequestFilter {
         UserDetails userDetails = customEmployeeDetailService.loadUserByUsername(employeeName);
 
         UsernamePasswordAuthenticationToken authentication =
-                new UsernamePasswordAuthenticationToken(
-                        userDetails, null, userDetails.getAuthorities());
+            new UsernamePasswordAuthenticationToken(
+                userDetails, null, userDetails.getAuthorities());
 
         SecurityContextHolder.getContext().setAuthentication(authentication);
-      } 
+      }
     }
 
     filterChain.doFilter(request, response);

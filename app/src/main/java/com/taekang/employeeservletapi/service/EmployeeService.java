@@ -4,10 +4,9 @@ import com.taekang.employeeservletapi.DTO.EmployeeDTO;
 import com.taekang.employeeservletapi.DTO.EmployeeUpdateDTO;
 import com.taekang.employeeservletapi.DTO.RegisterRequestDTO;
 import com.taekang.employeeservletapi.entity.employee.Employee;
+import java.util.List;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.Pageable;
-
-import java.util.List;
 
 public interface EmployeeService {
 
@@ -25,7 +24,7 @@ public interface EmployeeService {
 
   Page<EmployeeDTO> getEmployeeListBySite(String site, Pageable pageable);
 
-//  Page<EmployeeDTO> getEmployeeListByLevel(Level level);
+  //  Page<EmployeeDTO> getEmployeeListByLevel(Level level);
 
   void deleteEmployeeById(String name, Long id);
 }

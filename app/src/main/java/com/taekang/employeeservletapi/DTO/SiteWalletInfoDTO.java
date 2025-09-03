@@ -13,25 +13,25 @@ import lombok.*;
 @AllArgsConstructor
 @ToString
 public class SiteWalletInfoDTO {
-    
-    private Long id;
-    
-    private String cryptoWallet;
 
-    private ChainType chainType;
+  private Long id;
 
-    @JsonFormat(shape = JsonFormat.Shape.STRING)
-    private BigDecimal balance;
+  private String cryptoWallet;
 
-    private long depositHistoryLength;
+  private ChainType chainType;
 
-    @JsonFormat(shape = JsonFormat.Shape.STRING)
-    private BigDecimal todayDepositAmount;
+  @JsonFormat(shape = JsonFormat.Shape.STRING)
+  private BigDecimal balance;
 
-    @JsonFormat(shape = JsonFormat.Shape.STRING)
-    private BigDecimal weeksDepositAmount;
+  private long depositHistoryLength;
 
-    private LocalDateTime insertDateTime;
+  @JsonFormat(shape = JsonFormat.Shape.STRING)
+  private BigDecimal todayDepositAmount;
 
-    private LocalDateTime updateDateTime;
+  @JsonFormat(shape = JsonFormat.Shape.STRING)
+  private BigDecimal weeksDepositAmount;
+
+  private LocalDateTime insertDateTime;
+
+  private LocalDateTime updateDateTime;
 }

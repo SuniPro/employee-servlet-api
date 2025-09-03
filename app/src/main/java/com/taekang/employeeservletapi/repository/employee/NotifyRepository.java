@@ -9,7 +9,7 @@ import org.springframework.stereotype.Repository;
 
 @Repository
 public interface NotifyRepository extends JpaRepository<Notify, Long> {
-  List<Notify> findByLevelGreaterThanEqualAndSite(Level levelIsGreaterThan,String site);
+  List<Notify> findByLevelGreaterThanEqualAndSite(Level levelIsGreaterThan, String site);
 
   Optional<Notify> findTopByOrderByInsertDateTimeDesc();
 }

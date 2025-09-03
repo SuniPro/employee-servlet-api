@@ -10,7 +10,7 @@ import lombok.*;
 @Builder(toBuilder = true)
 @ToString
 public class CreateSiteDTO {
-    private String site;
-    
-    private List<SiteWalletDTO> siteWalletList;
+  private String site;
+
+  private List<SiteWalletDTO> siteWalletList;
 }

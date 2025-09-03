@@ -3,6 +3,7 @@ package com.taekang.employeeservletapi.api;
 import com.taekang.employeeservletapi.DTO.BalanceResponseDTO;
 import com.taekang.employeeservletapi.entity.user.ChainType;
 import com.taekang.employeeservletapi.error.AccountNotFoundException;
+import java.net.URI;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.beans.factory.annotation.Value;
@@ -11,8 +12,6 @@ import org.springframework.stereotype.Component;
 import org.springframework.web.client.RestClientException;
 import org.springframework.web.client.RestTemplate;
 import org.springframework.web.util.UriComponentsBuilder;
-
-import java.net.URI;
 
 @Slf4j
 @Component

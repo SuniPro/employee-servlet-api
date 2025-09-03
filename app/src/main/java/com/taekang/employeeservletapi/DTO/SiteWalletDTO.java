@@ -10,10 +10,10 @@ import lombok.*;
 @NoArgsConstructor
 @AllArgsConstructor
 public class SiteWalletDTO {
-    
-    private Long id;
-    
-    private String cryptoWallet;
 
-    private ChainType chainType;
+  private Long id;
+
+  private String cryptoWallet;
+
+  private ChainType chainType;
 }

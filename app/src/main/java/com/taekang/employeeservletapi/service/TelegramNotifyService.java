@@ -6,13 +6,12 @@ import com.pengrad.telegrambot.model.request.ParseMode;
 import com.pengrad.telegrambot.request.SendMessage;
 import com.pengrad.telegrambot.response.SendResponse;
 import com.taekang.employeeservletapi.DTO.crypto.DepositNotifyDTO;
-import lombok.extern.slf4j.Slf4j;
-import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.stereotype.Service;
-
 import java.text.NumberFormat;
 import java.time.format.DateTimeFormatter;
 import java.util.Locale;
+import lombok.extern.slf4j.Slf4j;
+import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.stereotype.Service;
 
 @Service
 @Slf4j
@@ -29,9 +28,8 @@ public class TelegramNotifyService {
 
     LinkPreviewOptions lpo = new LinkPreviewOptions().isDisabled(true);
 
-    SendMessage req = new SendMessage(chatId, text)
-            .linkPreviewOptions(lpo)
-            .parseMode(ParseMode.Markdown);
+    SendMessage req =
+        new SendMessage(chatId, text).linkPreviewOptions(lpo).parseMode(ParseMode.Markdown);
 
     SendResponse res = telegramBot.execute(req);
     if (!res.isOk()) {
@@ -48,10 +46,22 @@ public class TelegramNotifyService {
 
     // 인덴트 없이 깔끔하게 (텔레그램 Markdown: *, _, ` 만 사용 권장)
     return "*입금 알림*\n"
-           + "*이메일:* `" + dto.getEmail() + "`\n"
-           + "*지갑주소:* `" + dto.getFromAddress() + "`\n"
-           + "*금액 (" + dto.getCryptoType() + " / 개수):* `" + amount + "`\n"
-           + "*금액 (원 / ₩):* `" + krw + "`\n"
-           + "*요청시각:* `" + when + "`";
+        + "*이메일:* `"
+        + dto.getEmail()
+        + "`\n"
+        + "*지갑주소:* `"
+        + dto.getFromAddress()
+        + "`\n"
+        + "*금액 ("
+        + dto.getCryptoType()
+        + " / 개수):* `"
+        + amount
+        + "`\n"
+        + "*금액 (원 / ₩):* `"
+        + krw
+        + "`\n"
+        + "*요청시각:* `"
+        + when
+        + "`";
   }
 }

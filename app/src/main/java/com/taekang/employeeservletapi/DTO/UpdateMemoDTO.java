@@ -9,6 +9,6 @@ import lombok.*;
 @NoArgsConstructor
 @AllArgsConstructor
 public class UpdateMemoDTO {
-    private Long id;
-    private String memo;
+  private Long id;
+  private String memo;
 }

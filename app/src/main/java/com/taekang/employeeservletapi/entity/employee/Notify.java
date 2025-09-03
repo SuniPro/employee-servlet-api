@@ -29,7 +29,7 @@ public class Notify {
   @Column(name = "contents", nullable = false)
   private String contents;
 
-  @Column(name= "site", nullable = false)
+  @Column(name = "site", nullable = false)
   private String site;
 
   @Column(name = "insert_date_time", nullable = false)

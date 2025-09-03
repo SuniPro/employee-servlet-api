@@ -10,8 +10,8 @@ import lombok.*;
 @NoArgsConstructor
 @AllArgsConstructor
 public class UpdateIsSendDTO {
-    private Long id;
+  private Long id;
 
-    @JsonProperty("isSend")
-    private boolean isSend;
+  @JsonProperty("isSend")
+  private boolean isSend;
 }

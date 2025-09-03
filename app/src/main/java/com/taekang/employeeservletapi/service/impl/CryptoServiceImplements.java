@@ -39,11 +39,13 @@ public class CryptoServiceImplements implements CryptoService {
 
   @Autowired
   public CryptoServiceImplements(
-          CryptoAccountRepository cryptoAccountRepository,
-          CryptoDepositRepository cryptoDepositRepository,
-          CryptoBalanceAPI cryptoBalanceAPI,
-          MessageProducer messageProducer,
-          ModelMapper modelMapper, SiteRepository siteRepository, SiteWalletRepository siteWalletRepository) {
+      CryptoAccountRepository cryptoAccountRepository,
+      CryptoDepositRepository cryptoDepositRepository,
+      CryptoBalanceAPI cryptoBalanceAPI,
+      MessageProducer messageProducer,
+      ModelMapper modelMapper,
+      SiteRepository siteRepository,
+      SiteWalletRepository siteWalletRepository) {
     this.cryptoAccountRepository = cryptoAccountRepository;
     this.cryptoDepositRepository = cryptoDepositRepository;
     this.cryptoBalanceAPI = cryptoBalanceAPI;
@@ -170,7 +172,8 @@ public class CryptoServiceImplements implements CryptoService {
             .findByCryptoWallet(save.getFromAddress())
             .orElseThrow(AccountNotFoundException::new);
 
-    DepositSentApprovalNotifyDTO message = DepositSentApprovalNotifyDTO.builder()
+    DepositSentApprovalNotifyDTO message =
+        DepositSentApprovalNotifyDTO.builder()
             .email(cryptoAccount.getEmail())
             .cryptoType(save.getCryptoType())
             .amount(save.getAmount())

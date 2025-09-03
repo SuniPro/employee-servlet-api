@@ -21,7 +21,8 @@ import org.springframework.web.bind.annotation.*;
 public class FinancialController {
 
   private static final String DEFAULT_ACCESS =
-      "hasAnyAuthority('LEVEL_ADMINISTRATOR','LEVEL_MANAGER', 'LEVEL_OFFICEMANAGER', 'LEVEL_SENIORMANAGER')";
+      "hasAnyAuthority('LEVEL_ADMINISTRATOR','LEVEL_MANAGER', 'LEVEL_OFFICEMANAGER',"
+          + " 'LEVEL_SENIORMANAGER')";
 
   private static final String MANAGER_ACCESS =
       "hasAnyAuthority('LEVEL_ADMINISTRATOR','LEVEL_MANAGER')";

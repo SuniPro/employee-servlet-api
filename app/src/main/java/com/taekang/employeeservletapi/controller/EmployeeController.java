@@ -6,6 +6,7 @@ import com.taekang.employeeservletapi.DTO.RegisterRequestDTO;
 import com.taekang.employeeservletapi.entity.employee.Employee;
 import com.taekang.employeeservletapi.service.EmployeeService;
 import com.taekang.employeeservletapi.service.auth.JwtUtil;
+import java.util.List;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.Pageable;
@@ -15,14 +16,13 @@ import org.springframework.http.ResponseEntity;
 import org.springframework.security.access.prepost.PreAuthorize;
 import org.springframework.web.bind.annotation.*;
 
-import java.util.List;
-
 @RestController
 @RequestMapping("employee")
 public class EmployeeController {
 
   private static final String MANAGER_ACCESS =
-          "hasAnyAuthority('LEVEL_ADMINISTRATOR','LEVEL_MANAGER', 'LEVEL_OFFICEMANAGER', 'LEVEL_SENIORMANAGER')";
+      "hasAnyAuthority('LEVEL_ADMINISTRATOR','LEVEL_MANAGER', 'LEVEL_OFFICEMANAGER',"
+          + " 'LEVEL_SENIORMANAGER')";
 
   private final EmployeeService employeeService;
   private final JwtUtil jwtUtil;
@@ -30,12 +30,13 @@ public class EmployeeController {
   @Autowired
   public EmployeeController(EmployeeService employeeService, JwtUtil jwtUtil) {
     this.employeeService = employeeService;
-      this.jwtUtil = jwtUtil;
+    this.jwtUtil = jwtUtil;
   }
 
   @PreAuthorize(MANAGER_ACCESS)
   @PostMapping("create")
-  public ResponseEntity<Employee> createEmployee(@CookieValue("access-token") String token,
+  public ResponseEntity<Employee> createEmployee(
+      @CookieValue("access-token") String token,
       @RequestBody RegisterRequestDTO registerRequestDTO) {
 
     String name = jwtUtil.getEmployeeName(token);
@@ -74,13 +75,15 @@ public class EmployeeController {
 
   @GetMapping("get/all/{site}")
   public ResponseEntity<Page<EmployeeDTO>> getAllEmployeeListBySite(
-          @PageableDefault(size = 10, sort = "insertDateTime", direction = Sort.Direction.DESC)
-          Pageable pageable, @PathVariable String site) {
+      @PageableDefault(size = 10, sort = "insertDateTime", direction = Sort.Direction.DESC)
+          Pageable pageable,
+      @PathVariable String site) {
     return ResponseEntity.ok().body(employeeService.getEmployeeListBySite(site, pageable));
   }
 
   @DeleteMapping("delete/by/{id}")
-  public ResponseEntity<Long> deleteEmployee(@CookieValue("access-token") String token, @PathVariable Long id) {
+  public ResponseEntity<Long> deleteEmployee(
+      @CookieValue("access-token") String token, @PathVariable Long id) {
     String name = jwtUtil.getEmployeeName(token);
     employeeService.deleteEmployeeById(name, id);
 

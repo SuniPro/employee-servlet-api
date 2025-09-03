@@ -16,56 +16,59 @@ import org.springframework.transaction.annotation.Transactional;
 @Service
 public class TelegramLinkService {
 
-    private final SiteRepository siteRepository;
-    private final TelegramBotInfo botInfo;
+  private final SiteRepository siteRepository;
+  private final TelegramBotInfo botInfo;
 
-    @Autowired
-    public TelegramLinkService(SiteRepository siteRepository, TelegramBotInfo botInfo) {
-        this.siteRepository = siteRepository;
-        this.botInfo = botInfo;
+  @Autowired
+  public TelegramLinkService(SiteRepository siteRepository, TelegramBotInfo botInfo) {
+    this.siteRepository = siteRepository;
+    this.botInfo = botInfo;
+  }
+
+  @Transactional
+  public String issueLinkToken(String siteCode) {
+    Site site =
+        siteRepository
+            .findBySite(siteCode)
+            .orElseThrow(() -> new IllegalArgumentException("site not found"));
+
+    String token = UUID.randomUUID().toString().replace("-", "");
+
+    siteRepository.save(site.toBuilder().telegramLinkToken(token).build());
+
+    return "https://t.me/" + botInfo.username() + "?start=" + token;
+  }
+
+  @Transactional
+  public Site consumeLinkTokenAndLink(String token, Long chatId, String username) {
+    Site site =
+        siteRepository.findByTelegramLinkToken(token).orElseThrow(TokenNotValidateException::new);
+
+    if (Objects.equals(site.getTelegramChatId(), chatId)) {
+      throw new AlreadyTelegramConnectException();
     }
 
-    @Transactional
-    public String issueLinkToken(String siteCode) {
-        Site site = siteRepository.findBySite(siteCode)
-                .orElseThrow(() -> new IllegalArgumentException("site not found"));
-
-        String token = UUID.randomUUID().toString().replace("-", "");
-
-        siteRepository.save(site.toBuilder().telegramLinkToken(token).build());
-
-        return "https://t.me/" + botInfo.username() + "?start=" + token;
+    if (siteRepository.existsByTelegramChatId(chatId)) {
+      throw new TokenNotValidateException();
     }
 
-    @Transactional
-    public Site consumeLinkTokenAndLink(String token, Long chatId, String username) {
-        Site site = siteRepository.findByTelegramLinkToken(token)
-                .orElseThrow(TokenNotValidateException::new);
+    Site updated =
+        site.toBuilder()
+            .telegramChatId(chatId)
+            .telegramUsername(username) // 최신 username으로 업데이트(선택)
+            .telegramLinkToken(null) // 1회용 토큰 소모
+            .build();
 
-        if (Objects.equals(site.getTelegramChatId(), chatId)) {
-            throw new AlreadyTelegramConnectException();
-        }
+    return siteRepository.save(updated);
+  }
 
-        if (siteRepository.existsByTelegramChatId(chatId)){
-            throw new TokenNotValidateException();
-        }
+  @Transactional
+  public void unlinkTelegram(String siteCode) {
+    Site site =
+        siteRepository
+            .findBySite(siteCode)
+            .orElseThrow(() -> new IllegalArgumentException("site not found"));
 
-        Site updated = site.toBuilder()
-                .telegramChatId(chatId)
-                .telegramUsername(username) // 최신 username으로 업데이트(선택)
-                .telegramLinkToken(null)    // 1회용 토큰 소모
-                .build();
-
-        return siteRepository.save(updated);
-    }
-
-    @Transactional
-    public void unlinkTelegram(String siteCode) {
-        Site site = siteRepository.findBySite(siteCode)
-                .orElseThrow(() -> new IllegalArgumentException("site not found"));
-
-        siteRepository.save(site.toBuilder()
-                .telegramChatId(null)
-                .build());
-    }
+    siteRepository.save(site.toBuilder().telegramChatId(null).build());
+  }
 }

@@ -41,15 +41,18 @@ public class SiteServiceImpl implements SiteService {
 
   @Autowired
   public SiteServiceImpl(
-          SiteRepository siteRepository,
-          SiteWalletRepository siteWalletRepository, CryptoAccountRepository cryptoAccountRepository, CryptoDepositRepository cryptoDepositRepository, CryptoBalanceAPI cryptoBalanceAPI,
-          ModelMapper modelMapper) {
+      SiteRepository siteRepository,
+      SiteWalletRepository siteWalletRepository,
+      CryptoAccountRepository cryptoAccountRepository,
+      CryptoDepositRepository cryptoDepositRepository,
+      CryptoBalanceAPI cryptoBalanceAPI,
+      ModelMapper modelMapper) {
     this.siteRepository = siteRepository;
     this.siteWalletRepository = siteWalletRepository;
-      this.cryptoAccountRepository = cryptoAccountRepository;
-      this.cryptoDepositRepository = cryptoDepositRepository;
-      this.cryptoBalanceAPI = cryptoBalanceAPI;
-      this.modelMapper = modelMapper;
+    this.cryptoAccountRepository = cryptoAccountRepository;
+    this.cryptoDepositRepository = cryptoDepositRepository;
+    this.cryptoBalanceAPI = cryptoBalanceAPI;
+    this.modelMapper = modelMapper;
   }
 
   public SiteDTO toSiteDTO(Site site) {
@@ -145,12 +148,10 @@ public class SiteServiceImpl implements SiteService {
   @Override
   public SiteOnlyDTO updateOnlySite(UpdateSiteDTO updateSiteDTO, String name) {
     // 1) 기존 Site 조회(merge 위험 제거)
-    Site current = siteRepository.findById(updateSiteDTO.getId()).orElseThrow(CannotFoundSiteException::new);
+    Site current =
+        siteRepository.findById(updateSiteDTO.getId()).orElseThrow(CannotFoundSiteException::new);
 
-    Site updated = current.toBuilder()
-            .site(updateSiteDTO.getSite())
-            .updateId(name)
-            .build();
+    Site updated = current.toBuilder().site(updateSiteDTO.getSite()).updateId(name).build();
 
     siteRepository.save(updated); // merge 1회
 
@@ -169,7 +170,7 @@ public class SiteServiceImpl implements SiteService {
             .orElseThrow(CannotFoundWalletException::new);
 
     SiteWallet build =
-            byId.toBuilder()
+        byId.toBuilder()
             .cryptoWallet(updateCryptoWalletDTO.getCryptoWallet())
             .chainType(updateCryptoWalletDTO.getChainType())
             .updateId(name)
@@ -205,43 +206,45 @@ public class SiteServiceImpl implements SiteService {
     LocalDateTime now = LocalDateTime.now();
     LocalDateTime beforeOneWeeks = now.minusWeeks(1);
 
-    siteWalletList.forEach(wallet -> {
-      BalanceResponseDTO balance = cryptoBalanceAPI.getBalance(wallet.getChainType(), wallet.getCryptoWallet());
+    siteWalletList.forEach(
+        wallet -> {
+          BalanceResponseDTO balance =
+              cryptoBalanceAPI.getBalance(wallet.getChainType(), wallet.getCryptoWallet());
 
-      List<CryptoDeposit> deposits =
+          List<CryptoDeposit> deposits =
               cryptoDepositRepository.findByCryptoAccount_SiteAndRequestedAtBetween(
-                      site, beforeOneWeeks, beforeOneWeeks);
+                  site, beforeOneWeeks, beforeOneWeeks);
 
-      BigDecimal weeksDepositAmount = BigDecimal.ZERO;
-      BigDecimal todayDepositAmount = BigDecimal.ZERO;
+          BigDecimal weeksDepositAmount = BigDecimal.ZERO;
+          BigDecimal todayDepositAmount = BigDecimal.ZERO;
 
-      LocalDate today = now.toLocalDate();
+          LocalDate today = now.toLocalDate();
 
-      for (CryptoDeposit deposit : deposits) {
-        BigDecimal amount = deposit.getKrwAmount();
-        weeksDepositAmount = weeksDepositAmount.add(amount);
+          for (CryptoDeposit deposit : deposits) {
+            BigDecimal amount = deposit.getKrwAmount();
+            weeksDepositAmount = weeksDepositAmount.add(amount);
 
-        // 날짜가 오늘과 같은 경우
-        if (deposit.getRequestedAt().toLocalDate().isEqual(today)) {
-          todayDepositAmount = todayDepositAmount.add(amount);
-        }
-      }
+            // 날짜가 오늘과 같은 경우
+            if (deposit.getRequestedAt().toLocalDate().isEqual(today)) {
+              todayDepositAmount = todayDepositAmount.add(amount);
+            }
+          }
 
-      SiteWalletInfoDTO siteWalletInfoDTO = SiteWalletInfoDTO.builder()
-              .id(wallet.getId())
-              .cryptoWallet(wallet.getCryptoWallet())
-              .chainType(wallet.getChainType())
-              .balance(balance.getBalance())
-              .depositHistoryLength(depositHistoryLength)
-              .todayDepositAmount(todayDepositAmount)
-              .weeksDepositAmount(weeksDepositAmount)
-              .insertDateTime(wallet.getInsertDateTime())
-              .updateDateTime(wallet.getUpdateDateTime())
-              .build();
+          SiteWalletInfoDTO siteWalletInfoDTO =
+              SiteWalletInfoDTO.builder()
+                  .id(wallet.getId())
+                  .cryptoWallet(wallet.getCryptoWallet())
+                  .chainType(wallet.getChainType())
+                  .balance(balance.getBalance())
+                  .depositHistoryLength(depositHistoryLength)
+                  .todayDepositAmount(todayDepositAmount)
+                  .weeksDepositAmount(weeksDepositAmount)
+                  .insertDateTime(wallet.getInsertDateTime())
+                  .updateDateTime(wallet.getUpdateDateTime())
+                  .build();
 
-      result.add(siteWalletInfoDTO);
-    });
-
+          result.add(siteWalletInfoDTO);
+        });
 
     return result;
   }

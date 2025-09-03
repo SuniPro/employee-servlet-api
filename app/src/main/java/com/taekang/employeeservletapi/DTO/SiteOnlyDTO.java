@@ -1,8 +1,7 @@
 package com.taekang.employeeservletapi.DTO;
 
-import lombok.*;
-
 import java.time.LocalDateTime;
+import lombok.*;
 
 @Getter
 @Setter
@@ -11,17 +10,17 @@ import java.time.LocalDateTime;
 @AllArgsConstructor
 public class SiteOnlyDTO {
 
-    private Long id;
+  private Long id;
 
-    private String site;
+  private String site;
 
-    private String telegramUsername;
-    private Long telegramChatId;
+  private String telegramUsername;
+  private Long telegramChatId;
 
-    private LocalDateTime insertDateTime;
-    private String insertId;
-    private LocalDateTime updateDateTime;
-    private String updateId;
-    private LocalDateTime deleteDateTime;
-    private String deleteId;
+  private LocalDateTime insertDateTime;
+  private String insertId;
+  private LocalDateTime updateDateTime;
+  private String updateId;
+  private LocalDateTime deleteDateTime;
+  private String deleteId;
 }

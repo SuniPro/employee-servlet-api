@@ -22,7 +22,6 @@ public enum ErrorCode {
   PASSWORD_INCORRECT("C401", "잘못된 패스워드입니다.", HttpStatus.UNAUTHORIZED),
   NAME_INCORRECT("C401", "잘못된 이름입니다.", HttpStatus.UNAUTHORIZED),
 
-
   /* Auth */
   TOKEN_EXPIRE("C401", "이미 만료된 토큰입니다.", HttpStatus.UNAUTHORIZED),
   TOKEN_ABNORMALITY("C401", "이미 만료된 토큰입니다.", HttpStatus.UNAUTHORIZED),
@@ -30,7 +29,6 @@ public enum ErrorCode {
   CANNOT_FIND_TOKEN("C401", "토큰을 찾을 수 없습니다.", HttpStatus.UNAUTHORIZED),
   IS_NOT_REFRESH_TOKEN("C400", "리프레시 토큰이 아닙니다.", HttpStatus.BAD_REQUEST),
   IS_NOT_ACCESS_TOKEN("C400", "엑세스 토큰이 아닙니다.", HttpStatus.BAD_REQUEST),
-
 
   ABILITY_IS_EMPTY("S404", "해당 직원의 평가 기록이 없습니다.", HttpStatus.BAD_REQUEST),
 
@@ -45,7 +43,7 @@ public enum ErrorCode {
   INVALID_AMOUNT("C400", "잘못된 금액입니다.", HttpStatus.BAD_REQUEST),
   DEPOSIT_VERIFICATION("C400", "계정과 금액이 일치하지 않습니다.", HttpStatus.BAD_REQUEST),
   DEPOSIT_NOT_FOUND_OR_ALREADY_APPROVED(
-          "C400", "입금기록을 찾을 수 없거나, 이미 승인되었습니다.", HttpStatus.BAD_REQUEST),
+      "C400", "입금기록을 찾을 수 없거나, 이미 승인되었습니다.", HttpStatus.BAD_REQUEST),
   DEPOSIT_NOT_FOUND("D404", "입금 정보를 찾을 수 없습니다.", HttpStatus.NOT_FOUND),
   ALREADY_TETHER_WALLET("D400", "이미 존재하는 지갑입니다.", HttpStatus.BAD_REQUEST),
   IS_NOT_SUPPORT_WALLET_TYPE("S400", "지원하지 않는 지갑 형식입니다.", HttpStatus.BAD_REQUEST),

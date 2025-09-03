@@ -11,21 +11,21 @@ import org.springframework.stereotype.Service;
 @Service
 public class MessageProducer {
 
-    @Value("${rabbitmq.transaction.exchange}")
-    private String transactionExchangeName;
+  @Value("${rabbitmq.transaction.exchange}")
+  private String transactionExchangeName;
 
-    @Value("${rabbitmq.deposit.approval.routing}")
-    private String depositApprovalRoutingKey;
-    
-    private final RabbitTemplate rabbitTemplate;
+  @Value("${rabbitmq.deposit.approval.routing}")
+  private String depositApprovalRoutingKey;
 
-    @Autowired
-    public MessageProducer(RabbitTemplate rabbitTemplate) {
-        this.rabbitTemplate = rabbitTemplate;
-    }
+  private final RabbitTemplate rabbitTemplate;
 
-    public void sendDepositSendMessage(DepositSentApprovalNotifyDTO message) {
-        log.info("Sent deposit message: {}", message.toString());
-        rabbitTemplate.convertAndSend(transactionExchangeName, depositApprovalRoutingKey, message);
-    }
+  @Autowired
+  public MessageProducer(RabbitTemplate rabbitTemplate) {
+    this.rabbitTemplate = rabbitTemplate;
+  }
+
+  public void sendDepositSendMessage(DepositSentApprovalNotifyDTO message) {
+    log.info("Sent deposit message: {}", message.toString());
+    rabbitTemplate.convertAndSend(transactionExchangeName, depositApprovalRoutingKey, message);
+  }
 }

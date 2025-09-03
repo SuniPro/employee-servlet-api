@@ -14,25 +14,27 @@ import org.springframework.stereotype.Service;
 @Service
 public class MessageConsumer {
 
-    private final SiteRepository siteRepository;
-    private final TelegramNotifyService telegramNotifyService;
+  private final SiteRepository siteRepository;
+  private final TelegramNotifyService telegramNotifyService;
 
-    @Autowired
-    public MessageConsumer(SiteRepository siteRepository, TelegramNotifyService telegramNotifyService) {
-        this.siteRepository = siteRepository;
-        this.telegramNotifyService = telegramNotifyService;
+  @Autowired
+  public MessageConsumer(
+      SiteRepository siteRepository, TelegramNotifyService telegramNotifyService) {
+    this.siteRepository = siteRepository;
+    this.telegramNotifyService = telegramNotifyService;
+  }
+
+  @RabbitListener(queues = "${rabbitmq.deposit.request.queue}")
+  public void receiveDepositMessage(DepositNotifyDTO message) {
+    log.info("Received deposit message: {}", message.toString());
+
+    Site site =
+        siteRepository.findBySite(message.getSite()).orElseThrow(CannotFoundSiteException::new);
+
+    boolean ok = telegramNotifyService.sendDepositRequest(site.getTelegramChatId(), message);
+
+    if (!ok) {
+      log.error("입금 요청 알림 실패");
     }
-
-    @RabbitListener(queues = "${rabbitmq.deposit.request.queue}")
-    public void receiveDepositMessage(DepositNotifyDTO message) {
-        log.info("Received deposit message: {}", message.toString());
-
-        Site site = siteRepository.findBySite(message.getSite()).orElseThrow(CannotFoundSiteException::new);
-
-        boolean ok = telegramNotifyService.sendDepositRequest(site.getTelegramChatId(), message);
-
-        if (!ok){
-            log.error("입금 요청 알림 실패");
-        }
-    }
+  }
 }

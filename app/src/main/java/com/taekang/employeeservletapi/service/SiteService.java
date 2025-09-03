@@ -17,7 +17,7 @@ public interface SiteService {
   SiteDTO createSite(CreateSiteDTO createSiteDTO, String name);
 
   SiteOnlyDTO updateOnlySite(UpdateSiteDTO updateSiteDTO, String name);
-  
+
   SiteWalletDTO updateSiteWallet(UpdateCryptoWalletDTO updateCryptoWalletDTO, String name);
 
   List<SiteWalletInfoDTO> getSiteWalletInfoBySite(String site);

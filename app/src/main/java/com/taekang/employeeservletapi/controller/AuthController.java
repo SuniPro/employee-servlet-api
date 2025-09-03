@@ -18,6 +18,7 @@ public class AuthController {
 
   @Value("${server.servlet.context-path}")
   private String contextPath;
+
   @Value("${admin.domain}")
   private String adminDomain;
 
@@ -49,8 +50,8 @@ public class AuthController {
             .httpOnly(true)
             //                    일단 프로토타입은 Http도 혀용
             //                    .secure(true)
-                .domain(adminDomain)
-                .path("/")
+            .domain(adminDomain)
+            .path("/")
             .maxAge(tokenResponse.getAccessTokenExpiresIn())
             .sameSite("Strict")
             .build();
@@ -61,7 +62,7 @@ public class AuthController {
             .httpOnly(true)
             //                    일단 프로토타입은 Http도 혀용
             //                    .secure(true)
-                .domain(adminDomain)
+            .domain(adminDomain)
             .path("/")
             .maxAge(tokenResponse.getRefreshTokenExpiresIn())
             .sameSite("Strict")
@@ -90,30 +91,30 @@ public class AuthController {
     TokenResponse tokenResponse = authService.refresh(refreshToken);
 
     ResponseCookie accessCookie =
-            ResponseCookie.from("access-token", tokenResponse.getAccessToken())
-                    .httpOnly(true)
-                    //                    일단 프로토타입은 Http도 혀용
-                    //                    .secure(true)
-                    .domain(adminDomain)
-                    .path("/")
-                    .maxAge(tokenResponse.getAccessTokenExpiresIn())
-                    .sameSite("Strict")
-                    .build();
+        ResponseCookie.from("access-token", tokenResponse.getAccessToken())
+            .httpOnly(true)
+            //                    일단 프로토타입은 Http도 혀용
+            //                    .secure(true)
+            .domain(adminDomain)
+            .path("/")
+            .maxAge(tokenResponse.getAccessTokenExpiresIn())
+            .sameSite("Strict")
+            .build();
 
     // Refresh Token Cookie
     ResponseCookie refreshCookie =
-            ResponseCookie.from("refresh-token", tokenResponse.getRefreshToken())
-                    .httpOnly(true)
-                    //                    일단 프로토타입은 Http도 혀용
-                    //                    .secure(true)
-                    .domain(adminDomain)
-                    .path("/")
-                    .maxAge(tokenResponse.getRefreshTokenExpiresIn())
-                    .sameSite("Strict")
-                    .build();
+        ResponseCookie.from("refresh-token", tokenResponse.getRefreshToken())
+            .httpOnly(true)
+            //                    일단 프로토타입은 Http도 혀용
+            //                    .secure(true)
+            .domain(adminDomain)
+            .path("/")
+            .maxAge(tokenResponse.getRefreshTokenExpiresIn())
+            .sameSite("Strict")
+            .build();
 
     return ResponseEntity.ok()
-            .header(HttpHeaders.SET_COOKIE, accessCookie.toString(), refreshCookie.toString())
-            .build();
+        .header(HttpHeaders.SET_COOKIE, accessCookie.toString(), refreshCookie.toString())
+        .build();
   }
 }

@@ -9,6 +9,6 @@ import lombok.*;
 @NoArgsConstructor
 @AllArgsConstructor
 public class UpdateSiteDTO {
-    private Long id;
-    private String site;
+  private Long id;
+  private String site;
 }

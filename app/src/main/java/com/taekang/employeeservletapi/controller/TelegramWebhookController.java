@@ -22,6 +22,7 @@ import org.springframework.web.bind.annotation.*;
 public class TelegramWebhookController {
 
   private final JwtUtil jwtUtil;
+
   @Value("${telegram.webhook-secret:}")
   private String webhookSecret;
 
@@ -33,7 +34,7 @@ public class TelegramWebhookController {
 
   @Autowired
   public TelegramWebhookController(
-          TelegramLinkService telegramLinkService, TelegramBot telegramBot, JwtUtil jwtUtil) {
+      TelegramLinkService telegramLinkService, TelegramBot telegramBot, JwtUtil jwtUtil) {
     this.telegramLinkService = telegramLinkService;
     this.telegramBot = telegramBot;
     this.jwtUtil = jwtUtil;
@@ -86,7 +87,8 @@ public class TelegramWebhookController {
 
   @PostMapping("/link-token")
   @PreAuthorize(MANAGER_ACCESS)
-  public ResponseEntity<Map<String, String>> issueLinkToken(@CookieValue("access-token") String token) {
+  public ResponseEntity<Map<String, String>> issueLinkToken(
+      @CookieValue("access-token") String token) {
     String site = jwtUtil.getSite(token);
     String url = telegramLinkService.issueLinkToken(site);
     return ResponseEntity.ok(Map.of("site", site, "link", url));

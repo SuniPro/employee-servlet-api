@@ -12,6 +12,6 @@ import lombok.*;
 @ToString
 public class BalanceResponseDTO {
 
-    @JsonFormat(shape = JsonFormat.Shape.STRING)
-    private BigDecimal balance;
+  @JsonFormat(shape = JsonFormat.Shape.STRING)
+  private BigDecimal balance;
 }

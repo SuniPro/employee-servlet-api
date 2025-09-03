@@ -27,7 +27,6 @@ public class TelegramNotifyService {
   public boolean sendDepositRequest(Long chatId, DepositNotifyDTO depositNotifyDTO) {
     String text = formatMarkdown(depositNotifyDTO);
 
-
     LinkPreviewOptions lpo = new LinkPreviewOptions().isDisabled(true);
 
     SendMessage req = new SendMessage(chatId, text)
@@ -50,9 +49,9 @@ public class TelegramNotifyService {
     // 인덴트 없이 깔끔하게 (텔레그램 Markdown: *, _, ` 만 사용 권장)
     return "*입금 알림*\n"
            + "*이메일:* `" + dto.getEmail() + "`\n"
-           + "*보낸 주소:* `" + dto.getFromAddress() + "`\n"
-           + "*금액:* `" + amount + "`\n"
-           + "*KRW:* `" + krw + "`\n"
+           + "*지갑주소:* `" + dto.getFromAddress() + "`\n"
+           + "*금액 (" + dto.getCryptoType() + " / 개수):* `" + amount + "`\n"
+           + "*금액 (원 / ₩):* `" + krw + "`\n"
            + "*요청시각:* `" + when + "`";
   }
 }

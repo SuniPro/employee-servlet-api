@@ -20,7 +20,7 @@ import java.util.Locale;
 
 @Slf4j
 @Component
-@ConditionalOnProperty(name = "telegram.polling.enabled", havingValue = "false", matchIfMissing = false)
+@ConditionalOnProperty(name = "telegram.polling.enabled", havingValue = "true", matchIfMissing = false)
 @RequiredArgsConstructor
 public class TelegramLongPollingRunner implements ApplicationRunner {
 

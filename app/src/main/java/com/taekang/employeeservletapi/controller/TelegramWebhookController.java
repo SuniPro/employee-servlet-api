@@ -6,6 +6,7 @@ import com.pengrad.telegrambot.request.SendMessage;
 import com.taekang.employeeservletapi.entity.employee.Site;
 import com.taekang.employeeservletapi.error.TokenNotValidateException;
 import com.taekang.employeeservletapi.service.TelegramLinkService;
+import com.taekang.employeeservletapi.service.auth.JwtUtil;
 import java.util.Map;
 import java.util.Objects;
 import lombok.extern.slf4j.Slf4j;
@@ -20,6 +21,7 @@ import org.springframework.web.bind.annotation.*;
 @RestController
 public class TelegramWebhookController {
 
+  private final JwtUtil jwtUtil;
   @Value("${telegram.webhook-secret:}")
   private String webhookSecret;
 
@@ -31,9 +33,10 @@ public class TelegramWebhookController {
 
   @Autowired
   public TelegramWebhookController(
-      TelegramLinkService telegramLinkService, TelegramBot telegramBot) {
+          TelegramLinkService telegramLinkService, TelegramBot telegramBot, JwtUtil jwtUtil) {
     this.telegramLinkService = telegramLinkService;
     this.telegramBot = telegramBot;
+    this.jwtUtil = jwtUtil;
   }
 
   @PostMapping("${telegram.webhook-path:/telegram/webhook}")
@@ -83,16 +86,18 @@ public class TelegramWebhookController {
 
   @PostMapping("/link-token")
   @PreAuthorize(MANAGER_ACCESS)
-  public ResponseEntity<Map<String, String>> issue(@RequestParam String siteCode) {
-    String url = telegramLinkService.issueLinkToken(siteCode);
-    return ResponseEntity.ok(Map.of("site", siteCode, "link", url));
+  public ResponseEntity<Map<String, String>> issueLinkToken(@CookieValue("access-token") String token) {
+    String site = jwtUtil.getSite(token);
+    String url = telegramLinkService.issueLinkToken(site);
+    return ResponseEntity.ok(Map.of("site", site, "link", url));
   }
 
   // (선택) 연결 해제
   @PostMapping("/unlink")
   @PreAuthorize(MANAGER_ACCESS)
-  public ResponseEntity<Void> unlink(@RequestParam String siteCode) {
-    telegramLinkService.unlinkTelegram(siteCode);
+  public ResponseEntity<Void> unlink(@CookieValue("access-token") String token) {
+    String site = jwtUtil.getSite(token);
+    telegramLinkService.unlinkTelegram(site);
     return ResponseEntity.ok().build();
   }
 }

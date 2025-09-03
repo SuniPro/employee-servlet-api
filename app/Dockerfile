@@ -4,6 +4,7 @@ WORKDIR /app
 
 COPY . .
 
+RUN chmod +x gradlew
 RUN ./gradlew bootJar --no-daemon
 
 FROM amazoncorretto:17-alpine

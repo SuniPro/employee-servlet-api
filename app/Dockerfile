@@ -3,7 +3,7 @@ FROM gradle:8.3.0-jdk17 AS build
 WORKDIR /app
 
 COPY . .
-RUN app
+
 RUN chmod +x gradlew
 RUN ./gradlew bootJar --no-daemon
 

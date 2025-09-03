@@ -15,7 +15,7 @@ jobs:
 
       - name: Set up application.properties
         run: |
-          cat <<EOF > ./src/main/resources/application.properties
+          cat <<EOF > ./app/src/main/resources/application.properties
           ${{ secrets.APPLICATION }}
           EOF
 
@@ -33,7 +33,7 @@ jobs:
 
       - name: Build and Push Docker Image
         run: |
-          docker buildx build --platform linux/amd64 -t ariel250225/employee-servlet-api:1.0.0 --push .
+          docker buildx build --platform linux/amd64 -t ariel250225/employee-servlet-api:1.0.0 --push ./app
 
       - name: Deploy to EC2 via SSH
         uses: appleboy/ssh-action@v1.0.0

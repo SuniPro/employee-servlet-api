@@ -56,6 +56,7 @@ public enum ErrorCode {
 
   /* Telegram */
   ALREADY_TELEGRAM_ID("C400", "텔레그램 ID가 이미 존재합니다.", HttpStatus.BAD_REQUEST),
+  ALREADY_TELEGRAM_CONNECT("C400", "텔레그램이 이미 연결되어있습니다.", HttpStatus.BAD_REQUEST),
   ;
 
   private final String code;

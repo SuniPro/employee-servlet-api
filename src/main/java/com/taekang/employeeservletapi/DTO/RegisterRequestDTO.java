@@ -4,6 +4,8 @@ import com.taekang.employeeservletapi.entity.employee.Department;
 import com.taekang.employeeservletapi.entity.employee.Level;
 import lombok.*;
 
+import java.util.List;
+
 @Getter
 @Setter
 @Builder(toBuilder = true)
@@ -22,5 +24,5 @@ public class RegisterRequestDTO {
 
   private Level level;
 
-  private String cryptoWallet;
+  private List<SiteWalletDTO> siteWalletList;
 }

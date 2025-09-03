@@ -6,11 +6,9 @@ import com.taekang.employeeservletapi.DTO.RegisterRequestDTO;
 import com.taekang.employeeservletapi.entity.employee.*;
 import com.taekang.employeeservletapi.error.DuplicateEmployeeException;
 import com.taekang.employeeservletapi.error.EmployeeNotFoundException;
-import com.taekang.employeeservletapi.error.IsNotSupportWalletTypeException;
 import com.taekang.employeeservletapi.repository.employee.*;
 import com.taekang.employeeservletapi.service.CryptoValidationService;
 import com.taekang.employeeservletapi.service.EmployeeService;
-import com.taekang.employeeservletapi.utils.WalletAddressType;
 import java.time.LocalDateTime;
 import java.time.ZoneId;
 import java.util.ArrayList;
@@ -79,22 +77,21 @@ public class EmployeeServiceImplements implements EmployeeService {
     if (!siteRepository.existsBySite(registerRequestDTO.getSite())) {
       Site site = Site.builder().site(registerRequestDTO.getSite()).insertId(name).build();
 
-      siteRepository.save(site);
+      Site save = siteRepository.save(site);
 
-      WalletAddressType type = WalletAddressType.of(registerRequestDTO.getCryptoWallet());
+      List<SiteWallet> list =
+          registerRequestDTO.getSiteWalletList().stream()
+              .map(
+                  wallet ->
+                      SiteWallet.builder()
+                              .site(save)
+                          .cryptoWallet(wallet.getCryptoWallet())
+                          .chainType(wallet.getChainType())
+                          .insertId(name)
+                          .build())
+              .toList();
 
-      if (!type.isInvalid(cryptoValidationService, registerRequestDTO.getCryptoWallet())) {
-        throw new IsNotSupportWalletTypeException();
-      }
-
-      SiteWallet siteWallet =
-          SiteWallet.builder()
-              .cryptoWallet(registerRequestDTO.getCryptoWallet())
-              .chainType(type.toChainType())
-              .insertId(name)
-              .build();
-
-      siteWalletRepository.save(siteWallet);
+      siteWalletRepository.saveAll(list);
     }
 
     return modelMapper.map(employee, Employee.class);

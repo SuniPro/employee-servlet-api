@@ -89,7 +89,7 @@ public class TelegramWebhookController {
     return ResponseEntity.ok().build();
   }
 
-  @PostMapping("/link-token")
+  @PostMapping("/employee/link-token")
   @PreAuthorize(MANAGER_ACCESS)
   public ResponseEntity<Map<String, String>> issueLinkToken(
       @CookieValue("access-token") String token) {
@@ -99,7 +99,7 @@ public class TelegramWebhookController {
   }
 
   // (선택) 연결 해제
-  @PostMapping("/unlink")
+  @PostMapping("/employee/unlink")
   @PreAuthorize(MANAGER_ACCESS)
   public ResponseEntity<Void> unlink(@CookieValue("access-token") String token) {
     String site = jwtUtil.getSite(token);

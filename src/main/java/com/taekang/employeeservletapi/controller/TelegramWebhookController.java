@@ -1,8 +1,10 @@
 package com.taekang.employeeservletapi.controller;
 
 import com.pengrad.telegrambot.TelegramBot;
-import com.pengrad.telegrambot.model.Update;
 import com.pengrad.telegrambot.request.SendMessage;
+import com.taekang.employeeservletapi.DTO.telegram.TelegramChat;
+import com.taekang.employeeservletapi.DTO.telegram.TelegramMessage;
+import com.taekang.employeeservletapi.DTO.telegram.TelegramUpdate;
 import com.taekang.employeeservletapi.entity.employee.Site;
 import com.taekang.employeeservletapi.error.TokenNotValidateException;
 import com.taekang.employeeservletapi.service.TelegramLinkService;
@@ -43,23 +45,24 @@ public class TelegramWebhookController {
   @PostMapping("${telegram.webhook-path:/telegram/webhook}")
   public ResponseEntity<Void> onUpdate(
       @RequestHeader(value = "X-Telegram-Bot-Api-Secret-Token", required = false) String secret,
-      @RequestBody Update update) {
+      @RequestBody TelegramUpdate update) {
 
     log.info("✅ Webhook 호출됨 - secret: {}, update: {}", secret, update);
 
-    if (StringUtils.hasText(webhookSecret)) {
-      if (!Objects.equals(secret, webhookSecret)) {
-        // 비정상 요청은 조용히 무시
-        return ResponseEntity.ok().build();
-      }
+    if (StringUtils.hasText(webhookSecret) && !Objects.equals(secret, webhookSecret)) {
+      return ResponseEntity.ok().build(); // 비정상 요청
     }
 
-    var msg = update.message();
-    if (msg == null) return ResponseEntity.ok().build();
+    if (update == null || update.getMessage() == null || update.getMessage().getChat() == null) {
+      return ResponseEntity.ok().build();
+    }
 
-    Long chatId = msg.chat().id();
-    String username = msg.chat().username();
-    String text = msg.text();
+    TelegramMessage msg = update.getMessage();
+    TelegramChat chat = msg.getChat();
+
+    Long chatId = chat.getId();
+    String username = chat.getUsername();
+    String text = msg.getText();
 
     if (text != null && text.toLowerCase().startsWith("/start")) {
       String[] parts = text.trim().split("\\s+");
@@ -71,12 +74,9 @@ public class TelegramWebhookController {
       String token = parts[1].trim();
       try {
         Site linked = telegramLinkService.consumeLinkTokenAndLink(token, chatId, username);
-
         telegramBot.execute(
             new SendMessage(chatId, "✅ 연결 완료! 이제 사이트 [" + linked.getSite() + "] 알림을 보내드려요."));
-
       } catch (TokenNotValidateException e) {
-        // 중복 chatId or 잘못된 토큰
         telegramBot.execute(new SendMessage(chatId, "❌ 이미 다른 사이트에 연결된 계정이거나, 잘못되었거나 만료된 링크입니다."));
       } catch (Exception e) {
         telegramBot.execute(new SendMessage(chatId, "⚠️ 처리 중 문제가 발생했습니다. 잠시 후 다시 시도해주세요."));

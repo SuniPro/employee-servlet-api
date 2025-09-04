@@ -17,7 +17,7 @@ import org.springframework.security.access.prepost.PreAuthorize;
 import org.springframework.web.bind.annotation.*;
 
 @RestController
-@RequestMapping("employee")
+@RequestMapping("/employee/employee")
 public class EmployeeController {
 
   private static final String MANAGER_ACCESS =

@@ -7,7 +7,6 @@ import org.springframework.data.jpa.repository.config.EnableJpaAuditing;
 
 @EnableJpaAuditing
 @SpringBootApplication
-@Profile("dev")
 public class EmployeeServletApiApplication {
 
   public static void main(String[] args) {

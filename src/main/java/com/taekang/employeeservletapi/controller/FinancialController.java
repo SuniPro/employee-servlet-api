@@ -17,7 +17,7 @@ import org.springframework.security.access.prepost.PreAuthorize;
 import org.springframework.web.bind.annotation.*;
 
 @RestController
-@RequestMapping("financial")
+@RequestMapping("/employee/financial")
 public class FinancialController {
 
   private static final String DEFAULT_ACCESS =

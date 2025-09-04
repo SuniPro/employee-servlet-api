@@ -4,6 +4,6 @@ import lombok.Data;
 
 @Data
 public class TelegramMessage {
-    private TelegramChat chat;
-    private String text;
+  private TelegramChat chat;
+  private String text;
 }

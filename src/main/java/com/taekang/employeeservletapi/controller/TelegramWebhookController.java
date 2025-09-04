@@ -44,6 +44,9 @@ public class TelegramWebhookController {
   public ResponseEntity<Void> onUpdate(
       @RequestHeader(value = "X-Telegram-Bot-Api-Secret-Token", required = false) String secret,
       @RequestBody Update update) {
+
+    log.info("✅ Webhook 호출됨 - secret: {}, update: {}", secret, update);
+
     if (StringUtils.hasText(webhookSecret)) {
       if (!Objects.equals(secret, webhookSecret)) {
         // 비정상 요청은 조용히 무시

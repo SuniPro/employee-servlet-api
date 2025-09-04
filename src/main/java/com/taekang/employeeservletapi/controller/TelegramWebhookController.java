@@ -1,7 +1,6 @@
 package com.taekang.employeeservletapi.controller;
 
 import com.pengrad.telegrambot.TelegramBot;
-import com.pengrad.telegrambot.model.Update;
 import com.pengrad.telegrambot.request.SendMessage;
 import com.taekang.employeeservletapi.DTO.telegram.TelegramChat;
 import com.taekang.employeeservletapi.DTO.telegram.TelegramMessage;
@@ -76,7 +75,7 @@ public class TelegramWebhookController {
       try {
         Site linked = telegramLinkService.consumeLinkTokenAndLink(token, chatId, username);
         telegramBot.execute(
-                new SendMessage(chatId, "✅ 연결 완료! 이제 사이트 [" + linked.getSite() + "] 알림을 보내드려요."));
+            new SendMessage(chatId, "✅ 연결 완료! 이제 사이트 [" + linked.getSite() + "] 알림을 보내드려요."));
       } catch (TokenNotValidateException e) {
         telegramBot.execute(new SendMessage(chatId, "❌ 이미 다른 사이트에 연결된 계정이거나, 잘못되었거나 만료된 링크입니다."));
       } catch (Exception e) {

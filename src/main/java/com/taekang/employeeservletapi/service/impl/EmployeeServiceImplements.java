@@ -102,7 +102,7 @@ public class EmployeeServiceImplements implements EmployeeService {
     if (employeeUpdateDTO.getPassword().isEmpty()) {
       return toEmployeeDTO(
           employeeRepository.save(
-                  employee.toBuilder()
+              employee.toBuilder()
                   .id(employeeUpdateDTO.getId())
                   .department(employeeUpdateDTO.getDepartment())
                   .level(employeeUpdateDTO.getLevel())
@@ -113,7 +113,7 @@ public class EmployeeServiceImplements implements EmployeeService {
     } else {
       return toEmployeeDTO(
           employeeRepository.save(
-                  employee.toBuilder()
+              employee.toBuilder()
                   .id(employeeUpdateDTO.getId())
                   .department(employeeUpdateDTO.getDepartment())
                   .level(employeeUpdateDTO.getLevel())

@@ -2,8 +2,8 @@ package com.taekang.employeeservletapi.entity.employee;
 
 import com.taekang.employeeservletapi.entity.BaseTimeEntity;
 import jakarta.persistence.*;
-import lombok.*;
 import java.time.LocalDateTime;
+import lombok.*;
 
 @Getter
 @Entity

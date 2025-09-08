@@ -11,13 +11,13 @@ import org.springframework.data.domain.AuditorAware;
 @Configuration
 public class JpaAuditingConfig {
 
-    @Bean
-    public AuditorAware<String> auditorProvider() {
-        return () -> Optional.of("administrator");
-    }
+  @Bean
+  public AuditorAware<String> auditorProvider() {
+    return () -> Optional.of("administrator");
+  }
 
-    @Bean
-    public DateTimeProvider auditingDateTimeProvider() {
-        return () -> Optional.of(LocalDateTime.now(ZoneId.of("Asia/Seoul"))); // KST
-    }
+  @Bean
+  public DateTimeProvider auditingDateTimeProvider() {
+    return () -> Optional.of(LocalDateTime.now(ZoneId.of("Asia/Seoul"))); // KST
+  }
 }

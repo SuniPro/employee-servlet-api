@@ -24,7 +24,7 @@ public class FinancialController {
       "hasAnyAuthority('LEVEL_DEVELOPER','LEVEL_ADMINISTRATOR','LEVEL_MANAGER', 'LEVEL_STAFF')";
 
   private static final String MANAGER_ACCESS =
-          "hasAnyAuthority('LEVEL_DEVELOPER','LEVEL_ADMINISTRATOR','LEVEL_MANAGER')";
+      "hasAnyAuthority('LEVEL_DEVELOPER','LEVEL_ADMINISTRATOR','LEVEL_MANAGER')";
 
   private final CryptoService cryptoService;
   private final JwtUtil jwtUtil;

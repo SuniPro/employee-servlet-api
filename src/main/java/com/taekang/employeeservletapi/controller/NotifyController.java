@@ -16,7 +16,7 @@ import org.springframework.web.bind.annotation.*;
 public class NotifyController {
 
   private static final String MANAGER_ACCESS =
-          "hasAnyAuthority('LEVEL_DEVELOPER','LEVEL_ADMINISTRATOR','LEVEL_MANAGER')";
+      "hasAnyAuthority('LEVEL_DEVELOPER','LEVEL_ADMINISTRATOR','LEVEL_MANAGER')";
 
   private final NotifyService notifyService;
   private final JwtUtil jwtUtil;

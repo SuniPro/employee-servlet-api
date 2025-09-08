@@ -29,7 +29,7 @@ public class TelegramWebhookController {
   private String webhookSecret;
 
   private static final String MANAGER_ACCESS =
-          "hasAnyAuthority('LEVEL_DEVELOPER','LEVEL_ADMINISTRATOR','LEVEL_MANAGER')";
+      "hasAnyAuthority('LEVEL_DEVELOPER','LEVEL_ADMINISTRATOR','LEVEL_MANAGER')";
 
   private final TelegramLinkService telegramLinkService;
   private final TelegramBot telegramBot;

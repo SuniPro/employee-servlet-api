@@ -4,6 +4,7 @@ import com.taekang.employeeservletapi.DTO.*;
 import com.taekang.employeeservletapi.DTO.crypto.UpdateCryptoWalletDTO;
 import com.taekang.employeeservletapi.service.SiteService;
 import com.taekang.employeeservletapi.service.auth.JwtUtil;
+import java.util.ArrayList;
 import java.util.List;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.data.domain.Page;
@@ -38,9 +39,12 @@ public class SiteController {
     return ResponseEntity.ok().body(siteService.getAllThoughPage(pageable));
   }
 
-  @GetMapping("get/{site}")
-  public ResponseEntity<SiteDTO> getSite(@PathVariable String site) {
-    return ResponseEntity.ok().body(siteService.getBySite(site));
+  @GetMapping("get")
+  public ResponseEntity<List<SiteDTO>> getSite(@CookieValue("access-token") String token) {
+    String site = jwtUtil.getSite(token);
+    List<SiteDTO> siteDTOList = new ArrayList<>();
+    siteDTOList.add(siteService.getBySite(site));
+    return ResponseEntity.ok().body(siteDTOList);
   }
 
   @PostMapping("create")

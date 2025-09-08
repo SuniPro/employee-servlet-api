@@ -6,11 +6,9 @@ import lombok.Getter;
 @Getter
 public enum Level {
   STAFF(1),
-  ASSOCIATE(2),
-  SENIORMANAGER(3),
-  OFFICEMANAGER(4),
-  MANAGER(5),
-  ADMINISTRATOR(6),
+  MANAGER(2),
+  ADMINISTRATOR(3),
+  DEVELOPER(4),
   ;
 
   private final int rank;

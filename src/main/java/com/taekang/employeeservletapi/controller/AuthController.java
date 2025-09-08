@@ -74,10 +74,10 @@ public class AuthController {
   @GetMapping("logout")
   public ResponseEntity<HttpStatus> logout() {
     ResponseCookie accessCookie =
-        ResponseCookie.from("access-token", "").path("/").maxAge(0).build();
+        ResponseCookie.from("access-token", "").path("/").domain(adminDomain).maxAge(0).build();
 
     ResponseCookie refreshCookie =
-        ResponseCookie.from("refresh-token", "").path("/").maxAge(0).build();
+        ResponseCookie.from("refresh-token", "").path("/").domain(adminDomain).maxAge(0).build();
 
     return ResponseEntity.ok()
         .header(HttpHeaders.SET_COOKIE, accessCookie.toString(), refreshCookie.toString())

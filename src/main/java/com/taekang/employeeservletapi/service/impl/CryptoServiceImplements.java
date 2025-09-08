@@ -2,14 +2,11 @@ package com.taekang.employeeservletapi.service.impl;
 
 import com.taekang.employeeservletapi.DTO.*;
 import com.taekang.employeeservletapi.DTO.crypto.*;
-import com.taekang.employeeservletapi.api.CryptoBalanceAPI;
 import com.taekang.employeeservletapi.entity.user.CryptoAccount;
 import com.taekang.employeeservletapi.entity.user.CryptoDeposit;
 import com.taekang.employeeservletapi.entity.user.TransactionStatus;
 import com.taekang.employeeservletapi.error.AccountNotFoundException;
 import com.taekang.employeeservletapi.rabbitMQ.MessageProducer;
-import com.taekang.employeeservletapi.repository.employee.SiteRepository;
-import com.taekang.employeeservletapi.repository.employee.SiteWalletRepository;
 import com.taekang.employeeservletapi.repository.user.CryptoAccountRepository;
 import com.taekang.employeeservletapi.repository.user.CryptoDepositRepository;
 import com.taekang.employeeservletapi.service.CryptoService;
@@ -30,29 +27,19 @@ public class CryptoServiceImplements implements CryptoService {
 
   private final CryptoDepositRepository cryptoDepositRepository;
 
-  private final CryptoBalanceAPI cryptoBalanceAPI;
-
   private final MessageProducer messageProducer;
   private final ModelMapper modelMapper;
-  private final SiteRepository siteRepository;
-  private final SiteWalletRepository siteWalletRepository;
 
   @Autowired
   public CryptoServiceImplements(
       CryptoAccountRepository cryptoAccountRepository,
       CryptoDepositRepository cryptoDepositRepository,
-      CryptoBalanceAPI cryptoBalanceAPI,
       MessageProducer messageProducer,
-      ModelMapper modelMapper,
-      SiteRepository siteRepository,
-      SiteWalletRepository siteWalletRepository) {
+      ModelMapper modelMapper) {
     this.cryptoAccountRepository = cryptoAccountRepository;
     this.cryptoDepositRepository = cryptoDepositRepository;
-    this.cryptoBalanceAPI = cryptoBalanceAPI;
     this.messageProducer = messageProducer;
     this.modelMapper = modelMapper;
-    this.siteRepository = siteRepository;
-    this.siteWalletRepository = siteWalletRepository;
   }
 
   private CryptoAccountDTO toCryptoAccountDTO(CryptoAccount cryptoAccount) {

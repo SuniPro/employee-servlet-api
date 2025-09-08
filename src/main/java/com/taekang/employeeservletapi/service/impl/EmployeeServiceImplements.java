@@ -7,7 +7,6 @@ import com.taekang.employeeservletapi.entity.employee.*;
 import com.taekang.employeeservletapi.error.DuplicateEmployeeException;
 import com.taekang.employeeservletapi.error.EmployeeNotFoundException;
 import com.taekang.employeeservletapi.repository.employee.*;
-import com.taekang.employeeservletapi.service.CryptoValidationService;
 import com.taekang.employeeservletapi.service.EmployeeService;
 import java.time.LocalDateTime;
 import java.time.ZoneId;
@@ -30,8 +29,6 @@ public class EmployeeServiceImplements implements EmployeeService {
   private final SiteRepository siteRepository;
   private final SiteWalletRepository siteWalletRepository;
 
-  private final CryptoValidationService cryptoValidationService;
-
   private final BCryptPasswordEncoder bCryptPasswordEncoder;
   private final ModelMapper modelMapper;
 
@@ -40,13 +37,11 @@ public class EmployeeServiceImplements implements EmployeeService {
       EmployeeRepository employeeRepository,
       SiteRepository siteRepository,
       SiteWalletRepository siteWalletRepository,
-      CryptoValidationService cryptoValidationService,
       BCryptPasswordEncoder bCryptPasswordEncoder,
       ModelMapper modelMapper) {
     this.employeeRepository = employeeRepository;
     this.siteRepository = siteRepository;
     this.siteWalletRepository = siteWalletRepository;
-    this.cryptoValidationService = cryptoValidationService;
     this.bCryptPasswordEncoder = bCryptPasswordEncoder;
     this.modelMapper = modelMapper;
   }
@@ -107,7 +102,7 @@ public class EmployeeServiceImplements implements EmployeeService {
     if (employeeUpdateDTO.getPassword().isEmpty()) {
       return toEmployeeDTO(
           employeeRepository.save(
-              Employee.builder()
+              employee.toBuilder()
                   .id(employeeUpdateDTO.getId())
                   .department(employeeUpdateDTO.getDepartment())
                   .level(employeeUpdateDTO.getLevel())
@@ -118,7 +113,7 @@ public class EmployeeServiceImplements implements EmployeeService {
     } else {
       return toEmployeeDTO(
           employeeRepository.save(
-              Employee.builder()
+              employee.toBuilder()
                   .id(employeeUpdateDTO.getId())
                   .department(employeeUpdateDTO.getDepartment())
                   .level(employeeUpdateDTO.getLevel())

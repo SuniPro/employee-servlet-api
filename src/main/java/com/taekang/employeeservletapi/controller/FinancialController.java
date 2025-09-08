@@ -21,11 +21,10 @@ import org.springframework.web.bind.annotation.*;
 public class FinancialController {
 
   private static final String DEFAULT_ACCESS =
-      "hasAnyAuthority('LEVEL_ADMINISTRATOR','LEVEL_MANAGER', 'LEVEL_OFFICEMANAGER',"
-          + " 'LEVEL_SENIORMANAGER')";
+      "hasAnyAuthority('LEVEL_DEVELOPER','LEVEL_ADMINISTRATOR','LEVEL_MANAGER', 'LEVEL_STAFF')";
 
   private static final String MANAGER_ACCESS =
-      "hasAnyAuthority('LEVEL_ADMINISTRATOR','LEVEL_MANAGER')";
+      "hasAnyAuthority('LEVEL_DEVELOPER','LEVEL_ADMINISTRATOR','LEVEL_MANAGER')";
 
   private final CryptoService cryptoService;
   private final JwtUtil jwtUtil;

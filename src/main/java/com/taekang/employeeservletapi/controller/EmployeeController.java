@@ -21,7 +21,7 @@ import org.springframework.web.bind.annotation.*;
 public class EmployeeController {
 
   private static final String MANAGER_ACCESS =
-      "hasAnyAuthority('LEVEL_ADMINISTRATOR','LEVEL_MANAGER')";
+      "hasAnyAuthority('LEVEL_DEVELOPER','LEVEL_ADMINISTRATOR','LEVEL_MANAGER')";
 
   private final EmployeeService employeeService;
   private final JwtUtil jwtUtil;
@@ -46,7 +46,7 @@ public class EmployeeController {
   @PreAuthorize(MANAGER_ACCESS)
   @PutMapping("update")
   public ResponseEntity<EmployeeDTO> updateEmployee(
-      @CookieValue String token, @RequestBody EmployeeUpdateDTO employeeUpdateDTO) {
+      @CookieValue("access-token") String token, @RequestBody EmployeeUpdateDTO employeeUpdateDTO) {
     String name = jwtUtil.getEmployeeName(token);
     return ResponseEntity.ok().body(employeeService.updateEmployee(name, employeeUpdateDTO));
   }

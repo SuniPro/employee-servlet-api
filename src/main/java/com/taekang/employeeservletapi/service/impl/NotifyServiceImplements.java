@@ -48,7 +48,6 @@ public class NotifyServiceImplements implements NotifyService {
                 .level(notifyDTO.getLevel())
                 .writer(notifyDTO.getWriter())
                 .site(notifyDTO.getSite())
-                .insertDateTime(LocalDateTime.now(ZoneId.of("Asia/Singapore")).minusHours(1))
                 .build());
 
     List<Employee> targets =
@@ -72,7 +71,6 @@ public class NotifyServiceImplements implements NotifyService {
             .title(notifyDTO.getTitle())
             .contents(notifyDTO.getContents())
             .site(notifyDTO.getSite())
-            .updateDateTime(LocalDateTime.now(ZoneId.of("Asia/Singapore")).minusHours(1))
             .build();
     return notifyRepository.save(notify);
   }

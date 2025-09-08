@@ -30,29 +30,19 @@ public class CryptoServiceImplements implements CryptoService {
 
   private final CryptoDepositRepository cryptoDepositRepository;
 
-  private final CryptoBalanceAPI cryptoBalanceAPI;
-
   private final MessageProducer messageProducer;
   private final ModelMapper modelMapper;
-  private final SiteRepository siteRepository;
-  private final SiteWalletRepository siteWalletRepository;
 
   @Autowired
   public CryptoServiceImplements(
       CryptoAccountRepository cryptoAccountRepository,
       CryptoDepositRepository cryptoDepositRepository,
-      CryptoBalanceAPI cryptoBalanceAPI,
       MessageProducer messageProducer,
-      ModelMapper modelMapper,
-      SiteRepository siteRepository,
-      SiteWalletRepository siteWalletRepository) {
+      ModelMapper modelMapper) {
     this.cryptoAccountRepository = cryptoAccountRepository;
     this.cryptoDepositRepository = cryptoDepositRepository;
-    this.cryptoBalanceAPI = cryptoBalanceAPI;
     this.messageProducer = messageProducer;
     this.modelMapper = modelMapper;
-    this.siteRepository = siteRepository;
-    this.siteWalletRepository = siteWalletRepository;
   }
 
   private CryptoAccountDTO toCryptoAccountDTO(CryptoAccount cryptoAccount) {

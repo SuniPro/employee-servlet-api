@@ -1,8 +1,9 @@
 package com.taekang.employeeservletapi.entity.employee;
 
+import com.taekang.employeeservletapi.entity.BaseTimeEntity;
 import jakarta.persistence.*;
-import java.time.LocalDateTime;
 import lombok.*;
+import java.time.LocalDateTime;
 
 @Getter
 @Entity
@@ -10,7 +11,7 @@ import lombok.*;
 @NoArgsConstructor(access = AccessLevel.PROTECTED)
 @AllArgsConstructor(access = AccessLevel.PRIVATE) // 빌더 사용 시 필수
 @Builder(toBuilder = true)
-public class Notify {
+public class Notify extends BaseTimeEntity {
 
   @Id
   @Column(name = "id")
@@ -31,12 +32,6 @@ public class Notify {
 
   @Column(name = "site", nullable = false)
   private String site;
-
-  @Column(name = "insert_date_time", nullable = false)
-  private LocalDateTime insertDateTime;
-
-  @Column(name = "update_date_time")
-  private LocalDateTime updateDateTime;
 
   @Column(name = "delete_date_time")
   private LocalDateTime deleteDateTime;

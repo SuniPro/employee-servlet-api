@@ -46,8 +46,7 @@ public class AuthController {
     ResponseCookie accessCookie =
         ResponseCookie.from("access-token", tokenResponse.getAccessToken())
             .httpOnly(true)
-            //                    일단 프로토타입은 Http도 혀용
-            //                    .secure(true)
+            .secure(true)
             .domain(adminDomain)
             .path("/")
             .maxAge(tokenResponse.getAccessTokenExpiresIn())
@@ -58,8 +57,7 @@ public class AuthController {
     ResponseCookie refreshCookie =
         ResponseCookie.from("refresh-token", tokenResponse.getRefreshToken())
             .httpOnly(true)
-            //                    일단 프로토타입은 Http도 혀용
-            //                    .secure(true)
+            .secure(true)
             .domain(adminDomain)
             .path("/")
             .maxAge(tokenResponse.getRefreshTokenExpiresIn())
@@ -91,8 +89,7 @@ public class AuthController {
     ResponseCookie accessCookie =
         ResponseCookie.from("access-token", tokenResponse.getAccessToken())
             .httpOnly(true)
-            //                    일단 프로토타입은 Http도 혀용
-            //                    .secure(true)
+            .secure(true)
             .domain(adminDomain)
             .path("/")
             .maxAge(tokenResponse.getAccessTokenExpiresIn())
@@ -103,8 +100,7 @@ public class AuthController {
     ResponseCookie refreshCookie =
         ResponseCookie.from("refresh-token", tokenResponse.getRefreshToken())
             .httpOnly(true)
-            //                    일단 프로토타입은 Http도 혀용
-            //                    .secure(true)
+            .secure(true)
             .domain(adminDomain)
             .path("/")
             .maxAge(tokenResponse.getRefreshTokenExpiresIn())

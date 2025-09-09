@@ -173,11 +173,9 @@ public class FinancialController {
   @PreAuthorize(DEFAULT_ACCESS)
   @GetMapping("get/crypto/account/wallet/{cryptoWallet}")
   public ResponseEntity<CryptoAccountDTO> getCryptoAccountByCryptoWallet(
-      @PageableDefault(size = 10, sort = "insertDateTime", direction = Sort.Direction.DESC)
-          Pageable pageable,
       @PathVariable String cryptoWallet) {
     return ResponseEntity.ok()
-        .body(cryptoService.getCryptoAccountByCryptoWallet(cryptoWallet, pageable));
+        .body(cryptoService.getCryptoAccountByCryptoWallet(cryptoWallet));
   }
 
   @PreAuthorize(DEFAULT_ACCESS)

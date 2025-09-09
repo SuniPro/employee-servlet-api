@@ -204,7 +204,7 @@ public class CryptoServiceImplements implements CryptoService {
 
   @Override
   @Transactional(readOnly = true)
-  public CryptoAccountDTO getCryptoAccountByCryptoWallet(String cryptoWallet, Pageable pageable) {
+  public CryptoAccountDTO getCryptoAccountByCryptoWallet(String cryptoWallet) {
     CryptoAccount cryptoAccount =
         cryptoAccountRepository
             .findByCryptoWallet(cryptoWallet)

@@ -212,8 +212,8 @@ public class SiteServiceImpl implements SiteService {
               cryptoBalanceAPI.getBalance(wallet.getChainType(), wallet.getCryptoWallet());
 
           List<CryptoDeposit> deposits =
-              cryptoDepositRepository.findByCryptoAccount_SiteAndRequestedAtBetween(
-                  site, beforeOneWeeks, beforeOneWeeks);
+              cryptoDepositRepository.findByToAddressAndRequestedAtBetween(
+                      wallet.getCryptoWallet(), beforeOneWeeks, now);
 
           BigDecimal weeksDepositAmount = BigDecimal.ZERO;
           BigDecimal todayDepositAmount = BigDecimal.ZERO;
@@ -221,7 +221,7 @@ public class SiteServiceImpl implements SiteService {
           LocalDate today = now.toLocalDate();
 
           for (CryptoDeposit deposit : deposits) {
-            BigDecimal amount = deposit.getKrwAmount();
+            BigDecimal amount = deposit.getAmount();
             weeksDepositAmount = weeksDepositAmount.add(amount);
 
             // 날짜가 오늘과 같은 경우

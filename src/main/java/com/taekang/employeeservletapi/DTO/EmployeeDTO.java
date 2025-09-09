@@ -16,6 +16,8 @@ public class EmployeeDTO {
 
   private Department department;
 
+  private String site;
+
   private Level level;
 
   private String name;

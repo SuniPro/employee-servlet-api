@@ -60,7 +60,7 @@ public interface CryptoService {
 
   List<CryptoAccountDTO> getCryptoAccountByEmailAndSite(String email, String site);
 
-  CryptoAccountDTO getCryptoAccountByCryptoWallet(String cryptoWallet, Pageable pageable);
+  CryptoAccountDTO getCryptoAccountByCryptoWallet(String cryptoWallet);
 
   Page<CryptoDepositDTO> getDepositsBySite(String site, Pageable pageable);
 

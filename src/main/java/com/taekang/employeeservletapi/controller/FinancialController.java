@@ -173,11 +173,8 @@ public class FinancialController {
   @PreAuthorize(DEFAULT_ACCESS)
   @GetMapping("get/crypto/account/wallet/{cryptoWallet}")
   public ResponseEntity<CryptoAccountDTO> getCryptoAccountByCryptoWallet(
-      @PageableDefault(size = 10, sort = "insertDateTime", direction = Sort.Direction.DESC)
-          Pageable pageable,
       @PathVariable String cryptoWallet) {
-    return ResponseEntity.ok()
-        .body(cryptoService.getCryptoAccountByCryptoWallet(cryptoWallet, pageable));
+    return ResponseEntity.ok().body(cryptoService.getCryptoAccountByCryptoWallet(cryptoWallet));
   }
 
   @PreAuthorize(DEFAULT_ACCESS)
@@ -211,13 +208,15 @@ public class FinancialController {
 
   @PreAuthorize(DEFAULT_ACCESS)
   @PostMapping("create/crypto/deposit/sent")
-  public ResponseEntity<CryptoDepositDTO> createSentDeposit(@RequestBody CryptoDepositDTO cryptoDepositDTO) {
+  public ResponseEntity<CryptoDepositDTO> createSentDeposit(
+      @RequestBody CryptoDepositDTO cryptoDepositDTO) {
     return ResponseEntity.ok().body(cryptoService.createSentDeposit(cryptoDepositDTO));
   }
 
   @PreAuthorize(DEFAULT_ACCESS)
   @PostMapping("create/crypto/deposit/not/sent")
-  public ResponseEntity<CryptoDepositDTO> createNotSentDeposit(@RequestBody CryptoDepositDTO cryptoDepositDTO) {
+  public ResponseEntity<CryptoDepositDTO> createNotSentDeposit(
+      @RequestBody CryptoDepositDTO cryptoDepositDTO) {
     return ResponseEntity.ok().body(cryptoService.createNotSentDeposit(cryptoDepositDTO));
   }
 

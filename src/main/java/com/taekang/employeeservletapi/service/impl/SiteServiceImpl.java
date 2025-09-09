@@ -213,7 +213,7 @@ public class SiteServiceImpl implements SiteService {
 
           List<CryptoDeposit> deposits =
               cryptoDepositRepository.findByToAddressAndRequestedAtBetween(
-                      wallet.getCryptoWallet(), beforeOneWeeks, now);
+                  wallet.getCryptoWallet(), beforeOneWeeks, now);
 
           BigDecimal weeksDepositAmount = BigDecimal.ZERO;
           BigDecimal todayDepositAmount = BigDecimal.ZERO;

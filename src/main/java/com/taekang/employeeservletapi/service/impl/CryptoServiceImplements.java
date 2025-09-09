@@ -178,7 +178,7 @@ public class CryptoServiceImplements implements CryptoService {
             .email(cryptoAccount.getEmail())
             .cryptoType(save.getCryptoType())
             .amount(save.getAmount())
-                .realAmount(save.getRealAmount())
+            .realAmount(save.getRealAmount())
             .requestAt(save.getRequestedAt())
             .build();
 
@@ -277,10 +277,14 @@ public class CryptoServiceImplements implements CryptoService {
 
   @Override
   @Transactional
-  public CryptoDepositDTO createSentDeposit(CryptoDepositDTO cryptoDepositDTO){
-    CryptoAccount cryptoAccount = cryptoAccountRepository.findByCryptoWallet(cryptoDepositDTO.getFromAddress()).orElseThrow(CannotFoundWalletException::new);
+  public CryptoDepositDTO createSentDeposit(CryptoDepositDTO cryptoDepositDTO) {
+    CryptoAccount cryptoAccount =
+        cryptoAccountRepository
+            .findByCryptoWallet(cryptoDepositDTO.getFromAddress())
+            .orElseThrow(CannotFoundWalletException::new);
 
-    CryptoDeposit build = CryptoDeposit.builder()
+    CryptoDeposit build =
+        CryptoDeposit.builder()
             .status(TransactionStatus.CONFIRMED)
             .cryptoAccount(cryptoAccount)
             .chainType(cryptoDepositDTO.getChainType())
@@ -303,10 +307,14 @@ public class CryptoServiceImplements implements CryptoService {
 
   @Override
   @Transactional
-  public CryptoDepositDTO createNotSentDeposit(CryptoDepositDTO cryptoDepositDTO){
-    CryptoAccount cryptoAccount = cryptoAccountRepository.findByCryptoWallet(cryptoDepositDTO.getFromAddress()).orElseThrow(CannotFoundWalletException::new);
+  public CryptoDepositDTO createNotSentDeposit(CryptoDepositDTO cryptoDepositDTO) {
+    CryptoAccount cryptoAccount =
+        cryptoAccountRepository
+            .findByCryptoWallet(cryptoDepositDTO.getFromAddress())
+            .orElseThrow(CannotFoundWalletException::new);
 
-    CryptoDeposit build = CryptoDeposit.builder()
+    CryptoDeposit build =
+        CryptoDeposit.builder()
             .status(TransactionStatus.PENDING)
             .cryptoAccount(cryptoAccount)
             .chainType(cryptoDepositDTO.getChainType())

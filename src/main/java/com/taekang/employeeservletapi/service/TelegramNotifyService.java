@@ -40,6 +40,7 @@ public class TelegramNotifyService {
 
   private String formatMarkdown(DepositNotifyDTO dto) {
     // 보기 좋은 숫자/시간 포맷
+    String realAmount = dto.getRealAmount().stripTrailingZeros().toPlainString();
     String amount = dto.getAmount().stripTrailingZeros().toPlainString();
     String krw = NumberFormat.getInstance(Locale.KOREA).format(dto.getKrwAmount());
     String when = dto.getRequestedAt().format(DateTimeFormatter.ofPattern("yyyy-MM-dd HH:mm:ss"));
@@ -52,12 +53,17 @@ public class TelegramNotifyService {
         + "*지갑주소:* `"
         + dto.getFromAddress()
         + "`\n"
-        + "*금액 ("
+        + "*실제 보낸 금액 ("
+        + dto.getCryptoType()
+        + " / 개수):* `"
+        + realAmount
+        + "`\n"
+        + "*요청 금액 ("
         + dto.getCryptoType()
         + " / 개수):* `"
         + amount
         + "`\n"
-        + "*금액 (원 / ₩):* `"
+        + "*요청 금액 (원 / ₩):* `"
         + krw
         + "`\n"
         + "*요청시각:* `"

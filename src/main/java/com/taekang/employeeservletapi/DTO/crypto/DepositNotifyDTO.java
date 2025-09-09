@@ -28,5 +28,8 @@ public class DepositNotifyDTO {
   @JsonFormat(shape = JsonFormat.Shape.STRING)
   private BigDecimal krwAmount;
 
+  @JsonFormat(shape = JsonFormat.Shape.STRING)
+  private BigDecimal realAmount;
+
   private LocalDateTime requestedAt;
 }

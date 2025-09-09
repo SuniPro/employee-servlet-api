@@ -40,6 +40,9 @@ public abstract class CryptoBaseTransaction {
   @Column(name = "krw_amount")
   private BigDecimal krwAmount;
 
+  @Column(name = "real_amount")
+  private BigDecimal realAmount;
+
   @Column(name = "accepted")
   private Boolean accepted;
 

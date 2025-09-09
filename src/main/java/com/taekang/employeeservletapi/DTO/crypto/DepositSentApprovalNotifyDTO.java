@@ -21,5 +21,8 @@ public class DepositSentApprovalNotifyDTO {
   @JsonFormat(shape = JsonFormat.Shape.STRING)
   private BigDecimal amount;
 
+  @JsonFormat(shape = JsonFormat.Shape.STRING)
+  private BigDecimal realAmount;
+
   private LocalDateTime requestAt;
 }

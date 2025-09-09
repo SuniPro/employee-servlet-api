@@ -122,7 +122,7 @@ public class FinancialController {
                 isSend, address, start, end, pageable));
   }
 
-  @PreAuthorize("hasAnyAuthority('LEVEL_ADMINISTRATOR')")
+  @PreAuthorize(DEFAULT_ACCESS)
   @DeleteMapping("delete/deposit/{id}")
   public void deleteDeposit(@PathVariable Long id) {
     cryptoService.deleteDepositById(id);
@@ -207,6 +207,18 @@ public class FinancialController {
       @PathVariable String email,
       @PathVariable String site) {
     return ResponseEntity.ok().body(cryptoService.getDepositsByEmailAndSite(email, site, pageable));
+  }
+
+  @PreAuthorize(DEFAULT_ACCESS)
+  @PostMapping("create/crypto/deposit/sent")
+  public ResponseEntity<CryptoDepositDTO> createSentDeposit(@RequestBody CryptoDepositDTO cryptoDepositDTO) {
+    return ResponseEntity.ok().body(cryptoService.createSentDeposit(cryptoDepositDTO));
+  }
+
+  @PreAuthorize(DEFAULT_ACCESS)
+  @PostMapping("create/crypto/deposit/not/sent")
+  public ResponseEntity<CryptoDepositDTO> createNotSentDeposit(@RequestBody CryptoDepositDTO cryptoDepositDTO) {
+    return ResponseEntity.ok().body(cryptoService.createNotSentDeposit(cryptoDepositDTO));
   }
 
   @PreAuthorize(DEFAULT_ACCESS)

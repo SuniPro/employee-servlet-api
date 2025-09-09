@@ -68,6 +68,10 @@ public interface CryptoService {
 
   Page<CryptoDepositDTO> getDepositsByEmailAndSite(String email, String site, Pageable pageable);
 
+  CryptoDepositDTO createSentDeposit(CryptoDepositDTO cryptoDepositDTO);
+
+  CryptoDepositDTO createNotSentDeposit(CryptoDepositDTO cryptoDepositDTO);
+
   /* 특정 지갑의 입금내역 조회 */
   Page<CryptoDepositDTO> getDepositsByCryptoWalletAndSite(
       String cryptoWallet, String site, Pageable pageable);

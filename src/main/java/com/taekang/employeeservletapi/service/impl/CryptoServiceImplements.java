@@ -6,6 +6,7 @@ import com.taekang.employeeservletapi.entity.user.CryptoAccount;
 import com.taekang.employeeservletapi.entity.user.CryptoDeposit;
 import com.taekang.employeeservletapi.entity.user.TransactionStatus;
 import com.taekang.employeeservletapi.error.AccountNotFoundException;
+import com.taekang.employeeservletapi.error.CannotFoundWalletException;
 import com.taekang.employeeservletapi.rabbitMQ.MessageProducer;
 import com.taekang.employeeservletapi.repository.user.CryptoAccountRepository;
 import com.taekang.employeeservletapi.repository.user.CryptoDepositRepository;
@@ -18,6 +19,7 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.Pageable;
 import org.springframework.stereotype.Service;
+import org.springframework.transaction.annotation.Transactional;
 
 @Slf4j
 @Service
@@ -51,11 +53,13 @@ public class CryptoServiceImplements implements CryptoService {
   }
 
   @Override
+  @Transactional(readOnly = true)
   public Page<CryptoAccountDTO> getCryptoAccountList(Pageable pageable) {
     return cryptoAccountRepository.findAll(pageable).map(this::toCryptoAccountDTO);
   }
 
   @Override
+  @Transactional(readOnly = true)
   public List<CryptoAccountDTO> getCryptoAccountByEmail(String email) {
     List<CryptoAccountDTO> result = new ArrayList<>();
     CryptoAccount cryptoAccount =
@@ -66,6 +70,7 @@ public class CryptoServiceImplements implements CryptoService {
   }
 
   @Override
+  @Transactional(readOnly = true)
   public Page<CryptoDepositDTO> getDepositsByCryptoWallet(String cryptoWallet, Pageable pageable) {
     return cryptoDepositRepository
         .findByCryptoAccount_CryptoWallet(cryptoWallet, pageable)
@@ -73,6 +78,7 @@ public class CryptoServiceImplements implements CryptoService {
   }
 
   @Override
+  @Transactional(readOnly = true)
   public Page<CryptoDepositDTO> getDepositsByToAddressAndStatus(
       TransactionStatus status, String toAddress, Pageable pageable) {
     return cryptoDepositRepository
@@ -81,6 +87,7 @@ public class CryptoServiceImplements implements CryptoService {
   }
 
   @Override
+  @Transactional(readOnly = true)
   public Page<CryptoDepositDTO> getDepositsByFromAddressAndStatus(
       TransactionStatus status, String fromAddress, Pageable pageable) {
     return cryptoDepositRepository
@@ -89,6 +96,7 @@ public class CryptoServiceImplements implements CryptoService {
   }
 
   @Override
+  @Transactional(readOnly = true)
   public Page<CryptoDepositDTO> getDepositsInRange(
       LocalDateTime start, LocalDateTime end, Pageable pageable) {
     return cryptoDepositRepository
@@ -97,6 +105,7 @@ public class CryptoServiceImplements implements CryptoService {
   }
 
   @Override
+  @Transactional(readOnly = true)
   public Page<CryptoDepositDTO> getDepositsInRangeByToAddressAndIsSend(
       boolean isSend, String toAddress, LocalDateTime start, LocalDateTime end, Pageable pageable) {
     return cryptoDepositRepository
@@ -106,6 +115,7 @@ public class CryptoServiceImplements implements CryptoService {
   }
 
   @Override
+  @Transactional(readOnly = true)
   public Page<CryptoDepositDTO> getDepositsInRangeByFromAddressAndIsSend(
       boolean isSend,
       String fromAddress,
@@ -119,11 +129,13 @@ public class CryptoServiceImplements implements CryptoService {
   }
 
   @Override
+  @Transactional
   public void deleteDepositById(Long depositId) {
     cryptoDepositRepository.deleteById(depositId);
   }
 
   @Override
+  @Transactional
   public void updateSite(UpdateSiteDTO updateSiteDTO) {
     CryptoAccount cryptoAccount =
         cryptoAccountRepository
@@ -133,6 +145,7 @@ public class CryptoServiceImplements implements CryptoService {
   }
 
   @Override
+  @Transactional
   public void updateMemo(UpdateMemoDTO updateMemoDTO) {
     CryptoAccount cryptoAccount =
         cryptoAccountRepository
@@ -142,6 +155,7 @@ public class CryptoServiceImplements implements CryptoService {
   }
 
   @Override
+  @Transactional
   public Boolean updateSend(UpdateIsSendDTO updateIsSendDTO) {
     CryptoDeposit cryptoDeposit =
         cryptoDepositRepository
@@ -164,6 +178,7 @@ public class CryptoServiceImplements implements CryptoService {
             .email(cryptoAccount.getEmail())
             .cryptoType(save.getCryptoType())
             .amount(save.getAmount())
+                .realAmount(save.getRealAmount())
             .requestAt(save.getRequestedAt())
             .build();
 
@@ -172,6 +187,7 @@ public class CryptoServiceImplements implements CryptoService {
   }
 
   @Override
+  @Transactional
   public CryptoAccountDTO updateCryptoWallet(UpdateCryptoWalletDTO updateCryptoWalletDTO) {
     CryptoAccount cryptoAccount =
         cryptoAccountRepository
@@ -187,6 +203,7 @@ public class CryptoServiceImplements implements CryptoService {
   }
 
   @Override
+  @Transactional(readOnly = true)
   public CryptoAccountDTO getCryptoAccountByCryptoWallet(String cryptoWallet, Pageable pageable) {
     CryptoAccount cryptoAccount =
         cryptoAccountRepository
@@ -196,11 +213,13 @@ public class CryptoServiceImplements implements CryptoService {
   }
 
   @Override
+  @Transactional(readOnly = true)
   public Page<CryptoAccountDTO> getCryptoAccountListBySite(String site, Pageable pageable) {
     return cryptoAccountRepository.findBySite(site, pageable).map(this::toCryptoAccountDTO);
   }
 
   @Override
+  @Transactional(readOnly = true)
   public List<CryptoAccountDTO> getCryptoAccountByEmailAndSite(String email, String site) {
     List<CryptoAccountDTO> result = new ArrayList<>();
     CryptoAccount cryptoAccount =
@@ -213,6 +232,7 @@ public class CryptoServiceImplements implements CryptoService {
   }
 
   @Override
+  @Transactional(readOnly = true)
   public Page<CryptoDepositDTO> getDepositsBySite(String site, Pageable pageable) {
     return cryptoDepositRepository
         .findByCryptoAccount_Site(site, pageable)
@@ -220,6 +240,7 @@ public class CryptoServiceImplements implements CryptoService {
   }
 
   @Override
+  @Transactional(readOnly = true)
   public Page<CryptoDepositDTO> getSendDepositsBySite(
       String site, boolean send, Pageable pageable) {
     return cryptoDepositRepository
@@ -228,6 +249,7 @@ public class CryptoServiceImplements implements CryptoService {
   }
 
   @Override
+  @Transactional(readOnly = true)
   public Page<CryptoDepositDTO> getDepositsByToAddressAndIsSendAndSite(
       String toAddress, boolean isSend, String site, Pageable pageable) {
     return cryptoDepositRepository
@@ -236,6 +258,7 @@ public class CryptoServiceImplements implements CryptoService {
   }
 
   @Override
+  @Transactional(readOnly = true)
   public Page<CryptoDepositDTO> getDepositsByFromAddressAndIsSendAndSite(
       String fromAddress, boolean isSend, String site, Pageable pageable) {
     return cryptoDepositRepository
@@ -244,6 +267,7 @@ public class CryptoServiceImplements implements CryptoService {
   }
 
   @Override
+  @Transactional(readOnly = true)
   public Page<CryptoDepositDTO> getDepositsByEmailAndSite(
       String email, String site, Pageable pageable) {
     return cryptoDepositRepository
@@ -252,6 +276,59 @@ public class CryptoServiceImplements implements CryptoService {
   }
 
   @Override
+  @Transactional
+  public CryptoDepositDTO createSentDeposit(CryptoDepositDTO cryptoDepositDTO){
+    CryptoAccount cryptoAccount = cryptoAccountRepository.findByCryptoWallet(cryptoDepositDTO.getFromAddress()).orElseThrow(CannotFoundWalletException::new);
+
+    CryptoDeposit build = CryptoDeposit.builder()
+            .status(TransactionStatus.CONFIRMED)
+            .cryptoAccount(cryptoAccount)
+            .chainType(cryptoDepositDTO.getChainType())
+            .cryptoType(cryptoDepositDTO.getCryptoType())
+            .fromAddress(cryptoDepositDTO.getFromAddress())
+            .toAddress(cryptoDepositDTO.getToAddress())
+            .amount(cryptoDepositDTO.getAmount())
+            .krwAmount(cryptoDepositDTO.getKrwAmount())
+            .realAmount(cryptoDepositDTO.getRealAmount())
+            .accepted(true)
+            .acceptedAt(LocalDateTime.now())
+            .requestedAt(LocalDateTime.now())
+            .isSend(true)
+            .build();
+
+    CryptoDeposit save = cryptoDepositRepository.save(build);
+
+    return modelMapper.map(save, CryptoDepositDTO.class);
+  }
+
+  @Override
+  @Transactional
+  public CryptoDepositDTO createNotSentDeposit(CryptoDepositDTO cryptoDepositDTO){
+    CryptoAccount cryptoAccount = cryptoAccountRepository.findByCryptoWallet(cryptoDepositDTO.getFromAddress()).orElseThrow(CannotFoundWalletException::new);
+
+    CryptoDeposit build = CryptoDeposit.builder()
+            .status(TransactionStatus.PENDING)
+            .cryptoAccount(cryptoAccount)
+            .chainType(cryptoDepositDTO.getChainType())
+            .cryptoType(cryptoDepositDTO.getCryptoType())
+            .fromAddress(cryptoDepositDTO.getFromAddress())
+            .toAddress(cryptoDepositDTO.getToAddress())
+            .amount(cryptoDepositDTO.getAmount())
+            .krwAmount(cryptoDepositDTO.getKrwAmount())
+            .realAmount(cryptoDepositDTO.getRealAmount())
+            .accepted(true)
+            .acceptedAt(LocalDateTime.now())
+            .requestedAt(LocalDateTime.now())
+            .isSend(false)
+            .build();
+
+    CryptoDeposit save = cryptoDepositRepository.save(build);
+
+    return modelMapper.map(save, CryptoDepositDTO.class);
+  }
+
+  @Override
+  @Transactional(readOnly = true)
   public Page<CryptoDepositDTO> getDepositsByCryptoWalletAndSite(
       String cryptoWallet, String site, Pageable pageable) {
     return cryptoDepositRepository
@@ -260,6 +337,7 @@ public class CryptoServiceImplements implements CryptoService {
   }
 
   @Override
+  @Transactional(readOnly = true)
   public Page<CryptoDepositDTO> getDepositsByToAddressAndSite(
       String toAddress, String site, Pageable pageable) {
     return cryptoDepositRepository
@@ -268,6 +346,7 @@ public class CryptoServiceImplements implements CryptoService {
   }
 
   @Override
+  @Transactional(readOnly = true)
   public Page<CryptoDepositDTO> getDepositsByFromAddressAndSite(
       String fromAddress, String site, Pageable pageable) {
     return cryptoDepositRepository
@@ -276,6 +355,7 @@ public class CryptoServiceImplements implements CryptoService {
   }
 
   @Override
+  @Transactional(readOnly = true)
   public Page<CryptoDepositDTO> getSendDepositsByCryptoWalletAndSite(
       String cryptoWallet, String site, boolean isSend, Pageable pageable) {
     return cryptoDepositRepository
@@ -285,6 +365,7 @@ public class CryptoServiceImplements implements CryptoService {
   }
 
   @Override
+  @Transactional(readOnly = true)
   public Page<CryptoDepositDTO> getDepositsInRangeBySite(
       LocalDateTime start, LocalDateTime end, String site, Pageable pageable) {
     return cryptoDepositRepository
@@ -294,6 +375,7 @@ public class CryptoServiceImplements implements CryptoService {
   }
 
   @Override
+  @Transactional(readOnly = true)
   public Page<CryptoDepositDTO> getDepositsInRangeByToAddressAndIsSendAndSite(
       boolean isSend,
       String toAddress,
@@ -308,6 +390,7 @@ public class CryptoServiceImplements implements CryptoService {
   }
 
   @Override
+  @Transactional(readOnly = true)
   public Page<CryptoDepositDTO> getDepositsInRangeByFromAddressAndIsSendAndSite(
       boolean isSend,
       String fromAddress,

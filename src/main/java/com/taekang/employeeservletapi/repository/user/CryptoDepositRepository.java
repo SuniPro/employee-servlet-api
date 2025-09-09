@@ -33,8 +33,8 @@ public interface CryptoDepositRepository extends JpaRepository<CryptoDeposit, Lo
 
   Long countAllByCryptoAccount_Site(String site);
 
-  List<CryptoDeposit> findByCryptoAccount_SiteAndRequestedAtBetween(
-      String cryptoAccountSite, LocalDateTime requestedAtAfter, LocalDateTime requestedAtBefore);
+  List<CryptoDeposit> findByToAddressAndRequestedAtBetween(
+      String fromAddress, LocalDateTime requestedAtAfter, LocalDateTime requestedAtBefore);
 
   Page<CryptoDeposit> findByCryptoAccount_Site(String cryptoAccountSite, Pageable pageable);
 
